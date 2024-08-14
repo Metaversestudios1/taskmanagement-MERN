@@ -59,10 +59,8 @@ app.get('/protected', auth, (req, res) => {
   });
 
 
-app.use('/', async (req, res) => {
-  
+app.use('/', async (req, res) => {  
       res.json('ok');
-   
   });
 const port  = process.env.PORT || 3000;
 
