@@ -1,71 +1,87 @@
 const express = require('express');
-const dotenv = require('dotenv');
-const connectDB = require('./config/db');
-const cors = require('cors');
-require('dotenv').config();
-const auth = require('./Middleware/auth'); // Adjust the path as needed
-const session= require('express-session');
-const cookieParser = require('cookie-parser');
-const app = express();
-app.use(express.json());
-app.use(cookieParser());
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const Employee = require('./models/Employee'); // Import the Employee model
+// Define a schema and model
 
-dotenv.config();
-connectDB();
+//const Employee = mongoose.model('Employee', employeeSchema);
 
-const corsOptions = {
-    origin: 'http://localhost:3001', // specify the allowed origin
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // specify the allowed methods
-    credentials: true, // include credentials like cookies in the request
-    
+// Define a controller with data handling functions
+const insertEmployee = async (employeeData) => {
+  try {
+    const newEmployee = new Employee(employeeData);
+    return await newEmployee.save();
+  } catch (err) {
+    throw new Error('Error inserting data: ' + err.message);
+  }
 };
- 
-// Enable CORS with specific options
-app.use(cors(corsOptions)); 
 
-app.use(session({
-  secret: process.env.SESSION_SECRET, // Use session secret from environment variables
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false } // Set to true if using HTTPS
-}));
+const getAllEmployees = async () => {
+  try {
+    return await Employee.find();
+  } catch (err) {
+    throw new Error('Error fetching data: ' + err.message);
+  }
+};
+const deleteEmployee = async () => {
+    try {
+      return await Employee.findByIdAndDelete();
+    } catch (err) {
+      throw new Error('Error fetching data: ' + err.message);
+    }
+  };
 
-app.use(express.urlencoded({ extended: true }));
+// Initialize Express app
+const app = express();
+const port = 3000;
 
-// Serve static files from the 'uploads' directory
-app.use('/uploads', express.static('uploads'));
+// Middleware
+app.use(bodyParser.json()); // Parse JSON bodies
 
-const dashboardRoutes = require('./routes/dashboardRoutes');
-const employeeRoutes = require('./routes/EmployeeRoutes')
-const projectRoutes = require('./routes/ProjectRoutes')
-const roleRoutes = require('./routes/RoleRoutes')
-const PermissionRoutes = require('./routes/PermissionRoutes')
-const TaskRoutes = require('./routes/TaskRoutes');
-const AttendenceRoutes = require('./routes/AttendenceRoutes');
-const LeaveRoutes = require('./routes/LeaveRoutes');
+// Replace this with your MongoDB connection string
+const uri = 'mongodb://localhost:27017/taskmanagment';
 
-app.use('/api', dashboardRoutes);
-app.use('/api',employeeRoutes);
-app.use('/api', projectRoutes);
-app.use('/api', roleRoutes);
-app.use('/api', PermissionRoutes);
-app.use('/api', TaskRoutes);
-app.use('/api', AttendenceRoutes);
-app.use('/api', LeaveRoutes);
-
-
-app.get('/protected', auth, (req, res) => {
-    res.json({success: true, message: "you are authorize", user: req.user});
-  });
-
-
-app.use('/', async (req, res) => {  
-      res.json('ok');
-  });
-const port  = process.env.PORT || 3000;
-
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+// Connect to MongoDB
+mongoose.connect(uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
 });
 
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  console.log('Connected to MongoDB');
+});
 
+app.delete('/employees/:id', async (req, res) => {
+    try {
+      const result = await deleteEmployee(req.params.id);
+      res.json(result);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
+  });
+// Route to add an employee
+app.post('/employees', async (req, res) => {
+  try {
+    const result = await insertEmployee(req.body);
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+// Route to get all employees
+app.get('/employees', async (req, res) => {
+  try {
+    const employees = await getAllEmployees();
+    res.json(employees);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+});

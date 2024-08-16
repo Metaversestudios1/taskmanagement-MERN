@@ -7,5 +7,5 @@ router.post('/insertattendence',insertattendence);
 router.post('/updateattendence',updateattendence);
   
  router.delete('/deleteattendence', deleteattendence);
- router.get('/getSingleattendence',getSingleattendence);
+ router.post('/getSingleattendence',getSingleattendence);
 module.exports= router;

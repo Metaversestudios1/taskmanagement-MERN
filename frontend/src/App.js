@@ -1,30 +1,39 @@
+import { useState } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./App.css";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
-import Employees from "./components/Employees";
+import Employees from "./components/employees/Employees";
 import Home from "./components/Home";
-import Projects from "./components/Projects";
-import Tasks from "./components/Tasks";
-import AddProject from "./components/AddProject";
-import AddEmployee from "./components/AddEmployee";
-import AddTask from "./components/AddTask";
-import EditProject from "./components/EditProject";
-import EditEmployee from "./components/EditEmployee";
-import RolesTable from "./components/RolesTable";
-import PermissionsTable from "./components/PermissionsTable";
-import AddRole from "./components/AddRole";
-import AddPermission from "./components/AddPermission";
-import EditRole from "./components/EditRole";
-import EditPermission from "./components/EditPermission";
+import Projects from "./components/projects/Projects";
+import Tasks from "./components/tasks/Tasks";
+import AddProject from "./components/projects/AddProject";
+import AddEmployee from "./components/employees/AddEmployee";
+import AddTask from "./components/tasks/AddTask";
+import EditTask from "./components/tasks/EditTask";
+import EditProject from "./components/projects/EditProject";
+import EditEmployee from "./components/employees/EditEmployee";
+import RolesTable from "./components/roles/RolesTable";
+import PermissionsTable from "./components/permissions/PermissionsTable";
+import AddRole from "./components/roles/AddRole";
+import AddPermission from "./components/permissions/AddPermission";
+import EditRole from "./components/roles/EditRole";
+import EditPermission from "./components/permissions/EditPermission";
 import Login from "./components/Login";
 import AuthProvider from "./context/AuthContext";
 import PrivateRoute from "./components/utils/PrivateRoute";
 import Setting from "./components/Setting";
 import AdminRoute from "./components/utils/AdminRoute";
 import EmployeeRoute from "./components/utils/EmployeeRoute";
+import Attendance from "./components/attendance/Attendance";
+import LeaveHistory from "./components/leaveManagement/LeaveHistory";
+import LeaveRequests from "./components/leaveManagement/LeaveRequests";
 
 function App() {
+  const [sideBar, setSideBar] = useState(true)
+  const toggleSideBar = ()=>{
+    setSideBar(!sideBar)
+  }
   const router = createBrowserRouter([
     {
       path: "/login",
@@ -39,9 +48,9 @@ function App() {
       element: (
         <PrivateRoute>
           <div className="flex h-screen">
-            <Sidebar />
+            <Sidebar sidebar = {sideBar}/>
             <div className="flex flex-col flex-grow overflow-y-auto">
-              <Navbar />
+              <Navbar toggleSideBar = {toggleSideBar}/>
               <div className="flex-grow ">
                 <Home />
               </div>
@@ -56,9 +65,9 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar />
+              <Sidebar sidebar = {sideBar}/>
               <div className="flex flex-col flex-grow overflow-y-auto">
-                <Navbar />
+                <Navbar toggleSideBar = {toggleSideBar}/>
                 <div className="flex-grow ">
                   <Employees />
                 </div>
@@ -75,9 +84,9 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar />
+              <Sidebar sidebar = {sideBar}/>
               <div className="flex flex-col flex-grow overflow-y-auto">
-                <Navbar />
+                <Navbar toggleSideBar = {toggleSideBar}/>
                 <div className="flex-grow ">
                   <AddEmployee />
                 </div>
@@ -93,9 +102,9 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar />
+              <Sidebar sidebar = {sideBar}/>
               <div className="flex flex-col flex-grow overflow-y-auto">
-                <Navbar />
+                <Navbar toggleSideBar = {toggleSideBar}/>
                 <div className="flex-grow ">
                   <EditEmployee />
                 </div>
@@ -111,9 +120,9 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar />
+              <Sidebar sidebar = {sideBar}/>
               <div className="flex flex-col flex-grow overflow-y-auto">
-                <Navbar />
+                <Navbar toggleSideBar = {toggleSideBar}/>
                 <div className="flex-grow ">
                   <Projects />
                 </div>
@@ -129,9 +138,9 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar />
+              <Sidebar sidebar = {sideBar}/>
               <div className="flex flex-col flex-grow overflow-y-auto">
-                <Navbar />
+                <Navbar toggleSideBar = {toggleSideBar}/>
                 <div className="flex-grow ">
                   <AddProject />
                 </div>
@@ -147,9 +156,9 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar />
+              <Sidebar sidebar = {sideBar}/>
               <div className="flex flex-col flex-grow overflow-y-auto">
-                <Navbar />
+                <Navbar toggleSideBar = {toggleSideBar}/>
                 <div className="flex-grow ">
                   <EditProject />
                 </div>
@@ -165,9 +174,9 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar />
+              <Sidebar sidebar = {sideBar}/>
               <div className="flex flex-col flex-grow overflow-y-auto">
-                <Navbar />
+                <Navbar toggleSideBar = {toggleSideBar}/>
                 <div className="flex-grow ">
                   <RolesTable />
                 </div>
@@ -183,9 +192,9 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar />
+              <Sidebar sidebar = {sideBar}/>
               <div className="flex flex-col flex-grow overflow-y-auto">
-                <Navbar />
+                <Navbar toggleSideBar = {toggleSideBar}/>
                 <div className="flex-grow ">
                   <AddRole />
                 </div>
@@ -201,9 +210,9 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar />
+              <Sidebar sidebar = {sideBar}/>
               <div className="flex flex-col flex-grow overflow-y-auto">
-                <Navbar />
+                <Navbar toggleSideBar = {toggleSideBar}/>
                 <div className="flex-grow ">
                   <EditRole />
                 </div>
@@ -219,9 +228,9 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar />
+              <Sidebar sidebar = {sideBar}/>
               <div className="flex flex-col flex-grow overflow-y-auto">
-                <Navbar />
+                <Navbar toggleSideBar = {toggleSideBar}/>
                 <div className="flex-grow ">
                   <PermissionsTable />
                 </div>
@@ -237,9 +246,9 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar />
+              <Sidebar sidebar = {sideBar}/>
               <div className="flex flex-col flex-grow overflow-y-auto">
-                <Navbar />
+                <Navbar toggleSideBar = {toggleSideBar}/>
                 <div className="flex-grow ">
                   <AddPermission />
                 </div>
@@ -255,9 +264,9 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar />
+              <Sidebar sidebar = {sideBar}/>
               <div className="flex flex-col flex-grow overflow-y-auto">
-                <Navbar />
+                <Navbar toggleSideBar = {toggleSideBar}/>
                 <div className="flex-grow ">
                   <EditPermission />
                 </div>
@@ -272,9 +281,9 @@ function App() {
       element: (
         <PrivateRoute>
           <div className="flex h-screen">
-            <Sidebar />
+            <Sidebar sidebar = {sideBar}/>
             <div className="flex flex-col flex-grow overflow-y-auto">
-              <Navbar />
+              <Navbar toggleSideBar = {toggleSideBar}/>
               <div className="flex-grow ">
                 <Tasks />
               </div>
@@ -287,17 +296,35 @@ function App() {
       path: "/tasks/addtask",
       element: (
         <PrivateRoute>
-        <EmployeeRoute>
-        <div className="flex h-screen">
-        <Sidebar />
-        <div className="flex flex-col flex-grow overflow-y-auto">
-        <Navbar />
-        <div className="flex-grow ">
-        <AddTask />
-        </div>
-        </div>
-        </div>
-        </EmployeeRoute>
+          <EmployeeRoute>
+            <div className="flex h-screen">
+              <Sidebar sidebar = {sideBar}/>
+              <div className="flex flex-col flex-grow overflow-y-auto">
+                <Navbar toggleSideBar = {toggleSideBar}/>
+                <div className="flex-grow ">
+                  <AddTask />
+                </div>
+              </div>
+            </div>
+          </EmployeeRoute>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/tasks/edittask/:id",
+      element: (
+        <PrivateRoute>
+          <EmployeeRoute>
+            <div className="flex h-screen">
+              <Sidebar sidebar = {sideBar}/>
+              <div className="flex flex-col flex-grow overflow-y-auto">
+                <Navbar toggleSideBar = {toggleSideBar}/>
+                <div className="flex-grow ">
+                  <EditTask />
+                </div>
+              </div>
+            </div>
+          </EmployeeRoute>
         </PrivateRoute>
       ),
     },
@@ -307,11 +334,59 @@ function App() {
       element: (
         <PrivateRoute>
           <div className="flex h-screen">
-            <Sidebar />
+            <Sidebar sidebar = {sideBar}/>
             <div className="flex flex-col flex-grow overflow-y-auto">
-              <Navbar />
+              <Navbar toggleSideBar = {toggleSideBar}/>
               <div className="flex-grow ">
                 <Setting />
+              </div>
+            </div>
+          </div>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/leavehistory",
+      element: (
+        <PrivateRoute>
+          <div className="flex h-screen">
+            <Sidebar sidebar = {sideBar}/>
+            <div className="flex flex-col flex-grow overflow-y-auto">
+              <Navbar toggleSideBar = {toggleSideBar}/>
+              <div className="flex-grow ">
+                <LeaveHistory />
+              </div>
+            </div>
+          </div>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/leaverequests",
+      element: (
+        <PrivateRoute>
+          <div className="flex h-screen">
+            <Sidebar sidebar = {sideBar}/>
+            <div className="flex flex-col flex-grow overflow-y-auto">
+              <Navbar toggleSideBar = {toggleSideBar}/>
+              <div className="flex-grow ">
+                <LeaveRequests />
+              </div>
+            </div>
+          </div>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/attendance",
+      element: (
+        <PrivateRoute>
+          <div className="flex h-screen">
+            <Sidebar sidebar = {sideBar}/>
+            <div className="flex flex-col flex-grow overflow-y-auto">
+              <Navbar toggleSideBar = {toggleSideBar}/>
+              <div className="flex-grow ">
+                <Attendance />
               </div>
             </div>
           </div>

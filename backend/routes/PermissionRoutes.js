@@ -8,5 +8,5 @@ router.post('/insertpermission', insertPermission);
 router.put('/updatpermission', updatePermission);
   
 router.delete('/deletepermission', deletePermission);
-// router.post('/getesinglepermission', getSinglePermission);
+router.post('/getesinglepermission', getSinglePermission);
 module.exports = router;

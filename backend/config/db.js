@@ -5,8 +5,7 @@ dotenv.config();
 
 const connectDB = async () => {
     try {
-        // await mongoose.connect("mongodb://localhost:27017/taskmanagement");
-        await mongoose.connect("mongodb+srv://socialtridentverse:ODNTcEyh1SJNJeW3@taskmanagement.xs0sq.mongodb.net/taskmanagement?retryWrites=true&w=majority");
+        await mongoose.connect("mongodb://localhost:27017/taskmanagement");
         console.log('MongoDB connected');
     } catch (error) {
         if (error.message.includes('database exists')) {
