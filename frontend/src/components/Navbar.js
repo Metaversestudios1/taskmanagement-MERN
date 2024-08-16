@@ -133,7 +133,6 @@ const Navbar = ({ toggleSideBar }) => {
       body: JSON.stringify({ emp_id: userInfo.id, date: new Date() }),
     });
     const response = await res.json();
-    console.log(response);
     if (response.success) {
       localStorage.setItem("status", "true");
       localStorage.setItem("message", "Your status is recorded. Thank you!");
