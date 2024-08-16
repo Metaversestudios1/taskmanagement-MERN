@@ -13,7 +13,7 @@ app.use(cookieParser());
 dotenv.config();
 connectDB();
 const corsOption = {
-  origin: "http://localhost:3001",
+  origin: "https://taskmanagement-mern-front.vercel.app",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   preflightContinue: false,
   credentials: true,
@@ -43,6 +43,7 @@ const PermissionRoutes = require('./routes/PermissionRoutes')
 const TaskRoutes = require('./routes/TaskRoutes');
 const AttendenceRoutes = require('./routes/AttendenceRoutes');
 const LeaveRoutes = require('./routes/LeaveRoutes');
+const PayrollRoutes = require('./routes/PayrollRoutes');
 
 app.use('/api', dashboardRoutes);
 app.use('/api',employeeRoutes);
@@ -52,7 +53,7 @@ app.use('/api', PermissionRoutes);
 app.use('/api', TaskRoutes);
 app.use('/api', AttendenceRoutes);
 app.use('/api', LeaveRoutes);
-
+app.use('/api',PayrollRoutes);
 
 app.get('/protected', auth, (req, res) => {
     res.json({success: true, message: "you are authorize", user: req.user});
