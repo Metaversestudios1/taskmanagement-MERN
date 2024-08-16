@@ -16,7 +16,7 @@ const Projects = () => {
   const fetchProjects = async () => {
     setLoader(true)
     const res = await fetch(
-      `http://localhost:3000/api/getproject?page=${page}&limit=${pageSize}&search=${search}`
+      `${process.env.REACT_APP_BACKEND_URL}/api/getproject?page=${page}&limit=${pageSize}&search=${search}`
     );
     const response = await res.json();
     if(response.success) {
@@ -34,7 +34,7 @@ const Projects = () => {
     if (count === 1) {
       projectOne = false;
     }
-    const res = await fetch("http://localhost:3000/api/deleteproject", {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/deleteproject`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),

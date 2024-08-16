@@ -16,7 +16,7 @@ const AddRole = () => {
     fetchPermissions();
   }, []);
   const fetchPermissions = async () => {
-    const res = await fetch("http://localhost:3000/api/getpermission");
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getpermission`);
     const response = await res.json();
     console.log(response);
     if (response.success) {
@@ -43,7 +43,7 @@ const AddRole = () => {
       setError("Please provide atleast one permission correspond to specific Role")
       return 
     }
-    const res = await fetch("http://localhost:3000/api/insertrole", {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertrole`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
