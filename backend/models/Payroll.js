@@ -57,6 +57,6 @@ const payrollSchema = new mongoose.Schema({
         type:Date,
         default:null
       }
-},{ timestamps:true, collation:'payroll'});
+}, { timestamps: true, collection: 'payrolls' });
 
 module.exports = mongoose.model('Payroll',payrollSchema);
