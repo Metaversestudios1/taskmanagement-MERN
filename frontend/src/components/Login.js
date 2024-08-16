@@ -20,16 +20,18 @@ const Login = () => {
 
   useEffect(() => {
     if (token) {
-      navigate(-1);
+      setTimeout(() => {
+        navigate(-1);
+      }, 500);
     } else {
       setLoading(false);
     }
     fetchRoles();
-  }, []);
+  }, [token]);
 
   const fetchRoles = async () => {
     try {
-      const res = await fetch("https://taskmanagement-mern-front.vercel.app/api/getrole");
+      const res = await fetch("http://localhost:3000/api/getrole");
       const response = await res.json();
       if (response.success) {
         setRoles(response.result);
@@ -56,7 +58,7 @@ const Login = () => {
         setError("Email is not valid");
         return;
       }
-      const res = await fetch("https://taskmanagement-mern-front.vercel.app/api/login", {
+      const res = await fetch("http://localhost:3000/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

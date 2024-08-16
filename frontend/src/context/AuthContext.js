@@ -92,10 +92,14 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    // Check token validity when the component mounts
+useEffect(() => {
+  const timer = setTimeout(() => {
     fetchAuth();
-  }, []);
+  }, 500);
+
+  return () => clearTimeout(timer); // Cleanup timer on component unmount
+}, []);
+
 
   return (
     <AuthContext.Provider value={{ auth, setAuth, loading }}>

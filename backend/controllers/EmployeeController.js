@@ -134,7 +134,7 @@ const getSingleEmployee = async (req, res) => {
     }
 
     res.status(200).json({
-      sucess: true,
+      success: true,
       data,
     });
   } catch (err) {
