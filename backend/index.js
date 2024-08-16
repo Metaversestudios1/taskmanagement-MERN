@@ -13,7 +13,7 @@ app.use(cookieParser());
 dotenv.config();
 connectDB();
 const corsOption = {
-  origin: "https://taskmanagement-mern-front.vercel.app/",
+  origin: "https://taskmanagement-mern-front.vercel.app",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   preflightContinue: false,
   credentials: true,
