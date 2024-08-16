@@ -22,7 +22,7 @@ const AddEmployee = () => {
     fetchRoles();
   }, []);
   const fetchRoles = async () => {
-    const res = await fetch("http://localhost:3000/api/getrole");
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getrole`);
     const response = await res.json();
     if (response.success) {
       setRoles(response.result);
@@ -52,7 +52,7 @@ const AddEmployee = () => {
       return;
     }
     try {
-      const res = await fetch("http://localhost:3000/api/insertemployee", {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertemployee`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

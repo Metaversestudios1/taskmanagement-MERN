@@ -23,7 +23,7 @@ const EditEmployee = () => {
     const fetchOldData = async () => {
       try {
         const response = await fetch(
-          "http://localhost:3000/api/getesingleemployee",
+          `${process.env.REACT_APP_BACKEND_URL}/api/getesingleemployee`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -47,7 +47,7 @@ const EditEmployee = () => {
     };
 
     const fetchRoles = async () => {
-      const res = await fetch("http://localhost:3000/api/getrole");
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getrole`);
       const response = await res.json();
       if (response.success) {
         setRoles(response.result);
@@ -71,7 +71,7 @@ const EditEmployee = () => {
     e.preventDefault();
     const updateData = { id, oldData };
     setLoader(true);
-    const response = await fetch("http://localhost:3000/api/updatemployee", {
+    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updatemployee`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updateData),

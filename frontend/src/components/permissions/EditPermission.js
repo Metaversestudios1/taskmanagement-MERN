@@ -18,7 +18,7 @@ const EditPermission = () => {
     fetchPermissions();
   }, []);
   const fetchPermissions = async () => {
-    const res = await fetch("http://localhost:3000/api/getesinglepermission", {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getesinglepermission`, {
       method: "POST",
       headers: { "Content-type": "application/json" },
       body: JSON.stringify({ id }),
@@ -43,7 +43,7 @@ const EditPermission = () => {
       }
     } else {
       try {
-        const res = await fetch("http://localhost:3000/api/updatpermission", {
+        const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updatpermission`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(updateData),

@@ -30,7 +30,7 @@ const EditTask = () => {
     fetchProjects();
   }, []);
   const fetchOldoldData = async () => {
-    const res = await fetch("http://localhost:3000/api/getSingletask", {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getSingletask`, {
       method: "POST",
       headers: { "Content-type": "application/json" },
       body: JSON.stringify({ id }),
@@ -50,7 +50,7 @@ const EditTask = () => {
     }
   };
   const fetchProjects = async () => {
-    const res = await fetch("http://localhost:3000/api/getproject");
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getproject`);
     const response = await res.json();
     if (response.success) {
       setProjects(response.result);
@@ -100,7 +100,7 @@ const EditTask = () => {
       formData.append(key, oldData[key]);
     });
 
-    const res = await fetch(`http://localhost:3000/api/updatetask/${id}`, {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updatetask/${id}`, {
       method: "PUT",
       body: formData,
     });

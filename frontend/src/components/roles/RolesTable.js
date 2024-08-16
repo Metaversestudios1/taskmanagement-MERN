@@ -16,7 +16,7 @@ const RolesTable = () => {
 
   const fetchPermissions = async (id) => {
     const permRes = await fetch(
-      `http://localhost:3000/api/getesinglepermission`,
+      `${process.env.REACT_APP_BACKEND_URL}/api/getesinglepermission`,
       {
         method: "POST",
         headers: { "Content-type": "application/json" },
@@ -30,7 +30,7 @@ const RolesTable = () => {
   const fetchRoles = async () => {
     setLoader(true);
     const res = await fetch(
-      `http://localhost:3000/api/getrole?page=${page}&limit=${pageSize}&search=${search}`
+      `${process.env.REACT_APP_BACKEND_URL}/api/getrole?page=${page}&limit=${pageSize}&search=${search}`
     );
     const response = await res.json();
     if (response.success) {
@@ -59,7 +59,7 @@ const RolesTable = () => {
     if (count === 1) {
       roleOne = false;
     }
-    const res = await fetch("http://localhost:3000/api/deleterole", {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/deleterole`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),

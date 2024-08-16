@@ -61,7 +61,7 @@ const Navbar = ({ toggleSideBar }) => {
   }, []);
 
   const fetchCheckInRecord = async () => {
-    const res = await fetch("http://localhost:3000/api/getSingleattendence", {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getSingleattendence`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: userInfo.id }),
@@ -78,7 +78,7 @@ const Navbar = ({ toggleSideBar }) => {
   const handleLogout = async () => {
     try {
       // Perform logout logic (e.g., API call to logout)
-      const res = await fetch("http://localhost:3000/api/logout", {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/logout`, {
         method: "POST",
         credentials: "include", // Send cookies with the request
       });
@@ -105,7 +105,7 @@ const Navbar = ({ toggleSideBar }) => {
   };
 
   const handleCheckIn = async () => {
-    const res = await fetch("http://localhost:3000/api/insertattendence", {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertattendence`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ date, emp_id, check_in }),
@@ -127,7 +127,7 @@ const Navbar = ({ toggleSideBar }) => {
   };
 
   const handleCheckOut = async () => {
-    const res = await fetch("http://localhost:3000/api/updateattendence", {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateattendence`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ emp_id: userInfo.id, date: new Date() }),

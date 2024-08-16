@@ -37,7 +37,7 @@ const Tasks = () => {
   }, [page, search, employee, startDate, endDate]);
 
   const fetchEmployees = async () => {
-    const res = await fetch("http://localhost:3000/api/getemployee");
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getemployee`);
     const response = await res.json();
     if (response.success) {
       setEmployees(response.result);
@@ -46,7 +46,7 @@ const Tasks = () => {
 
   const fetchProjectName = async (id) => {
     const projectRes = await fetch(
-      `http://localhost:3000/api/getSingleproject`,
+      `${process.env.REACT_APP_BACKEND_URL}/api/getSingleproject`,
       {
         method: "POST",
         headers: { "Content-type": "application/json" },
@@ -61,7 +61,7 @@ const Tasks = () => {
   const fetchTasks = async () => {
     setLoader(true);
     const res = await fetch(
-      `http://localhost:3000/api/gettask?page=${page}&limit=${pageSize}&search=${search}&id=${employee}&startDate=${startDate}&endDate=${endDate}`
+      `${process.env.REACT_APP_BACKEND_URL}/api/gettask?page=${page}&limit=${pageSize}&search=${search}&id=${employee}&startDate=${startDate}&endDate=${endDate}`
     );
     const response = await res.json();
     if (response.success) {
@@ -90,7 +90,7 @@ const Tasks = () => {
       if (count === 1) {
         taskOne = false;
       }
-      const res = await fetch("http://localhost:3000/api/deletetask", {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/deletetask`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),

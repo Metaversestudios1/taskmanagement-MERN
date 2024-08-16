@@ -23,7 +23,7 @@ const AddProject = () => {
       setError("Please provide field.")
     }
  
-    const res = await fetch("http://localhost:3000/api/insertproject", {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertproject`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
