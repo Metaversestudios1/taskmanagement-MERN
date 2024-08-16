@@ -40,7 +40,7 @@ const EditPermission = () => {
       if (!oldData.permission.includes("-") || !oldData.permission.includes("_")) {
         setError("Input is wrong! Please read the NOTE Carefully");
         return;
-      }
+      } 
     } else {
       try {
         const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updatpermission`, {
