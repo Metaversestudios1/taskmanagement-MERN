@@ -7,7 +7,7 @@ const router = express.Router();
 router.post('/insertleave',insertleave);
 router.put('/updateleave',updateleave);
 router.delete('/deleteleave',deleteleave);
-router.get('/getSingleleave',getSingleleave);
+router.post('/getSingleleave',getSingleleave);
 router.get('/getAllLeave',getAllLeave)
 
 module.exports=router;
