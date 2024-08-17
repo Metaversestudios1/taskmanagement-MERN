@@ -60,8 +60,6 @@ const getAllattendence = async (req, res) => {
 };
 const updateattendence = async (req, res) => {
   const { emp_id, date } = req.body;
-  console.log(emp_id);
-
   // Convert the frontend date (already in 'YYYY-MM-DD' format) to a Date object
   const inputDate = new Date(date);
 
@@ -80,8 +78,6 @@ const updateattendence = async (req, res) => {
         ],
       },
     });
-
-    console.log(result);
 
     if (!result) {
       return res.status(404).json({ success: false, message: "Employee not found" });

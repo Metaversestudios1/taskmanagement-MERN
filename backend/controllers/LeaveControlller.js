@@ -21,7 +21,6 @@ const insertleave = async(req, res)=>{
 const updateleave = async(req, res) => {
      const updateData = req.body;
      const id = updateData.id;
-     console.log(req.body);
     try{
         const result = await Leave.updateOne(
             {_id:id},
