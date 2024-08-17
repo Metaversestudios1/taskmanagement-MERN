@@ -13,7 +13,7 @@ const insertleave = async(req, res)=>{
       .status(500)
       .json({
         success: false,
-        message: "Error inserting role",
+        message: "Error inserting leave",
         error: error.message,
       });   }
 

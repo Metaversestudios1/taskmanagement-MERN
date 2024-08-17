@@ -12,7 +12,7 @@ const insertattendence = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      messsage: "inserting attendence errror",
+      messsage: "inserting attendence error",
       error: error.message,
     });
   }
@@ -96,7 +96,7 @@ const updateattendence = async (req, res) => {
 
     
     if (!result) {
-      return res.status(404).json({ success: false, message: "Employee not found" });
+      return res.status(404).json({ success: false, message: "Attedence not found" });
     }
 
     const check_in = result["check_in"]; // Convert the stored check_in to a Date object
@@ -146,7 +146,7 @@ const deleteattendence = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "error deleteding attedence",
+      message: "error deleting attedence",
       error: error.message,
     });
   }
