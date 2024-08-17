@@ -5,6 +5,7 @@ const { findOne } = require('../models/Employee');
 
 const insertleave = async(req, res)=>{
     try{
+        console.log(req.body)
         const newleave = new Leave(req.body);
         await newleave.save();
         res.status(201).json({success:true});
@@ -21,10 +22,11 @@ const insertleave = async(req, res)=>{
 const updateleave = async(req, res) => {
      const updateData = req.body;
      const id = updateData.id;
+     console.log(req.body);
     try{
         const result = await Leave.updateOne(
             {_id:id},
-            { $set:updateData.oldData},
+            { $set:updateData.data},
         );
         if (!result) {
             res.status(404).json({success:false,message:"leave not found"});
@@ -56,9 +58,9 @@ const getSingleleave = async (req, res) => {
     try{
         const result = await Leave.findOne({_id:id});
         if(!result){
-            res.status(404).json({success:false,message:"leave not found"})
+            return res.status(404).json({success:false,message:"leave not found"})
         }
-        res.status(201).json({success:true,result:result})
+        res.status(201).json({success:true,result})
     }catch(error){
         res.status(500).json({success:false,message:"error fetching leave",error:error.message})
     }
@@ -67,19 +69,29 @@ const getAllLeave = async (req, res) => {
     try{
         const pageSize = parseInt(req.query.limit);
         const page = parseInt(req.query.page)
-        const search = req.query.search
+        const id = req.query.id;
+        const startDate = req.query.startDate;
+        const endDate = req.query.endDate;
         const query  = {
             deleted_at: null,
         };
-        if(search){
-            query.emp_id = { $regex: search, $option: "i" };
-        }
 
+        if (id) {
+            query.emp_id = id;
+          }
+          if (startDate && endDate) {
+            query.leave_from = { $gte: startDate, $lte: endDate };
+          } else if (startDate) {
+            query.leave_from = { $gte: startDate };
+          } else if (endDate) {
+            query.leave_from = { $lte: endDate };
+          }
+          console.log(query)
         const result = await Leave.find(query)
             .sort({ createdAt: -1 })
             .skip((page - 1) * pageSize)
             .limit(pageSize);
-         const count = await Leave.countDocuments;
+         const count = await Leave.find(query).countDocuments();
          res.status(200).json({ success: true, result, count });
     }catch(error){
         res.status(500).json({success:false,message:"error fetching leave",error:error.message})
