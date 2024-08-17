@@ -11,7 +11,7 @@ const insertattendence = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      messsage: "inserting attendence errror",
+      messsage: "inserting attendence error",
       error: error.message,
     });
   }

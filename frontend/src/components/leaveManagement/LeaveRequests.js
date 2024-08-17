@@ -12,7 +12,7 @@ const LeaveRequests = () => {
       ? userInfo.id
       : ""
   );
-  const [tasks, setTasks] = useState([]);
+  const [leaves, setLeaves] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [loader, setLoader] = useState(true);
@@ -30,51 +30,51 @@ const LeaveRequests = () => {
 
   useEffect(() => {
     if (employee) {
-      fetchTasks();
+      fetchLeaves();
     } else {
-      setTasks([]);
+      setLeaves([]);
     }
   }, [page, search, employee, startDate, endDate]);
 
   const fetchEmployees = async () => {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getemployee`);
+    const res = await fetch(`${REACT_APP_BACKEND_URL}/api/getemployee`);
     const response = await res.json();
     if (response.success) {
       setEmployees(response.result);
     }
   };
 
-  const fetchProjectName = async (id) => {
-    const projectRes = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/getSingleproject`,
+  const fetchEmployeeName = async (id) => {
+    const nameRes = await fetch(
+      `${REACT_APP_BACKEND_URL}/api/getesingleemployee`,
       {
         method: "POST",
         headers: { "Content-type": "application/json" },
         body: JSON.stringify({ id }),
       }
     );
-    const projectData = await projectRes.json();
-
-    return projectData.success ? projectData.result[0].name : "Unknown";
+    const employeeName = await nameRes.json();
+    return employeeName.success ? employeeName.data[0].name : "Unknown";
   };
 
-  const fetchTasks = async () => {
+  const fetchLeaves = async () => {
     setLoader(true);
     const res = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/gettask?page=${page}&limit=${pageSize}&search=${search}&id=${employee}&startDate=${startDate}&endDate=${endDate}`
+      `${REACT_APP_BACKEND_URL}/api/getAllLeave?page=${page}&limit=${pageSize}&id=${employee}&startDate=${startDate}&endDate=${endDate}`
     );
     const response = await res.json();
+    console.log(response)
     if (response.success) {
-      const tasksWithProjectNames = await Promise.all(
-        response.result.map(async (task) => {
-          const projectName = await fetchProjectName(task.project_name);
+      const leavesWithEmployeeNames = await Promise.all(
+        response.result.map(async (leave) => {
+          const employee_name = await fetchEmployeeName(leave.emp_id);
           return {
-            ...task,
-            project_name: projectName,
+            ...leave,
+            emp_id: employee_name,
           };
         })
       );
-      setTasks(tasksWithProjectNames);
+      setLeaves(leavesWithEmployeeNames);
       setCount(response.count);
       setLoader(false);
     }
@@ -86,11 +86,11 @@ const LeaveRequests = () => {
       "Are you sure, you want to delete the task?"
     );
     if (permissionOfDelete) {
-      let taskOne = tasks.length === 1;
+      let leaveOne = leaves.length === 1;
       if (count === 1) {
-        taskOne = false;
+        leaveOne = false;
       }
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/deletetask`, {
+      const res = await fetch(`${REACT_APP_BACKEND_URL}/api/deleteleave`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
@@ -100,10 +100,10 @@ const LeaveRequests = () => {
       }
       const response = await res.json();
       if (response.success) {
-        if (taskOne) {
+        if (leaveOne) {
           setPage(page - 1);
         } else {
-          fetchTasks();
+          fetchLeaves();
         }
       }
     }
@@ -117,33 +117,12 @@ const LeaveRequests = () => {
     ) {
       setEmployee(value);
     }
-    if (name === "search") {
-      setSearch(value);
-      setPage(1);
-    } else if (name === "startDate") {
+    if (name === "startDate") {
       setStartDate(value);
       setPage(1);
     } else if (name === "endDate") {
       setEndDate(value);
       setPage(1);
-    }
-  };
-
-  const handleDownload = (url) => {
-    if (!url) {
-      return window.alert("There is no attachment with this task.");
-    }
-    const isImage = url.match(/\.(jpeg|jpg|gif|png)$/) != null;
-
-    if (isImage) {
-      window.open(url, "_blank");
-    } else {
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = url.substring(url.lastIndexOf("/") + 1);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
     }
   };
 
@@ -156,16 +135,12 @@ const LeaveRequests = () => {
         <div className="text-xl font-bold mx-2 my-8">Leave Requests</div>
       </div>
       <div className="flex justify-between">
-            <div className={`flex items-center`}>
-              <input
-                placeholder="Search"
-                value={search}
-                onChange={handleChange}
-                type="text"
-                name="search"
-                className={`text-black border-[1px] rounded-lg bg-white p-2 m-5`}
-              />
-            </div>
+        {(userInfo.role==="Employee" || userInfo.role === "employee") && <NavLink to="/leaverequests/addleave">
+          <button className="bg-blue-800 text-white p-3 m-5 text-sm rounded-lg">
+            Add New
+          </button>
+        </NavLink>}
+        
       </div>
 
       {(userInfo.role === "Admin" || userInfo.role === "admin") && (
@@ -226,7 +201,7 @@ const LeaveRequests = () => {
           Reset
         </button>
       </div>
-      {tasks.length > 0 ? (
+      {leaves.length > 0 ? (
         <div className="relative overflow-x-auto m-5 mb-0">
           <table className="w-full text-sm text-left rtl:text-right border-2 border-gray-300">
             <thead className="text-xs text uppercase bg-gray-200">
@@ -235,25 +210,28 @@ const LeaveRequests = () => {
                   Sr no.
                 </th>
                 <th scope="col" className="px-6 py-3 border-2 border-gray-300">
-                  Date
-                </th>
-                <th scope="col" className="px-6 py-3 border-2 border-gray-300">
                   employee name
                 </th>
                 <th scope="col" className="px-6 py-3 border-2 border-gray-300">
-                  Leave from        
+                  Leave from
                 </th>
                 <th scope="col" className="px-6 py-3 border-2 border-gray-300">
-                  leave to  
+                  leave to
                 </th>
                 <th scope="col" className="px-6 py-3 border-2 border-gray-300">
                   total days
                 </th>
                 <th scope="col" className="px-6 py-3 border-2 border-gray-300">
+                  Leave type
+                </th>
+                <th scope="col" className="px-6 py-3 border-2 border-gray-300">
                   reason
                 </th>
                 <th scope="col" className="px-6 py-3 border-2 border-gray-300">
-                status
+                  remarks
+                </th>
+                <th scope="col" className="px-6 py-3 border-2 border-gray-300">
+                  status
                 </th>
                 <th scope="col" className="px-6 py-3 border-2 border-gray-300">
                   Action
@@ -262,73 +240,97 @@ const LeaveRequests = () => {
             </thead>
 
             <tbody>
-              {tasks.map((item, index) => (
-                <tr key={item._id} className="bg-white border-b">
-                  <th
-                    scope="row"
-                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap border-2 border-gray-300"
-                  >
-                    {startIndex + index + 1}
-                  </th>
-                  <th
-                    scope="row"
-                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap border-2 border-gray-300"
-                  >
-                    {item?.date.split("T")[0]}
-                  </th>
-                  <td className="px-6 py-4 border-2 border-gray-300">
-                    {item?.task_name}
-                  </td>
-                  <td className="px-6 py-4 border-2 border-gray-300">
-                    {item?.project_name}
-                  </td>
-                  <td className="px-6 py-4 border-2 border-gray-300">
-                    {item?.plan_for_tommorow}
-                  </td>
-                  <td className="px-6 py-4 border-2 border-gray-300">
-                    {item?.additional_comment}
-                  </td>
-                  <td className="px-6 py-4 border-2 border-gray-300">
-                    {item?.backlog}
-                  </td>
-                  <td className="px-6 py-2 border-2 border-gray-300">
-                    {item?.task_time} Hours
-                  </td>
-                  <td className=" py-5  gap-1 border-2 border-l-0 border-r-0 border-t-0 border-gray-300">
-                    <div className="flex items-center justify-center">
-                      {userInfo.role === "employee" ||
-                      userInfo.role === "Employee" ? (
-                        <>
-                          <NavLink to={`/tasks/edittask/${item._id}`}>
-                            <CiEdit className="text-2xl cursor-pointer text-green-900" />
-                          </NavLink>
-                          <MdDelete
-                            onClick={(e) => handleDelete(e, item._id)}
-                            className="text-2xl cursor-pointer text-red-900"
-                          />
-                          <IoMdDownload
-                            onClick={() =>
-                              handleDownload(item?.attachment?.url)
-                            }
-                            className="cursor-pointer text-lg"
-                          />
-                        </>
-                      ) : (
-                        <IoMdDownload
-                          onClick={() => handleDownload(item?.attachment?.url)}
-                          className="cursor-pointer text-lg"
+              {leaves.map((item, index) => {
+                return (
+                  <tr key={item._id} className="bg-white border-b">
+                    <th
+                      scope="row"
+                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap border-2 border-gray-300"
+                    >
+                      {startIndex + index + 1}
+                    </th>
+                    <th
+                      scope="row"
+                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap border-2 border-gray-300"
+                    >
+                      {item?.emp_id}
+                    </th>
+                    <td className="px-6 py-4 border-2 border-gray-300">
+                      {(item?.leave_from).split("T")[0]}
+                    </td>
+                    <td className="px-6 py-4 border-2 border-gray-300">
+                      {(item?.leave_to).split("T")[0]}
+                    </td>
+                    <td className="px-6 py-4 border-2 border-gray-300">
+                      {item?.no_of_days} days
+                    </td>
+                    <td className="px-6 py-4 border-2 border-gray-300">
+                      {item?.leave_type}
+                    </td>
+                    <td className="px-6 py-4 border-2 border-gray-300">
+                      {item?.reason}
+                    </td>
+                    <td className="px-6 py-4 border-2 border-gray-300">
+                      {item?.remarks || "NA"}
+                    </td>
+                    <td className="px-6 py-2 border-2 border-gray-300">
+                      {item?.status}
+                    </td>
+                    <td className=" py-5  gap-1 border-2 border-l-0 border-r-0 border-t-0 border-gray-300">
+                      <div className="flex items-center justify-center">
+                        <NavLink to={`/leaverequests/editleave/${item._id}`}>
+                          <CiEdit className="text-2xl cursor-pointer text-green-900" />
+                        </NavLink>
+                        <MdDelete
+                          onClick={(e) => handleDelete(e, item._id)}
+                          className="text-2xl cursor-pointer text-red-900"
                         />
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       ) : (
-        !loader && <div className="m-8 flex justify-center">No Tasks Found</div>
+        !loader && (
+          <div className="m-8 flex justify-center">No leaves Found</div>
+        )
       )}
+      {leaves.length > 0 && (
+        <div className="flex flex-col items-center my-10">
+          <span className="text-sm text-black">
+            Showing{" "}
+            <span className="font-semibold text-black">{startIndex + 1}</span>{" "}
+            to{" "}
+            <span className="font-semibold text-black">
+              {Math.min(startIndex + pageSize, count)}
+            </span>{" "}
+            of <span className="font-semibold text-black">{count}</span>{" "}
+            Entries
+          </span>
+          <div className="inline-flex mt-2 xs:mt-0">
+            <button
+              onClick={() => setPage(page - 1)}
+              disabled={page === 1}
+              className="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 rounded-s hover:bg-gray-900"
+            >
+              Prev
+            </button>
+            <button
+              onClick={() => setPage(page + 1)}
+              disabled={
+                leaves.length < pageSize || startIndex + pageSize >= count
+              }
+              className="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 border-0 border-s border-gray-700 rounded-e hover:bg-gray-900"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

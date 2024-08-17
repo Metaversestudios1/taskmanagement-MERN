@@ -19,7 +19,6 @@ const Attendance = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [count, setCount] = useState(0);
-  const [search, setSearch] = useState("");
   const [employees, setEmployees] = useState([]);
 
   useEffect(() => {
@@ -34,19 +33,19 @@ const Attendance = () => {
     } else {
       setAttendance([]);
     }
-  }, [page, search, employee, startDate, endDate]);
+  }, [page, employee, startDate, endDate]);
 
   const fetchEmployees = async () => {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getemployee`);
+    const res = await fetch(`${REACT_APP_BACKEND_URL}/api/getemployee`);
     const response = await res.json();
     if (response.success) {
-      setEmployees(response.result);
+      setEmployees(response.result); 
     }
   };
 
   const fetchEmployeeName = async (id) => {
     const nameRes = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/getesingleemployee`,
+      `${REACT_APP_BACKEND_URL}/api/getesingleemployee`,
       {
         method: "POST",
         headers: { "Content-type": "application/json" },
@@ -61,10 +60,10 @@ const Attendance = () => {
   const fetchAttendance = async () => {
     setLoader(true);
     const res = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/getAllattendence?page=${page}&limit=${pageSize}&search=${search}&id=${employee}&startDate=${startDate}&endDate=${endDate}`
+      `${REACT_APP_BACKEND_URL}/api/getAllattendence?page=${page}&limit=${pageSize}&id=${employee}&startDate=${startDate}&endDate=${endDate}`
     );
     const response = await res.json();
-    console.log(response);
+    console.log(response)
     if (response.success) {
       const attendanceWithEmployeeNames = await Promise.all(
         response.result.map(async (attendance) => {
@@ -75,7 +74,6 @@ const Attendance = () => {
           };
         })
       );
-      console.log(attendanceWithEmployeeNames);
       setAttendance(attendanceWithEmployeeNames);
       setCount(response.count);
       setLoader(false);
@@ -118,11 +116,7 @@ const Attendance = () => {
       name === "employees"
     ) {
       setEmployee(value);
-    }
-    if (name === "search") {
-      setSearch(value);
-      setPage(1);
-    } else if (name === "startDate") {
+    } if (name === "startDate") {
       setStartDate(value);
       setPage(1);
     } else if (name === "endDate") {
@@ -150,29 +144,13 @@ const Attendance = () => {
   // };
 
   const startIndex = (page - 1) * pageSize;
-
   return (
     <div className="">
       <div className="flex items-center">
         <div className="bg-[#032e4e] rounded-[5px] ml-5 h-[30px] w-[10px]"></div>
         <div className="text-xl font-bold mx-2 my-8">Attendance Sheet</div>
       </div>
-      <div className="flex justify-between">
-        {(userInfo.role === "Employee" || userInfo.role === "employee") && (
-          <>
-            <div className={`flex items-center`}>
-              <input
-                placeholder="Search"
-                value={search}
-                onChange={handleChange}
-                type="text"
-                name="search"
-                className={`text-black border-[1px] rounded-lg bg-white p-2 m-5`}
-              />
-            </div>
-          </>
-        )}
-      </div>
+      
 
       {(userInfo.role === "Admin" || userInfo.role === "admin") && (
         <div className="w-full ">
@@ -263,10 +241,6 @@ const Attendance = () => {
 
             <tbody>
               {attendance.map((item, index) => {
-                const checkIndateTime =(item?.check_in)?.split(".")[0] 
-                const checkIntime = checkIndateTime?.split("T")[1]
-                const checkOutdateTime =(item?.check_out)?.split(".")[0] 
-                const checkOuttime = checkOutdateTime?.split("T")[1]
                 return (
                   <tr key={item._id} className="bg-white border-b">
                     <th
@@ -285,10 +259,10 @@ const Attendance = () => {
                       {item?.emp_id}
                     </td>
                     <td className="px-6 py-4 border-2 border-gray-300">
-                      {checkIntime}
+                      {item?.check_in}
                     </td>
                     <td className="px-6 py-4 border-2 border-gray-300">
-                      {checkOuttime}
+                      {item?.check_out || "-" }
                     </td>
                     <td className="px-6 py-4 border-2 border-gray-300">
                       {item?.working_hours || "-"}
@@ -306,6 +280,38 @@ const Attendance = () => {
         !loader && (
           <div className="m-8 flex justify-center">No attendance Found</div>
         )
+      )}
+      {attendance.length > 0 && (
+        <div className="flex flex-col items-center my-10">
+          <span className="text-sm text-black">
+            Showing{" "}
+            <span className="font-semibold text-black">{startIndex + 1}</span>{" "}
+            to{" "}
+            <span className="font-semibold text-black">
+              {Math.min(startIndex + pageSize, count)}
+            </span>{" "}
+            of <span className="font-semibold text-black">{count}</span>{" "}
+            Entries
+          </span>
+          <div className="inline-flex mt-2 xs:mt-0">
+            <button
+              onClick={() => setPage(page - 1)}
+              disabled={page === 1}
+              className="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 rounded-s hover:bg-gray-900"
+            >
+              Prev
+            </button>
+            <button
+              onClick={() => setPage(page + 1)}
+              disabled={
+                attendance.length < pageSize || startIndex + pageSize >= count
+              }
+              className="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 border-0 border-s border-gray-700 rounded-e hover:bg-gray-900"
+            >
+              Next
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
