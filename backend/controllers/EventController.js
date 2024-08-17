@@ -89,6 +89,6 @@ module.exports={
     insertevent,
     getSingleevent,
     deleteevent,
-    updateevent
+    updateevent,
 
 }

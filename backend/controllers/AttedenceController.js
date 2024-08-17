@@ -12,7 +12,7 @@ const insertattendence = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      messsage: "inserting attendence error",
+      messsage: "inserting attendence errror",
       error: error.message,
     });
   }
@@ -58,51 +58,41 @@ const getAllattendence = async (req, res) => {
     });
   }
 };
-
-function convertTo12HourFormat(checkOutTime) {
-  const date = new Date(checkOutTime);
-  let hours = date.getUTCHours();
-  const minutes = date.getUTCMinutes();
-  const seconds = date.getUTCSeconds();
-  const milliseconds = date.getUTCMilliseconds();
-
-  // Convert hours from 24-hour to 12-hour format if necessary
-  if (hours > 12) {
-      hours -= 12;
-  }
-
-  // Format the hours, minutes, seconds, and milliseconds to match the ISO string format
-  const formattedTime = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}+00:00`;
-
-  return formattedTime;
-}
-
-
-// 2024-08-16T06:40:26.661+00:00
-
 const updateattendence = async (req, res) => {
   const { emp_id, date } = req.body;
+  console.log(emp_id);
+
+  // Convert the frontend date (already in 'YYYY-MM-DD' format) to a Date object
   const inputDate = new Date(date);
-  const now = new Date(); // Define 'now' as the current date and time
-  const check_out = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
-  const dateString = check_out.toISOString().split("T")[0];
+
+  // Adjust the time zone offset to ensure it matches local time
+  const localTime = new Date(inputDate.getTime() - inputDate.getTimezoneOffset() * 60000);
+  const dateString = localTime.toISOString().split("T")[0];
+
   try {
     // Use $expr and $dateToString to match only the date part
     const result = await Attendence.findOne({
       emp_id,
-      date: new Date(date), // Ensure the date is in the correct Date format
+      $expr: {
+        $eq: [
+          { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+          dateString,
+        ],
+      },
     });
-  
 
-    
+    console.log(result);
+
     if (!result) {
-      return res.status(404).json({ success: false, message: "Attedence not found" });
+      return res.status(404).json({ success: false, message: "Employee not found" });
     }
 
     const check_in = result["check_in"]; // Convert the stored check_in to a Date object
+    const check_out = new Date();
     const working_minutes = check_out - check_in;
     const working_hours = working_minutes / (1000 * 60 * 60);
     const roundedDurationHours = Math.round(working_hours * 100) / 100;
+
     let attendance_status;
     if (roundedDurationHours >= 8) {
       attendance_status = "present";
@@ -111,11 +101,12 @@ const updateattendence = async (req, res) => {
       attendance_status = "absent";
       res.status(200).json({ success: true });
     }
+
     await Attendence.updateOne(
       { emp_id, date: result.date },
       {
         $set: {
-          check_out: convertTo12HourFormat(check_out),
+          check_out: check_out,
           working_hours: roundedDurationHours,
           attendance_status: attendance_status,
         },
@@ -146,7 +137,7 @@ const deleteattendence = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "error deleting attedence",
+      message: "error deleteding attedence",
       error: error.message,
     });
   }
