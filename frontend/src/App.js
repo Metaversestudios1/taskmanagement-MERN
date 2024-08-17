@@ -28,6 +28,8 @@ import EmployeeRoute from "./components/utils/EmployeeRoute";
 import Attendance from "./components/attendance/Attendance";
 import LeaveHistory from "./components/leaveManagement/LeaveHistory";
 import LeaveRequests from "./components/leaveManagement/LeaveRequests";
+import AddLeave from "./components/leaveManagement/AddLeave";
+import EditLeave from "./components/leaveManagement/EditLeave";
 
 function App() {
   const [sideBar, setSideBar] = useState(true)
@@ -349,8 +351,9 @@ function App() {
       path: "/leavehistory",
       element: (
         <PrivateRoute>
-          <div className="flex h-screen">
-            <Sidebar sidebar = {sideBar}/>
+        <EmployeeRoute>
+        <div className="flex h-screen">
+        <Sidebar sidebar = {sideBar}/>
             <div className="flex flex-col flex-grow overflow-y-auto">
               <Navbar toggleSideBar = {toggleSideBar}/>
               <div className="flex-grow ">
@@ -358,6 +361,7 @@ function App() {
               </div>
             </div>
           </div>
+          </EmployeeRoute>
         </PrivateRoute>
       ),
     },
@@ -387,6 +391,40 @@ function App() {
               <Navbar toggleSideBar = {toggleSideBar}/>
               <div className="flex-grow ">
                 <Attendance />
+              </div>
+            </div>
+          </div>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/leaverequests/addleave",
+      element: (
+        <PrivateRoute>
+        <EmployeeRoute>
+        <div className="flex h-screen">
+        <Sidebar sidebar = {sideBar}/>
+        <div className="flex flex-col flex-grow overflow-y-auto">
+              <Navbar toggleSideBar = {toggleSideBar}/>
+              <div className="flex-grow ">
+                <AddLeave />
+              </div>
+            </div>
+          </div>
+          </EmployeeRoute>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/leaverequests/editleave/:id",
+      element: (
+        <PrivateRoute>
+          <div className="flex h-screen">
+            <Sidebar sidebar = {sideBar}/>
+            <div className="flex flex-col flex-grow overflow-y-auto">
+              <Navbar toggleSideBar = {toggleSideBar}/>
+              <div className="flex-grow ">
+                <EditLeave />
               </div>
             </div>
           </div>

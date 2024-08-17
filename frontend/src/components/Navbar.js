@@ -11,24 +11,26 @@ import getUserFromToken from "./utils/getUserFromToken";
 const Navbar = ({ toggleSideBar }) => {
   const navigate = useNavigate();
   const userInfo = getUserFromToken();
-  const now = new Date();
   const [checkInValue, setCheckInValue] = useState(true);
-  const [date, setDate] = useState(new Date(now.getTime() - now.getTimezoneOffset() * 60000));
+  const [date, setDate] = useState(null);
+  const [checkInTime, setCheckInTime] = useState(getCurrentTime());
   const [emp_id, setEmpId] = useState(userInfo.id);
-  const [check_in, setcheckIn] = useState(new Date(now.getTime() - now.getTimezoneOffset() * 60000));
   const [isMidnight, setIsMidnight] = useState(false);
-  // const initialState = {
-  //   date: new Date(),
-  //   check_in: new Date(),
-  //   check_out: 0,
-  //   emp_id: "",
-  //   working_hours: 0,
-  //   attendance_status: "",
-  // };
-  // const [data, setData] = useState(initialState);
-
   const token = Cookies.get("jwt");
- 
+  function getCurrentTime() {
+    const date = new Date();
+    let hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? "PM" : "AM";
+
+    hours = hours % 12;
+    hours = hours ? hours : 12; // Hour '0' should be '12'
+
+    const minutesStr = minutes < 10 ? `0${minutes}` : minutes;
+    const timeString = `${hours}:${minutesStr} ${ampm}`;
+
+    return timeString;
+  }
   useEffect(() => {
     // Function to change state at midnight
     const changeStateAtMidnight = () => {
@@ -61,24 +63,29 @@ const Navbar = ({ toggleSideBar }) => {
   }, []);
 
   const fetchCheckInRecord = async () => {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getSingleattendence`, {
+    const res = await fetch(`${REACT_APP_BACKEND_URL}/api/getSingleattendence`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: userInfo.id }),
     });
     const response = await res.json();
-    if (
-      response.success &&
-      !response.result.check_out
-    ) {
+    if (response.success && !response.result.check_out) {
       setCheckInValue(false);
-    } 
+      setCheckInTime(response.result?.check_in); // Store the check-in date
+      setDate(response.result?.date);
+    } else {
+      setCheckInValue(true);
+      const now = new Date();
+      const offset = now.getTimezoneOffset() * 60000; // Offset in milliseconds
+      const localDate = new Date(now.getTime() - offset);
+      setDate(localDate);
+    }
   };
 
   const handleLogout = async () => {
     try {
       // Perform logout logic (e.g., API call to logout)
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/logout`, {
+      const res = await fetch(`${REACT_APP_BACKEND_URL}/api/logout`, {
         method: "POST",
         credentials: "include", // Send cookies with the request
       });
@@ -105,10 +112,12 @@ const Navbar = ({ toggleSideBar }) => {
   };
 
   const handleCheckIn = async () => {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertattendence`, {
+    // const isoCheckIn = date.toISOString();
+    console.log(date);
+    const res = await fetch(`${REACT_APP_BACKEND_URL}/api/insertattendence`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ date, emp_id, check_in }),
+      body: JSON.stringify({ date: date, emp_id, check_in: checkInTime }),
     });
     const response = await res.json();
     if (response.success) {
@@ -127,10 +136,10 @@ const Navbar = ({ toggleSideBar }) => {
   };
 
   const handleCheckOut = async () => {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateattendence`, {
+    const res = await fetch(`${REACT_APP_BACKEND_URL}/api/updateattendence`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ emp_id: userInfo.id, date: new Date() }),
+      body: JSON.stringify({ emp_id: userInfo.id, date: date }),
     });
     const response = await res.json();
     if (response.success) {
@@ -217,31 +226,34 @@ const Navbar = ({ toggleSideBar }) => {
           className="hs-collapse  overflow-hidden transition-all duration-300 "
         >
           <div className="flex flex-row items-center justify-end ">
-            <div className="mx-3">
-              {checkInValue && localStorage.getItem("status") !== "true" ? (
-                <button
-                  type="button"
-                  onClick={handleCheckIn}
-                  className="text-white bg-purple-500 hover:bg-purple-800   rounded-full text-[14px] font-bold px-5 py-2.5 text-center "
-                >
-                  CheckIn
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  className={`${
-                    localStorage.getItem("status") === "true" && "hidden"
-                  } text-white  bg-red-500 hover:bg-red-800  rounded-full text-[14px] font-bold px-5 py-2.5 text-center`}
-                  onClick={handleCheckOut}
-                >
-                  CheckOut
-                </button>
+            {(userInfo.role === "Employee" || userInfo.role === "employee") &&
+    (
+                <div className="mx-3">
+                  {checkInValue && localStorage.getItem("status") !== "true" ? (
+                    <button
+                      type="button"
+                      onClick={handleCheckIn}
+                      className="text-white bg-purple-500 hover:bg-purple-800   rounded-full text-[14px] font-bold px-5 py-2.5 text-center "
+                    >
+                      CheckIn
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className={`${
+                        localStorage.getItem("status") === "true" && "hidden"
+                      } text-white  bg-red-500 hover:bg-red-800  rounded-full text-[14px] font-bold px-5 py-2.5 text-center`}
+                      onClick={handleCheckOut}
+                    >
+                      CheckOut
+                    </button>
+                  )}
+                  <div className="text-lg ">
+                    {localStorage.getItem("status") === "true" &&
+                      localStorage.getItem("message")}
+                  </div>
+                </div>
               )}
-              <div className="text-lg ">
-                {localStorage.getItem("status") === "true" &&
-                  localStorage.getItem("message")}
-              </div>
-            </div>
             {!token ? (
               <NavLink
                 className="flex items-center  font-medium text-black hover:text-blue-600 md:border-s md:border-gray-300 "
@@ -266,14 +278,14 @@ const Navbar = ({ toggleSideBar }) => {
               </NavLink>
             ) : (
               <>
-              <PiLineVerticalThin className="mx-2 text-2xl"/>
-              <button
-              onClick={handleLogout}
-              className="flex items-center text-lg  font-medium text-black hover:text-blue-600 "
-              >
-              <CgLogOut className="text-xl mx-2"/>              
-                Logout
-              </button>
+                <PiLineVerticalThin className="mx-2 text-2xl" />
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center text-lg  font-medium text-black hover:text-blue-600 "
+                >
+                  <CgLogOut className="text-xl mx-2" />
+                  Logout
+                </button>
               </>
             )}
           </div>
