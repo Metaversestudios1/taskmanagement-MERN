@@ -375,7 +375,7 @@ const Sidebar = ({ sidebar }) => {
                   }
                 >
                   <AiOutlineFundProjectionScreen className="text-lg" />
-                  Holidays
+                  Holiday
                 </NavLink>
               </li>
               <li>
