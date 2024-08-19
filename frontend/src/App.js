@@ -30,6 +30,9 @@ import LeaveHistory from "./components/leaveManagement/LeaveHistory";
 import LeaveRequests from "./components/leaveManagement/LeaveRequests";
 import AddLeave from "./components/leaveManagement/AddLeave";
 import EditLeave from "./components/leaveManagement/EditLeave";
+import AddHoliday from "./components/Holiday/AddHoliday";
+import HolidayTable from "./components/Holiday/HolidayTable";
+import EditHoliday from "./components/Holiday/EditHoliday";
 
 function App() {
   const [sideBar, setSideBar] = useState(true)
