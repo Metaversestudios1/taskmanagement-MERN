@@ -435,22 +435,6 @@ function App() {
       ),
     },
     {
-      path: "/Holiday/editholiday",
-      element: (
-        <PrivateRoute>
-          <div className="flex h-screen">
-            <Sidebar sidebar = {sideBar}/>
-            <div className="flex flex-col flex-grow overflow-y-auto">
-              <Navbar toggleSideBar = {toggleSideBar}/>
-              <div className="flex-grow ">
-                <EditLeave />
-              </div>
-            </div>
-          </div>
-        </PrivateRoute>
-      ),
-    },
-    {
       path: "/holiday",
       element: (
         <PrivateRoute>
@@ -476,6 +460,22 @@ function App() {
               <Navbar toggleSideBar = {toggleSideBar}/>
               <div className="flex-grow ">
                 <EditHoliday />
+              </div>
+            </div>
+          </div>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/holiday/addholiday",
+      element: (
+        <PrivateRoute>
+          <div className="flex h-screen">
+            <Sidebar sidebar = {sideBar}/>
+            <div className="flex flex-col flex-grow overflow-y-auto">
+              <Navbar toggleSideBar = {toggleSideBar}/>
+              <div className="flex-grow ">
+                <AddHoliday />
               </div>
             </div>
           </div>
