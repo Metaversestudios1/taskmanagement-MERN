@@ -18,7 +18,7 @@ const HolidayTable = () => {
     const fetchholiday = async () => {
         setLoader(true)
         const res = await fetch(
-            `http://localhost:3000/api/getAllholiday?page=${page}&limit=${pageSize}&search=${search}`
+            `${process.env.REACT_APP_BACKEND_URL}/api/getAllholiday?page=${page}&limit=${pageSize}&search=${search}`
         );
         const response = await res.json();
         if (response.success) {
@@ -36,7 +36,7 @@ const HolidayTable = () => {
             if (count === 1) {
                 holiOne = false;
             }
-            const res = await fetch('http://localhost:3000/api/deleteholiday', {
+            const res = await fetch('${process.env.REACT_APP_BACKEND_URL}/api/deleteholiday', {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id }),
