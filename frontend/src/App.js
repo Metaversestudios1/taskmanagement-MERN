@@ -33,6 +33,9 @@ import EditLeave from "./components/leaveManagement/EditLeave";
 import AddHoliday from "./components/Holiday/AddHoliday";
 import HolidayTable from "./components/Holiday/HolidayTable";
 import EditHoliday from "./components/Holiday/EditHoliday";
+import AddActivity from "./components/Activity/AddActivity";
+import ActivityTable from "./components/Activity/ActivityTable";
+import EditActivity from "./components/Activity/EditActivity";
 
 function App() {
   const [sideBar, setSideBar] = useState(true)
@@ -482,6 +485,55 @@ function App() {
         </PrivateRoute>
       ),
     },
+    {
+      path: "/activity/addactivity",
+      element: (
+        <PrivateRoute>         
+            <div className="flex h-screen">
+              <Sidebar sidebar = {sideBar}/>
+              <div className="flex flex-col flex-grow overflow-y-auto">
+                <Navbar toggleSideBar = {toggleSideBar}/>
+                <div className="flex-grow ">
+                  <AddActivity />
+                </div>
+              </div>
+            </div>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/activity",
+      element: (
+        <PrivateRoute>         
+            <div className="flex h-screen">
+              <Sidebar sidebar = {sideBar}/>
+              <div className="flex flex-col flex-grow overflow-y-auto">
+                <Navbar toggleSideBar = {toggleSideBar}/>
+                <div className="flex-grow ">
+                  <ActivityTable />
+                </div>
+              </div>
+            </div>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/activity/editactivity/:id",
+      element: (
+        <PrivateRoute>        
+            <div className="flex h-screen">
+              <Sidebar sidebar = {sideBar}/>
+              <div className="flex flex-col flex-grow overflow-y-auto">
+                <Navbar toggleSideBar = {toggleSideBar}/>
+                <div className="flex-grow ">
+                  <EditActivity />
+                </div>
+              </div>
+            </div>
+        </PrivateRoute>
+      ),
+    },
+
     {
       path: "*",
       element: (
