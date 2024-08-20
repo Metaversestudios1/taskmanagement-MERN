@@ -36,20 +36,19 @@ const ActivityTable = () =>{
         if (!res.ok) {
             throw new Error("Network response was not ok");
         }
-        if (res.success) {
-            toast.success("Activity is deleted successfully!", {
-              position: "top-right",
-              autoClose: 1000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "light",
-            });
-        }
+       
         const response =  await res.json();
         if(response.success){
+            toast.success("Activity is deleted successfully!", {
+                position: "top-right",
+                autoClose: 1000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+              });
             if(activOne){
                 setPage(page-1);
             }else{
