@@ -1,7 +1,6 @@
 const { json } = require("body-parser");
 const Attendence = require("../models/Attendence"); // Import the model
 const mongoose = require("mongoose");
-const { countDocuments, updateOne, findOne } = require("../models/Employee");
 // Function to insert data
 
 const insertattendence = async (req, res) => {
@@ -48,7 +47,7 @@ const getAllattendence = async (req, res) => {
       .sort({ createdAt: -1 })
       .skip((page - 1) * pageSize)
       .limit(pageSize);
-    const count = await countDocuments;
+    const count = await Attendence.find(query).countDocuments();
     res.status(200).json({ success: true, result, count });
   } catch (error) {
     res.status(500).json({
