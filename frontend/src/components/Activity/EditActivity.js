@@ -80,7 +80,7 @@ const Editactivity = () => {
   
   const fetchOldData = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/getSingleevent`, {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getSingleevent`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
@@ -109,7 +109,7 @@ const Editactivity = () => {
 
   const fetchAllActivity = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/getAllevent`);
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getAllevent`);
       const response = await res.json();
       if (response.success) {
         setActivity(response.result);
@@ -133,7 +133,7 @@ const Editactivity = () => {
     
     try {
         const updateData = { id, oldData };
-      const res = await fetch(`http://localhost:3000/api/updateevent`, {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateevent`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updateData), // Spread oldData into the body
