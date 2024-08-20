@@ -28,18 +28,19 @@ const ActivityTable = () =>{
         if(count===1){
             activOne=false;
         }
-        const res = await fetch('${process.env.REACT_APP_BACKEND_URL}/api/deleteevent',{
+        const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/deleteevent`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ id }),
-        })
+        });
+        
         if (!res.ok) {
             throw new Error("Network response was not ok");
         }
        
         const response =  await res.json();
         if(response.success){
-            toast.success("Activity is deleted successfully!", {
+              toast.success("Activity is deleted successfully!", {
                 position: "top-right",
                 autoClose: 1000,
                 hideProgressBar: false,
