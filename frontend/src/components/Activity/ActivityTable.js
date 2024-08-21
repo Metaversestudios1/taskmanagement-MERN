@@ -5,8 +5,10 @@ import { CiEdit } from "react-icons/ci";
 import { NavLink } from "react-router-dom";
 import { ToastContainer,toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import getUserFromToken from "../utils/getUserFromToken";
 
 const ActivityTable = () =>{
+    const userInfo = getUserFromToken()
  const[search, setSearch] = useState([]);
  const [page,setPage]= useState(1);
  const [pageSize ,setPageSize] = useState("");
@@ -96,11 +98,11 @@ const ActivityTable = () =>{
             <div className="text-xl font-bold mx-2 my-8">Acitivity/Events</div>
         </div>
         <div className="flex justify-between">
-            <NavLink to="/activity/addactivity">
+            {(userInfo.role==="admin" || userInfo.role==="Admin") && <NavLink to="/activity/addactivity">
                 <button className="bg-blue-800 text-white p-3 m-5 text-sm rounded-lg">
                     Add New
                 </button>
-            </NavLink>
+            </NavLink>}
             <div className={` flex items-center`}>
                 <input
                     placeholder="Search "
@@ -143,9 +145,9 @@ const ActivityTable = () =>{
                             Comments
                         </th>
 
-                        <th scope="col" className="px-6 py-3 border-2 border-gray-300">
+                        {(userInfo.role==="admin" || userInfo.role==="Admin") && <th scope="col" className="px-6 py-3 border-2 border-gray-300">
                             Action
-                        </th>
+                        </th>}
                     </tr>
                 </thead>
 
@@ -209,7 +211,7 @@ const ActivityTable = () =>{
                                     {item?.comments}
                                 </th>
                                 
-                                <td className="py-5  pl-5 gap-1 border-2  border-gray-300">
+                                {(userInfo.role==="admin" || userInfo.role==="Admin") && <td className="py-5  pl-5 gap-1 border-2  border-gray-300">
                                     <div className="flex items-center">
                                         <NavLink to={`/Activity/editactivity/${item._id}`}>
                                             <CiEdit className="text-2xl cursor-pointer text-green-900" />
@@ -219,7 +221,7 @@ const ActivityTable = () =>{
                                             className="text-2xl cursor-pointer text-red-900"
                                         />
                                     </div>
-                                </td>
+                                </td>}
                             </tr>
                         );
                     })}
