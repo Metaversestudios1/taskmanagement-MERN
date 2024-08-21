@@ -3,6 +3,9 @@ import { IoIosArrowRoundBack } from "react-icons/io";
 import { useNavigate, useParams } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import $ from 'jquery';
+import 'jquery-validation'; // Import the validation plugin
+
 const EditEmployee = () => {
   const [loader, setLoader] = useState(false);
   const [roles, setRoles] = useState([]);
@@ -23,7 +26,7 @@ const EditEmployee = () => {
     const fetchOldData = async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_BACKEND_URL}/api/getesingleemployee`,
+          `http://localhost:3000/api/getesingleemployee`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -47,7 +50,7 @@ const EditEmployee = () => {
     };
 
     const fetchRoles = async () => {
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getrole`);
+      const res = await fetch(`http://localhost:3000/api/getrole`);
       const response = await res.json();
       if (response.success) {
         setRoles(response.result);
@@ -56,9 +59,77 @@ const EditEmployee = () => {
 
     fetchOldData();
     fetchRoles();
+    validateEmployeeForm(); // Initialize validation on mount
   }, [id]);
 
- 
+  useEffect(() => {
+    // Re-initialize validation on data change
+    validateEmployeeForm();
+  }, [oldData]);
+
+  const validateEmployeeForm = () => {
+    // Add custom validation method for phone number
+    $.validator.addMethod("validPhone", function(value, element) {
+      return this.optional(element) || /^\d{10}$/.test(value);
+    }, "Please enter a valid 10-digit phone number.");
+  
+    // Initialize jQuery validation
+    $("#employeeform").validate({
+      rules: {
+        name: {
+          required: true
+        },
+        email: {
+          required: true,
+          email: true
+        },
+        password: {
+          required: true
+        },
+        contact_number: {
+          required: true,
+          validPhone: true  // Apply custom phone number validation
+        },
+        role: {
+          required: true
+        }
+      },
+      messages: {
+        name: {
+          required: "Please enter name"
+        },
+        email: {
+          required: "Please enter email",
+          email: "Please enter a valid email address"
+        },
+        password: {
+          required: "Please enter password"
+        },
+        contact_number: {
+          required: "Please enter contact details",
+          validPhone: "Phone number must be exactly 10 digits"  // Custom error message
+        },
+        role: {
+          required: "Please select a role"
+        }
+      },
+      errorElement: 'div',
+      errorPlacement: function(error, element) {
+        error.addClass('invalid-feedback');
+        error.insertAfter(element);
+      },
+      highlight: function(element, errorClass, validClass) {
+        $(element).addClass('is-invalid').removeClass('is-valid');
+      },
+      unhighlight: function(element, errorClass, validClass) {
+        $(element).removeClass('is-invalid').addClass('is-valid');
+      }
+    });
+  
+    // Return validation status
+    return $("#employeeform").valid();
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setOldData({
@@ -69,9 +140,13 @@ const EditEmployee = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateEmployeeForm()) {
+      return;
+    }
+  
     const updateData = { id, oldData };
     setLoader(true);
-    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updatemployee`, {
+    const response = await fetch(`http://localhost:3000/api/updatemployee`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updateData),
@@ -99,21 +174,22 @@ const EditEmployee = () => {
     e.preventDefault();
     navigate(-1);
   };
+
   return (
     <>
-      <div className="flex items-center ">
-      <ToastContainer
-      position="top-right"
-      autoClose={2000}
-      hideProgressBar={false}
-      newestOnTop={false}
-      closeOnClick
-      rtl={false}
-      pauseOnFocusLoss
-      draggable
-      pauseOnHover
-      theme="light"
-      />
+      <div className="flex items-center">
+        <ToastContainer
+          position="top-right"
+          autoClose={2000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
         <div className="flex items-center">
           <IoIosArrowRoundBack
             onClick={handleGoBack}
@@ -211,7 +287,7 @@ const EditEmployee = () => {
         </div>
       ) : (
         <div className="w-[70%] m-auto my-10">
-          <form>
+          <form id="employeeform">
             <div className="grid gap-6 mb-6 md:grid-cols-2">
               <div>
                 <label
@@ -278,10 +354,9 @@ const EditEmployee = () => {
                 onChange={handleChange}
                 className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 mb-5"
               >
-              <option value="">Select a role</option>
-              {roles.map((option) => (
-                <option  key={option._id} value={option._id} selected = {oldData.role === option._id}>
-             
+                <option value="">Select a role</option>
+                {roles.map((option) => (
+                  <option key={option._id} value={option._id} selected={oldData.role === option._id}>
                     {option.role}
                   </option>
                 ))}

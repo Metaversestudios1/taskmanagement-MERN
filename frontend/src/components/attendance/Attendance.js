@@ -36,7 +36,7 @@ const Attendance = () => {
   }, [page, employee, startDate, endDate]);
 
   const fetchEmployees = async () => {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getemployee`);
+    const res = await fetch(`http://localhost:3000/api/getemployee`);
     const response = await res.json();
     if (response.success) {
       setEmployees(response.result); 
@@ -45,7 +45,7 @@ const Attendance = () => {
 
   const fetchEmployeeName = async (id) => {
     const nameRes = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/getesingleemployee`,
+      `http://localhost:3000/api/getesingleemployee`,
       {
         method: "POST",
         headers: { "Content-type": "application/json" },
@@ -60,7 +60,7 @@ const Attendance = () => {
   const fetchAttendance = async () => {
     setLoader(true);
     const res = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/getAllattendence?page=${page}&limit=${pageSize}&id=${employee}&startDate=${startDate}&endDate=${endDate}`
+      `http://localhost:3000/api/getAllattendence?page=${page}&limit=${pageSize}&id=${employee}&startDate=${startDate}&endDate=${endDate}`
     );
     const response = await res.json();
     console.log(response)

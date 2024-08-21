@@ -16,7 +16,7 @@ const EditProject = () => {
     const fetchOldData = async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_BACKEND_URL}/api/getSingleproject`,
+          `http://localhost:3000/api/getSingleproject`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -48,7 +48,7 @@ const EditProject = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const updateData = { id, oldData };
-    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateproject`, {
+    const response = await fetch(`http://localhost:3000/api/updateproject`, {
       method: "PUT",
       headers: { "Content-Type": "application/json " },
       body: JSON.stringify(updateData),

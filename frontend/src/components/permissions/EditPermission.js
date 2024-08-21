@@ -3,22 +3,54 @@ import { IoIosArrowRoundBack } from "react-icons/io";
 import { useNavigate, useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import $ from "jquery";
+import "jquery-validation";
+
 const EditPermission = () => {
   const navigate = useNavigate();
   const params = useParams();
   const { id } = params;
   const initialState = {
     role: "",
-    permission: [],
+    permission: "",
   };
   const [oldData, setOldData] = useState(initialState);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchPermissions();
+
+    // Adding a custom validation method for checking hyphen or underscore
+    $.validator.addMethod(
+      "containsDashOrUnderscore",
+      function (value, element) {
+        return value.includes("-") || value.includes("_");
+      },
+      "Input is wrong! Please read the NOTE carefully."
+    );
+
+    // Initialize jQuery validation
+    $("#editPermissionForm").validate({
+      rules: {
+        permission: {
+          required: true,
+          containsDashOrUnderscore: true, // Applying custom validation rule
+        },
+      },
+      messages: {
+        permission: {
+          required: "Permission is required.",
+          containsDashOrUnderscore:
+            "Input is wrong! Please read the NOTE carefully.",
+        },
+      },
+      submitHandler: function (form) {
+        handleSubmit();
+      },
+    });
   }, []);
+
   const fetchPermissions = async () => {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getesinglepermission`, {
+    const res = await fetch(`http://localhost:3000/api/getesinglepermission`, {
       method: "POST",
       headers: { "Content-type": "application/json" },
       body: JSON.stringify({ id }),
@@ -28,56 +60,63 @@ const EditPermission = () => {
       setOldData(response.data[0]);
     }
   };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setOldData({ ...oldData, [name]: value });
   };
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+
+  const handleSubmit = async () => {
     const updateData = { id, oldData };
-    if (oldData.permission.includes(" ")) {
-      if (!oldData.permission.includes("-") || !oldData.permission.includes("_")) {
-        setError("Input is wrong! Please read the NOTE Carefully");
-        return;
-      } 
-    } else {
-      try {
-        const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updatpermission`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updateData),
+    try {
+      const res = await fetch(`http://localhost:3000/api/updatpermission`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updateData),
+      });
+      const response = await res.json();
+      if (response.success) {
+        toast.success("Permission is updated Successfully!", {
+          position: "top-right",
+          autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
         });
-        const response = await res.json();
-        if (response.success) {
-          toast.success("Permission is updated Successfully!", {
-            position: "top-right",
-            autoClose: 1000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
-          setTimeout(() => {
-            navigate("/permissionsTable");
-          }, 1500);
-        } else {
-          setError(response.message);
-        }
-      } catch (err) {
-        console.err(err);
+        setTimeout(() => {
+          navigate("/permissionsTable");
+        }, 1500);
+      } else {
+        toast.error(response.message);
       }
+    } catch (err) {
+      console.error(err);
     }
   };
 
   const handleGoBack = () => {
     navigate(-1);
   };
+
   return (
     <>
-      <div className="flex items-center ">
+      <style>
+        {`
+          .error {
+            color: red; /* Error messages in red */
+          }
+          label,
+          input,
+          .form-note {
+            color: black; /* Keep label, input, and notes in black */
+          }
+        `}
+      </style>
+
+      <div className="flex items-center">
         <ToastContainer
           position="top-right"
           autoClose={2000}
@@ -103,7 +142,7 @@ const EditPermission = () => {
       </div>
 
       <div className="w-[70%] m-auto my-10">
-        <form>
+        <form id="editPermissionForm">
           <div>
             <label
               htmlFor="permission"
@@ -117,23 +156,20 @@ const EditPermission = () => {
               onChange={handleChange}
               type="text"
               id="permission"
-              className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 mb-6"
-              placeholder="Enter the task description"
+              className="bg-gray-200 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 mb-6"
+              placeholder="Enter the permission name"
               required
             />
           </div>
-          <div className="mb-2 text-green-800">
+          <div className="form-note mb-2">
           NOTE&#58;Space&#40;s&#41; are not allowed in between Permission
           name&#46;&#40;Example:permission-table, permission_table is
           allowed&#41;
-        </div>
-          {error && <p className="text-red-900  text-[17px] mb-5">{error}</p>}
-
+          </div>
           <div>
             <button
-              onClick={handleSubmit}
               type="submit"
-              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
             >
               Save
             </button>

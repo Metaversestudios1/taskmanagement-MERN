@@ -3,6 +3,9 @@ import { IoIosArrowRoundBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import $ from 'jquery';
+import 'jquery-validation'; // Import jQuery validation
+
 const AddRole = () => {
   const navigate = useNavigate();
   const initialState = {
@@ -12,17 +15,23 @@ const AddRole = () => {
   const [data, setData] = useState(initialState);
   const [error, setError] = useState("");
   const [permissions, setPermissions] = useState([]);
+
   useEffect(() => {
     fetchPermissions();
   }, []);
+
+  useEffect(() => {
+    validateRoleForm(); // Initialize validation after permissions are fetched
+  }, [permissions]);
+
   const fetchPermissions = async () => {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getpermission`);
+    const res = await fetch(`http://localhost:3000/api/getpermission`);
     const response = await res.json();
-    console.log(response);
     if (response.success) {
       setPermissions(response.result);
     }
   };
+
   const handleChange = (e) => {
     const { name, value, checked } = e.target;
     if (name === "permission") {
@@ -37,19 +46,53 @@ const AddRole = () => {
       setData({ ...data, [name]: value });
     }
   };
+
+  const validateRoleForm = () => {
+    $("#roleForm").validate({
+      rules: {
+        role: {
+          required: true,
+          minlength: 2,
+        },
+        permission: {
+          required: true,
+        },
+      },
+      messages: {
+        role: {
+          required: "Please enter a role name",
+          minlength: "Role name must be at least 2 characters",
+        },
+        permission: {
+          required: "Please select at least one permission",
+        },
+      },
+      errorElement: "div",
+      errorPlacement: function (error, element) {
+        error.addClass("invalid-feedback");
+        error.insertAfter(element);
+      },
+      highlight: function (element, errorClass, validClass) {
+        $(element).addClass("is-invalid").removeClass("is-valid");
+      },
+      unhighlight: function (element, errorClass, validClass) {
+        $(element).removeClass("is-invalid").addClass("is-valid");
+      },
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if(data.permission.length===0) {
-      setError("Please provide atleast one permission correspond to specific Role")
-      return 
+    if (!$("#roleForm").valid()) {
+      return;
     }
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertrole`, {
+
+    const res = await fetch(`http://localhost:3000/api/insertrole`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
     const response = await res.json();
-    console.log(response)
     if (response.success) {
       toast.success('New Role is added Successfully!', {
         position: "top-right",
@@ -60,32 +103,32 @@ const AddRole = () => {
         draggable: true,
         progress: undefined,
         theme: "light",
-        });
-        setTimeout(() => {
-          navigate("/rolesTable");
-        }, 1500);
+      });
+      setTimeout(() => {
+        navigate("/rolesTable");
+      }, 1500);
     }
   };
 
   const handleGoBack = () => {
     navigate(-1);
   };
-  console.log(data)
+
   return (
     <>
       <div className="flex items-center ">
-      <ToastContainer
-      position="top-right"
-      autoClose={2000}
-      hideProgressBar={false}
-      newestOnTop={false}
-      closeOnClick
-      rtl={false}
-      pauseOnFocusLoss
-      draggable
-      pauseOnHover
-      theme="light"
-      />
+        <ToastContainer
+          position="top-right"
+          autoClose={2000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
         <div className="flex items-center">
           <IoIosArrowRoundBack
             onClick={handleGoBack}
@@ -99,7 +142,7 @@ const AddRole = () => {
       </div>
 
       <div className="w-[70%] m-auto my-10">
-        <form>
+        <form id="roleForm">
           <div>
             <label
               htmlFor="role"
@@ -109,67 +152,49 @@ const AddRole = () => {
             </label>
             <input
               name="role"
-              value={data?.role}
+              value={data.role}
               onChange={handleChange}
               type="text"
               id="role"
               className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
-              placeholder="Enter the task description"
+              placeholder="Enter the role name"
               required
             />
           </div>
-          <div >
-          <div className="mt-4">
-          Permissions<span className="text-red-900 text-lg ">&#x2a;</span>
-          </div>
-          {permissions.map((item) => {
-            return (
+          <div>
+            <div className="mt-4">
+              Permissions<span className="text-red-900 text-lg ">&#x2a;</span>
+            </div>
+            {permissions.map((item) => (
               <div key={item._id} className="flex flex-row items-center">
                 <label
                   className="relative flex items-center p-3 rounded-full cursor-pointer"
                   htmlFor={`check-${item._id}`}
                 >
                   <input
-                    value={item?._id}
+                    value={item._id}
                     onChange={handleChange}
                     type="checkbox"
                     name="permission"
-                    className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-gray-900 checked:bg-gray-900 checked:before:bg-gray-900 hover:before:opacity-10"
+                    className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all checked:border-gray-900 checked:bg-gray-900"
                     id={`check-${item._id}`}
                   />
-                  <span className="absolute text-white transition-opacity opacity-0 pointer-events-none top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 peer-checked:opacity-100">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-3.5 w-3.5"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      stroke="currentColor"
-                      strokeWidth="1"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      ></path>
-                    </svg>
-                  </span>
                 </label>
                 <label
                   className="mt-px font-light text-gray-700 cursor-pointer select-none"
                   htmlFor={`check-${item._id}`}
                 >
-                  {item?.permission}
+                  {item.permission}
                 </label>
               </div>
-            );
-          })}
+            ))}
           </div>
-          {error && <p className="text-red-900  text-[17px] mb-5">{error}</p>}
+          {error && <p className="text-red-900 text-[17px] mb-5">{error}</p>}
           <div>
             <button
               onClick={handleSubmit}
               type="submit"
-              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
             >
               ADD
             </button>

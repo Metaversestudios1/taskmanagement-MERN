@@ -21,7 +21,7 @@ const HolidaySchema = new mongoose.Schema({
     },
     deleted_at:{
         type:Date,
-        defaultL:null
+        default:null
     }
 },{ timestamps:true , collection : 'holidays'})
 

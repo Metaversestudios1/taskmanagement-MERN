@@ -37,7 +37,7 @@ const AddTask = () => {
   }, []);
 
   const fetchProjects = async () => {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getproject`);
+    const res = await fetch(`http://localhost:3000/api/getproject`);
     const response = await res.json();
     if (response.success) {
       setProjects(response.result);
@@ -86,7 +86,7 @@ const AddTask = () => {
     Object.keys(data).forEach((key) => {
       formData.append(key, data[key]);
     });
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/inserttask`, {
+    const res = await fetch(`http://localhost:3000/api/inserttask`, {
       method: "POST",
       body: formData,
     });

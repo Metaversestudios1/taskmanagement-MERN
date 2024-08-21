@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { useNavigate, useParams } from "react-router-dom";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import $ from 'jquery';
+import 'jquery-validation'; // Ensure the validation plugin is also imported
+
 const EditRole = () => {
   const params = useParams();
   const { id } = params;
@@ -15,14 +18,19 @@ const EditRole = () => {
   const [permissions, setPermissions] = useState([]);
   const [error, setError] = useState("");
 
-  
   useEffect(() => {
     fetchOldData();
     fetchAllPermissions();
+    validateRoleForm(); // Initialize validation on mount
   }, []);
-  
+
+  useEffect(() => {
+    // Re-initialize validation on data change
+    validateRoleForm();
+  }, [oldData]);
+
   const fetchOldData = async () => {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getSingleRole`, {
+    const res = await fetch(`http://localhost:3000/api/getSingleRole`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
@@ -32,15 +40,56 @@ const EditRole = () => {
       setOldData({ role: response.data[0].role, permission: response.data[0].permission });
     }
   };
-  
+
   const fetchAllPermissions = async () => {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getpermission`);
+    const res = await fetch(`http://localhost:3000/api/getpermission`);
     const response = await res.json();
     if (response.success) {
       setPermissions(response.result);
     }
   };
+
+  const validateRoleForm = () => {
+    $.validator.addMethod("requiredCheckbox", function(value, element) {
+      return $(element).closest('form').find('input[name="permission"]:checked').length > 0;
+    }, "Please select at least one permission.");
   
+    $("#roleform").validate({
+      rules: {
+        role: {
+          required: true,
+          
+          minlength: 2,
+        },
+        permission: {
+          requiredCheckbox: true  // Custom validation for permissions
+        }
+      },
+      messages: {
+        role: {
+          required: "Please enter a role name",
+          minlength: "Role name must be at least 2 characters",
+        },
+        permission: {
+          requiredCheckbox: "Please select at least one permission"
+        }
+      },
+      errorElement: 'div',
+      errorPlacement: function(error, element) {
+        error.addClass('invalid-feedback');
+        error.insertAfter(element);
+      },
+      highlight: function(element, errorClass, validClass) {
+        $(element).addClass('is-invalid').removeClass('is-valid');
+      },
+      unhighlight: function(element, errorClass, validClass) {
+        $(element).removeClass('is-invalid').addClass('is-valid');
+      }
+    });
+  
+    return $("#roleform").valid();
+  };
+
   const handleChange = (e) => {
     const { name, value, checked } = e.target;
     if (name === "permission") {
@@ -55,57 +104,62 @@ const EditRole = () => {
       setOldData({ ...oldData, [name]: value });
     }
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if(oldData.permission.length===0) {
-      setError("Please provide atleast one permission correspond to specific Role")
-      return 
+    if (!validateRoleForm()) {
+      return;
     }
-    const updateData = {id, oldData}
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updaterole`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updateData),
-    });
-    const response = await res.json();
-    console.log(response)
-    if (response.success) {
-      toast.success('Role is updated Successfully!', {
-        position: "top-right",
-        autoClose: 1000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
+  
+    try {
+      const updateData = { id, oldData };
+      const res = await fetch(`http://localhost:3000/api/updaterole`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updateData),
+      });
+      const response = await res.json();
+      if (response.success) {
+        toast.success('Role is updated Successfully!', {
+          position: "top-right",
+          autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
         });
         setTimeout(() => {
           navigate("/rolesTable");
         }, 1500);
+      } else {
+        setError(response.message);
+      }
+    } catch (err) {
+      console.log(err);
     }
   };
-  
+
   const handleGoBack = () => {
     navigate(-1);
   };
-  console.log(oldData)
+
   return (
     <>
       <div className="flex items-center">
-      <ToastContainer
-      position="top-right"
-      autoClose={2000}
-      hideProgressBar={false}
-      newestOnTop={false}
-      closeOnClick
-      rtl={false}
-      pauseOnFocusLoss
-      draggable
-      pauseOnHover
-      theme="light"
-      />
+        <ToastContainer
+          position="top-right"
+          autoClose={2000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
         <div className="flex items-center">
           <IoIosArrowRoundBack
             onClick={handleGoBack}
@@ -119,7 +173,7 @@ const EditRole = () => {
       </div>
 
       <div className="w-[70%] m-auto my-10">
-        <form>
+        <form id="roleform">
           <div>
             <label
               htmlFor="role"
@@ -134,7 +188,7 @@ const EditRole = () => {
               type="text"
               id="role"
               className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5"
-              placeholder="Enter the task description"
+              placeholder="Enter the role"
               required
             />
           </div>
@@ -184,15 +238,14 @@ const EditRole = () => {
               );
             })}
           </div>
-          {error && <p className="text-red-900  text-[17px] mb-5">{error}</p>}
+          {error && <p className="text-red-900 text-[17px] mb-5">{error}</p>}
 
           <div>
             <button
               onClick={handleSubmit}
-              type="submit"
               className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
-              UPDATE
+              Update
             </button>
           </div>
         </form>

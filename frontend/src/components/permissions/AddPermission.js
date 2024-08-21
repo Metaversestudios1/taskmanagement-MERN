@@ -3,62 +3,100 @@ import { IoIosArrowRoundBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import $ from "jquery";
+import "jquery-validation";
+
 const AddPermission = () => {
   const navigate = useNavigate();
   const initialState = {
     permission: "",
   };
   const [data, setData] = useState(initialState);
-  const [error, setError] = useState("");
+
+  useEffect(() => {
+    // Adding a custom validation method for checking hyphen or underscore
+    $.validator.addMethod(
+      "containsDashOrUnderscore",
+      function (value, element) {
+        return value.includes("-") || value.includes("_");
+      },
+      "Input is wrong! Please read the NOTE carefully."
+    );
+
+    // Initialize jQuery validation when the component mounts
+    $("#permissionForm").validate({
+      rules: {
+        permission: {
+          required: true,
+          containsDashOrUnderscore: true, // Applying custom validation rule
+        },
+      },
+      messages: {
+        permission: {
+          required: "Permission is required.",
+          containsDashOrUnderscore:
+            "Input is wrong! Please read the NOTE carefully.",
+        },
+      },
+      submitHandler: function (form) {
+        handleSubmit();
+      },
+    });
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setData({ ...data, [name]: value });
   };
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (data.permission.includes(" ")) {
-      if (!data.permission.includes("-") || !data.permission.includes("_")) {
-        setError("Input is wrong! Please read the NOTE Carefully");
-        return;
-      }
-    } else {
-      try {
-        const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertpermission`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
+
+  const handleSubmit = async () => {
+    try {
+      const res = await fetch(`http://localhost:3000/api/insertpermission`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const response = await res.json();
+      if (response.success) {
+        toast.success("New Permission is added Successfully!", {
+          position: "top-right",
+          autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
         });
-        const response = await res.json();
-        if (response.success) {
-          setError("")
-          toast.success("New Permission is added Successfully!", {
-            position: "top-right",
-            autoClose: 1000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
-          setTimeout(() => {
-            navigate("/permissionstable");
-          }, 1500);
-        } else {
-          setError(response.message);
-        }
-      } catch (err) {
-        console.error(err);
+        setTimeout(() => {
+          navigate("/permissionstable");
+        }, 1500);
+      } else {
+        toast.error(response.message);
       }
+    } catch (err) {
+      console.error(err);
     }
   };
 
   const handleGoBack = () => {
     navigate(-1);
   };
+
   return (
     <>
+      <style>
+        {`
+          .error {
+            color: red; /* Error messages in red */
+          }
+          label,
+          input {
+            color: black; /* Keep label, input, and notes in black */
+          }
+        `}
+      </style>
+
       <div className="flex items-center ">
         <ToastContainer
           position="top-right"
@@ -85,11 +123,11 @@ const AddPermission = () => {
       </div>
 
       <div className="w-[70%] m-auto my-10">
-        <form>
+        <form id="permissionForm">
           <div>
             <label
               htmlFor="permission"
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
+              className="block mb-2 text-sm font-medium"
             >
               Permission<span className="text-red-900 text-lg ">&#x2a;</span>
             </label>
@@ -99,22 +137,20 @@ const AddPermission = () => {
               onChange={handleChange}
               type="text"
               id="permission"
-              className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 mb-5"
+              className="bg-gray-200 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 mb-5"
               placeholder="Enter the Permission name"
               required
             />
           </div>
-          <div className="mb-2 text-green-800">
-            NOTE&#58;Space&#40;s&#41; are not allowed in between Permission
-            name&#46;&#40;Example:permission-table, permission_table is
-            allowed&#41;
+          <div className="form-note mb-2 text-green-800">
+          NOTE&#58;Space&#40;s&#41; are not allowed in between Permission
+          name&#46;&#40;Example:permission-table, permission_table is
+          allowed&#41;
           </div>
-          {error && <p className="text-red-900  text-[17px] mb-5">{error}</p>}
           <div>
             <button
-              onClick={handleSubmit}
               type="submit"
-              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
             >
               ADD
             </button>

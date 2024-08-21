@@ -3,6 +3,10 @@ import { IoIosArrowRoundBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import $ from 'jquery';
+// import 'jquery-validation'; // Ensure the validation plugin is also importe
+import 'jquery-validation'; 
+
 const AddEmployee = () => {
   const [mobileValid, setMobileValid] = useState("");
   const [error, setError] = useState("");
@@ -22,17 +26,80 @@ const AddEmployee = () => {
     fetchRoles();
   }, []);
   const fetchRoles = async () => {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getrole`);
+    const res = await fetch(`http://localhost:3000/api/getrole`);
     const response = await res.json();
     if (response.success) {
       setRoles(response.result);
     }
   };
 
-  const validatePhoneNumber = (number) => {
-    const phoneRegex = /^\d{10}$/;
-    return phoneRegex.test(number);
+  // const validatePhoneNumber = (number) => {
+  //   const phoneRegex = /^\d{10}$/;
+  //   return phoneRegex.test(number);
+  // };
+  const validateEmployeeForm = () => {
+    // Add custom validation method for phone number
+    $.validator.addMethod("validPhone", function(value, element) {
+      return this.optional(element) || /^\d{10}$/.test(value);
+    }, "Please enter a valid 10-digit phone number.");
+  
+    // Initialize jQuery validation
+    $("#employeeform").validate({
+      rules: {
+        name: {
+          required: true
+        },
+        email: {
+          required: true,
+          email: true
+        },
+        password: {
+          required: true
+        },
+        contact_number: {
+          required: true,
+          validPhone: true  // Apply custom phone number validation
+        },
+        role: {
+          required: true
+        }
+      },
+      messages: {
+        name: {
+          required: "Please enter name"
+        },
+        email: {
+          required: "Please enter email",
+          email: "Please enter a valid email address"
+        },
+        password: {
+          required: "Please enter password"
+        },
+        contact_number: {
+          required: "Please enter contact details",
+          validPhone: "Phone number must be exactly 10 digits"  // Custom error message
+        },
+        role: {
+          required: "Please select a role"
+        }
+      },
+      errorElement: 'div',
+      errorPlacement: function(error, element) {
+        error.addClass('invalid-feedback');
+        error.insertAfter(element);
+      },
+      highlight: function(element, errorClass, validClass) {
+        $(element).addClass('is-invalid').removeClass('is-valid');
+      },
+      unhighlight: function(element, errorClass, validClass) {
+        $(element).removeClass('is-invalid').addClass('is-valid');
+      }
+    });
+  
+    // Return validation status
+    return $("#employeeform").valid();
   };
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setData({ ...data, [name]: value });
@@ -40,19 +107,13 @@ const AddEmployee = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validatePhoneNumber(data.contact_number)) {
-      setMobileValid("Please enter a valid Phone Number.");
-      return 
-    } else {
-      setMobileValid("");
-      // Submit the form or handle the valid input
-    }
-    if (!data.email.includes("@") || !data.email.split("@")[1].includes(".")) {
-      setError("Email is not valid");
+    if (!validateEmployeeForm()) {
+      //setError("Please fill in all required fields.");
       return;
     }
+  
     try {
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertemployee`, {
+      const res = await fetch(`http://localhost:3000/api/insertemployee`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -112,7 +173,7 @@ const AddEmployee = () => {
       </div>
 
       <div className="w-[70%] m-auto my-10">
-        <form>
+        <form id="employeeform">
           <div className="grid gap-6 mb-6 md:grid-cols-2">
             <div>
               <label

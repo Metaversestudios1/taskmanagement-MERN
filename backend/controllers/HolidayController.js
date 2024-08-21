@@ -6,7 +6,7 @@ const { updateEmployee } = require('./EmployeeController');
 const insertholiday = async (req, res) => {
     try {
         const newholiday = new Holiday(req.body);
-        await newholiday.save();
+        const y = await newholiday.save();
         res.status(201).json({ success: true })
     } catch (err) {
         res.status(500).json({ success: false, message: "error inserting holiday", error: err.message });
@@ -18,18 +18,17 @@ const getAllholiday = async (req, res) => {
         const pageSize = parseInt(req.query.limit);
         const page = parseInt(req.query.page);
         const search = req.query.search;
-
         const query = {
             deleted_at: null,
-        };
+        }
         if (search) {
-            query.reason = { $regex: search, $option: "i" };
+            query.reason = { $regex: search, $options: "i" };
         }
         const result = await Holiday.find(query)
             .sort({ createdAt: -1 })
             .skip((page - 1) * pageSize)
             .limit(pageSize);
-        const count = Holiday.countDocuments;
+        const count =await  Holiday.find(query).countDocuments();
         res.status(200).json({ success: true, result, count });
 
     } catch (error) {
@@ -38,7 +37,6 @@ const getAllholiday = async (req, res) => {
 }
 const getSingleHoliday = async (req, res) => {
     const { id } = req.body;
-    console.log(id);
     try {
 
         const result = await Holiday.findOne({ _id: id });

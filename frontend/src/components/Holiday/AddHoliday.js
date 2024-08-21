@@ -13,7 +13,7 @@ const AddHoliday = () => {
     date: "",
     reason: "",
     day: "",
-    month: "",
+    month: "", 
   };
   const [data, setData] = useState(initialState);
   const [error, setError] = useState("");
@@ -80,7 +80,7 @@ const handleSubmit = async (e) => {
   }
 
   try {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertholiday`, {
+    const res = await fetch(`http://localhost:3000/api/insertholiday`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),

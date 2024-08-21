@@ -10,7 +10,7 @@ const AuthProvider = ({ children }) => {
 
   const fetchAuth = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/protected`, {
+      const response = await fetch(`http://localhost:3000/protected`, {
         method: 'GET',
         credentials: 'include', // Include cookies for authentication
       });
@@ -35,11 +35,7 @@ const AuthProvider = ({ children }) => {
   };
 
 useEffect(() => {
-  const timer = setTimeout(() => {
     fetchAuth();
-  }, 500);
-
-  return () => clearTimeout(timer); // Cleanup timer on component unmount
 }, []);
 
 
