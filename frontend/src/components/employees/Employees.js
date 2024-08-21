@@ -16,7 +16,7 @@ const Employees = () => {
   }, [page, search]);
 
   const fetchRoleName = async (id) => {
-    const roleRes = await fetch(`http://localhost:3000/api/getSingleRole`, {
+    const roleRes = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getSingleRole`, {
       method: "POST",
       headers: { "Content-type": "application/json" },
       body: JSON.stringify({ id }),
@@ -28,7 +28,7 @@ const Employees = () => {
 
   const fetchData = async () => {
     const res = await fetch(
-      `http://localhost:3000/api/getemployee?page=${page}&limit=${pageSize}&search=${search}`
+      `${process.env.REACT_APP_BACKEND_URL}/api/getemployee?page=${page}&limit=${pageSize}&search=${search}`
     );
     const response = await res.json();
     if (response.success) {
@@ -56,7 +56,7 @@ const Employees = () => {
       if (count === 1) {
       userOne = false;
     }
-    const res = await fetch(`http://localhost:3000/api/deleteemployee`, {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/deleteemployee`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),

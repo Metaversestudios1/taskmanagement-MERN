@@ -34,7 +34,7 @@ useEffect(()=>{
 fetchOldData()
 },[])
 const fetchOldData = async ()=>{
-    const res = await fetch(`http://localhost:3000/api/getSingleleave`,{
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getSingleleave`,{
         method:"POST",
         headers:{"Content-Type":"application/json"},
         body: JSON.stringify({id})
@@ -63,7 +63,7 @@ const fetchOldData = async ()=>{
   const handleSubmit = async (e) => {
     e.preventDefault();
     const updateData = {data, id}
-    const res = await fetch(`http://localhost:3000/api/updateleave`, {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateleave`, {
       method: "PUT",
       headers:{"Content-Type":"application/json"},
       body: JSON.stringify(updateData),
