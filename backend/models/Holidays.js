@@ -1,18 +1,18 @@
 const mongoose = require('mongoose');
 
 const HolidaySchema = new mongoose.Schema({
-    Date:{
+    date:{
         type:Date,
         required:true
     },
-    Reason:{
+    reason:{
         type:String,
         required:true,
     },
-    Day:{
+    day:{
         type:String,
     },
-    Month:{
+    month:{
         type:String,
     },
     status:{

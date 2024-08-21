@@ -30,6 +30,9 @@ import LeaveHistory from "./components/leaveManagement/LeaveHistory";
 import LeaveRequests from "./components/leaveManagement/LeaveRequests";
 import AddLeave from "./components/leaveManagement/AddLeave";
 import EditLeave from "./components/leaveManagement/EditLeave";
+import AddHoliday from "./components/Holiday/AddHoliday";
+import HolidayTable from "./components/Holiday/HolidayTable";
+import EditHoliday from "./components/Holiday/EditHoliday";
 
 function App() {
   const [sideBar, setSideBar] = useState(true)
@@ -425,6 +428,54 @@ function App() {
               <Navbar toggleSideBar = {toggleSideBar}/>
               <div className="flex-grow ">
                 <EditLeave />
+              </div>
+            </div>
+          </div>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/holiday",
+      element: (
+        <PrivateRoute>
+          <div className="flex h-screen">
+            <Sidebar sidebar = {sideBar}/>
+            <div className="flex flex-col flex-grow overflow-y-auto">
+              <Navbar toggleSideBar = {toggleSideBar}/>
+              <div className="flex-grow ">
+                <HolidayTable />
+              </div>
+            </div>
+          </div>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/holiday/editholiday/:id",
+      element: (
+        <PrivateRoute>
+          <div className="flex h-screen">
+            <Sidebar sidebar = {sideBar}/>
+            <div className="flex flex-col flex-grow overflow-y-auto">
+              <Navbar toggleSideBar = {toggleSideBar}/>
+              <div className="flex-grow ">
+                <EditHoliday />
+              </div>
+            </div>
+          </div>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/holiday/addholiday",
+      element: (
+        <PrivateRoute>
+          <div className="flex h-screen">
+            <Sidebar sidebar = {sideBar}/>
+            <div className="flex flex-col flex-grow overflow-y-auto">
+              <Navbar toggleSideBar = {toggleSideBar}/>
+              <div className="flex-grow ">
+                <AddHoliday />
               </div>
             </div>
           </div>

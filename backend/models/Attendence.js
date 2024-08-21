@@ -10,11 +10,11 @@ const AttendenceSchema = new mongoose.Schema({
         required:true
     },
     check_in:{
-        type:Date,
+        type:String,
         required:true
     },
     check_out:{
-        type:Date,
+        type:String,
         default:null
     },
     working_hours:{
@@ -23,7 +23,6 @@ const AttendenceSchema = new mongoose.Schema({
     },
     attendance_status:{ 
         type:String,
-        Enum:['Present','Absent'],
         default:null
     },
     deleted_at:{

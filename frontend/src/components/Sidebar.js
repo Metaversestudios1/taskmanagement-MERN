@@ -367,6 +367,19 @@ const Sidebar = ({ sidebar }) => {
               </li>
               <li>
                 <NavLink
+                  to="/holiday"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg"
+                      : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg hover:text-black hover:bg-white"
+                  }
+                >
+                  <AiOutlineFundProjectionScreen className="text-lg" />
+                  Holiday
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
                   to="/setting"
                   className={({ isActive }) =>
                     isActive

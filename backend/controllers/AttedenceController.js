@@ -11,7 +11,7 @@ const insertattendence = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      messsage: "inserting attendence errror",
+      messsage: "inserting attendence error",
       error: error.message,
     });
   }
@@ -47,7 +47,7 @@ const getAllattendence = async (req, res) => {
       .sort({ createdAt: -1 })
       .skip((page - 1) * pageSize)
       .limit(pageSize);
-    const count = await Attendence.find(query).countDocuments();
+    const count = await Attendence.find(query).countDocuments()
     res.status(200).json({ success: true, result, count });
   } catch (error) {
     res.status(500).json({
@@ -57,64 +57,92 @@ const getAllattendence = async (req, res) => {
     });
   }
 };
+
+function getCurrentTime() {
+  const date = new Date();
+  let hours = date.getHours();
+  const minutes = date.getMinutes();
+  const ampm = hours >= 12 ? "PM" : "AM";
+
+  hours = hours % 12;
+  hours = hours ? hours : 12; // Hour '0' should be '12'
+
+  const minutesStr = minutes < 10 ? `0${minutes}` : minutes;
+  const timeString = `${hours}:${minutesStr} ${ampm}`;
+
+  return timeString;
+}
+// Function to parse time string and return a Date object for the current date
+const parseTimeString = (timeString) => {
+  const [time, period] = timeString.split(' ');
+  let [hours, minutes] = time.split(':').map(Number);
+
+  if (period === 'PM' && hours !== 12) {
+    hours += 12;
+  } else if (period === 'AM' && hours === 12) {
+    hours = 0;
+  }
+
+  const now = new Date();
+  const date = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+  return date;
+};
+
+// Function to calculate working hours
+const calculateWorkingHours = (checkInTime, checkOutTime) => {
+  const checkInDate = parseTimeString(checkInTime);
+  const checkOutDate = parseTimeString(checkOutTime);
+
+  const diffMs = checkOutDate - checkInDate; // Difference in milliseconds
+  const diffHours = diffMs / (1000 * 60 * 60); // Convert to hours
+  return Math.round(diffHours * 100) / 100; // Round to 2 decimal places
+};
+
 const updateattendence = async (req, res) => {
   const { emp_id, date } = req.body;
-  // Convert the frontend date (already in 'YYYY-MM-DD' format) to a Date object
-  const inputDate = new Date(date);
-
-  // Adjust the time zone offset to ensure it matches local time
-  const localTime = new Date(inputDate.getTime() - inputDate.getTimezoneOffset() * 60000);
-  const dateString = localTime.toISOString().split("T")[0];
-
+  const check_out = getCurrentTime();
   try {
-    // Use $expr and $dateToString to match only the date part
     const result = await Attendence.findOne({
       emp_id,
-      $expr: {
-        $eq: [
-          { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
-          dateString,
-        ],
-      },
+      date: new Date(date),
     });
 
     if (!result) {
       return res.status(404).json({ success: false, message: "Employee not found" });
     }
 
-    const check_in = result["check_in"]; // Convert the stored check_in to a Date object
-    const check_out = new Date();
-    const working_minutes = check_out - check_in;
-    const working_hours = working_minutes / (1000 * 60 * 60);
-    const roundedDurationHours = Math.round(working_hours * 100) / 100;
+    const check_in = result["check_in"];
+    const check_out_time = check_out; // This should be in string format like "2:29 PM"
 
+    const roundedDurationHours = calculateWorkingHours(check_in, check_out_time);
     let attendance_status;
     if (roundedDurationHours >= 8) {
       attendance_status = "present";
-      res.status(200).json({ success: true });
     } else {
       attendance_status = "absent";
-      res.status(200).json({ success: true });
     }
 
     await Attendence.updateOne(
       { emp_id, date: result.date },
       {
         $set: {
-          check_out: check_out,
+          check_out: check_out_time, // Save as a string
           working_hours: roundedDurationHours,
           attendance_status: attendance_status,
         },
       }
     );
+    res.status(200).json({ success: true });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Error updating attendance",
       error: error.message,
     });
   }
 };
+
+
 
 const deleteattendence = async (req, res) => {
   const { id } = req.body;
