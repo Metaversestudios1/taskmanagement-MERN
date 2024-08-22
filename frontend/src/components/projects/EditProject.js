@@ -3,6 +3,8 @@ import { IoIosArrowRoundBack } from "react-icons/io";
 import { useNavigate, useParams } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import $ from "jquery";
+import 'jquery-validation';
 
 const EditProject = () => {
   const navigate = useNavigate();
@@ -16,7 +18,7 @@ const EditProject = () => {
     const fetchOldData = async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_BACKEND_URL}/api/getSingleproject`,
+          `http://localhost:3000/api/getSingleproject`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -45,10 +47,44 @@ const EditProject = () => {
       [name]: value,
     });
   };
+  const validateprojectForm = () => {
+    // Initialize jQuery validation
+    $("#projectform").validate({
+      rules: {
+        name: {
+          required: true
+        },      
+      },
+      messages: {
+        name: {
+          required: "Please enter project name"
+        },     
+      
+      },
+      errorElement: 'div',
+      errorPlacement: function(error, element) {
+        error.addClass('invalid-feedback');
+        error.insertAfter(element);
+      },
+      highlight: function(element, errorClass, validClass) {
+        $(element).addClass('is-invalid').removeClass('is-valid');
+      },
+      unhighlight: function(element, errorClass, validClass) {
+        $(element).removeClass('is-invalid').addClass('is-valid');
+      }
+    });
+  
+    // Return validation status
+    return $("#projectform").valid();
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateprojectForm()) {
+      // setError("Please fill in all required fields.");
+        return;
+      }
     const updateData = { id, oldData };
-    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateproject`, {
+    const response = await fetch(`http://localhost:3000/api/updateproject`, {
       method: "PUT",
       headers: { "Content-Type": "application/json " },
       body: JSON.stringify(updateData),
@@ -97,19 +133,19 @@ const EditProject = () => {
       />
     </div>
     <div className="flex items-center">
-      
-      <div className="text-2xl font-bold mx-2 my-8 px-4">Edit Project</div>
+      {/* <div className="bg-[#032e4e] rounded-[5px] ml-5 h-[30px] w-[10px]"></div> */}
+      <div className="text-xl font-bold mx-2 my-8">Edit Project</div>
     </div>
   </div>
         <div className="w-[70%] m-auto my-10">
-          <form>
+          <form id="projectform">
             <div className="grid gap-6 mb-6 md:grid-cols-2">
               <div>
                 <label
                   htmlFor="name"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
                 >
-                  Full Name
+                  Project Name
                 </label>
                 <input
                   onChange={handleChange}
