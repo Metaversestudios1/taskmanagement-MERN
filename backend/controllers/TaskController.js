@@ -35,7 +35,7 @@ const uploadImage = async (filePath) => {
 
 const insertTask = async (req, res) => {
   if (req.file) {
-  //  console.log("req.file is present")
+  
     const { originalname, path: filePath } = req.file;
 
     try {
@@ -62,6 +62,7 @@ const insertTask = async (req, res) => {
       await newTask.save();
       res.status(201).json({ success: true });
     } catch (error) {
+      console.error('Error details:', error);
       res
         .status(500)
         .json({
