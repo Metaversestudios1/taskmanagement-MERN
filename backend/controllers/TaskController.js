@@ -18,7 +18,7 @@ const uploadImage = async (filePath) => {
     use_filename: true,
     unique_filename: false,
     overwrite: true,
-    resource_type: "raw", // Set resource type to 'raw' for ZIP files
+    resource_type: "row", // Set resource type to 'raw' for ZIP files
   };
 
   try {
@@ -32,21 +32,22 @@ const uploadImage = async (filePath) => {
     throw new Error("Cloudinary upload failed");
   }
 };
-
 const insertTask = async (req, res) => {
   if (req.file) {
-  //  console.log("req.file is present")
+    console.log("req.file is present");
     const { originalname, path: filePath } = req.file;
 
     try {
       const taskData = req.body;
+      console.log("Uploading file to Cloudinary...");
+      
       // Upload file to Cloudinary
       const uploadResult = await uploadImage(filePath);
       if (!uploadResult) {
-        return res
-          .status(500)
-          .json({ success: false, message: "File upload error" });
+        return res.status(500).json({ success: false, message: "File upload error" });
       }
+
+      console.log("File uploaded successfully:", uploadResult);
 
       // Create new task with file information
       const newTask = new Task({
@@ -62,49 +63,41 @@ const insertTask = async (req, res) => {
       await newTask.save();
       res.status(201).json({ success: true });
     } catch (error) {
-      res
-        .status(500)
-        .json({
-          success: false,
-          message: "Error inserting Task",
-          error: error.message,
-        });
+      console.error("Error inserting task:", error.message);
+      res.status(500).json({
+        success: false,
+        message: "Error inserting Task",
+        error: error.message,
+      });
     } finally {
       // Remove the file from the local filesystem
-
-
       fs.unlink(filePath, (err) => {
         if (err) console.error("Failed to delete file:", err);
       });
-
     }
-
-  }
-  else {
-  //  console.log("req.file is not present")
-
+  } else {
+    console.log("req.file is not present");
     try {
       const taskData = req.body;
-      // Create new task with file information
+
+      // Create new task without file information
       const newTask = new Task({
-        ...taskData
+        ...taskData,
       });
 
       await newTask.save();
       res.status(201).json({ success: true });
     } catch (error) {
-      res
-        .status(500)
-        .json({
-          success: false,
-          message: "Error inserting Task",
-          error: error.message,
-        });
+      console.error("Error inserting task without file:", error.message);
+      res.status(500).json({
+        success: false,
+        message: "Error inserting Task",
+        error: error.message,
+      });
     }
   }
-
-
 };
+
 
 const getAllTask = async (req, res) => {
   try {
