@@ -18,7 +18,7 @@ const uploadImage = async (filePath) => {
     use_filename: true,
     unique_filename: false,
     overwrite: true,
-    resource_type: "raw", // Set resource type to 'raw' for ZIP files
+    resource_type: "row", // Set resource type to 'raw' for ZIP files
   };
 
   try {
