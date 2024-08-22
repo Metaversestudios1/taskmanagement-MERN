@@ -21,7 +21,7 @@ const Login = () => {
   useEffect(() => {
     if (token) {
       setTimeout(() => {
-        navigate(-1);
+        navigate("/");
       }, 500);
     } else {
       setLoading(false);
