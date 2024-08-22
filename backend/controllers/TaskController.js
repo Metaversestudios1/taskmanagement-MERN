@@ -34,51 +34,57 @@ const uploadImage = async (filePath) => {
 };
 
 const insertTask = async (req, res) => {
+
   if (req.file) {
   
     const { originalname, path: filePath } = req.file;
-
-    try {
-      const taskData = req.body;
-      // Upload file to Cloudinary
-      const uploadResult = await uploadImage(filePath);
-      if (!uploadResult) {
-        return res
-          .status(500)
-          .json({ success: false, message: "File upload error" });
-      }
-
-      // Create new task with file information
-      const newTask = new Task({
-        ...taskData,
-        attachment: {
-          publicId: uploadResult.public_id,
-          url: uploadResult.secure_url,
-          originalname: originalname,
-          mimetype: req.file.mimetype,
-        },
-      });
-
-      await newTask.save();
-      res.status(201).json({ success: true });
-    } catch (error) {
-      console.error('Error details:', error);
-      res
+    res
         .status(500)
         .json({
-          success: false,
-          message: "Error inserting Task",
-          error: error.message,
+          success: true,
+          originalname: originalname,
         });
-    } finally {
-      // Remove the file from the local filesystem
+    // try {
+    //   const taskData = req.body;
+    //   // Upload file to Cloudinary
+    //   const uploadResult = await uploadImage(filePath);
+    //   if (!uploadResult) {
+    //     return res
+    //       .status(500)
+    //       .json({ success: false, message: "File upload error" });
+    //   }
+
+    //   // Create new task with file information
+    //   const newTask = new Task({
+    //     ...taskData,
+    //     attachment: {
+    //       publicId: uploadResult.public_id,
+    //       url: uploadResult.secure_url,
+    //       originalname: originalname,
+    //       mimetype: req.file.mimetype,
+    //     },
+    //   });
+
+    //   await newTask.save();
+    //   res.status(201).json({ success: true });
+    // } catch (error) {
+    //   console.error('Error details:', error);
+    //   res
+    //     .status(500)
+    //     .json({
+    //       success: false,
+    //       message: "Error inserting Task",
+    //       error: error.message,
+    //     });
+    // } finally {
+    //   // Remove the file from the local filesystem
 
 
-      fs.unlink(filePath, (err) => {
-        if (err) console.error("Failed to delete file:", err);
-      });
+    //   fs.unlink(filePath, (err) => {
+    //     if (err) console.error("Failed to delete file:", err);
+    //   });
 
-    }
+    // }
 
   }
   else {
