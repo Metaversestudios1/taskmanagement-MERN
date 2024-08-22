@@ -74,13 +74,23 @@ const Tasks = () => {
           };
         })
       );
-      setTasks(tasksWithProjectNames);
+
+      // Group tasks by date
+      const groupedTasks = tasksWithProjectNames.reduce((acc, task) => {
+  
+        if (!acc[task.date]) {
+          acc[task.date] = [];
+        }
+        acc[task.date].push(task);
+        return acc;
+      }, {});
+      setTasks(groupedTasks);
       setCount(response.count);
       setLoader(false);
     }
   };
 
-  const handleDelete = async (e, id) => {
+  const handleDelete = async (e, id, date) => {
     e.preventDefault();
     const permissionOfDelete = window.confirm(
       "Are you sure, you want to delete the task?"
@@ -147,13 +157,10 @@ const Tasks = () => {
     }
   };
 
-  const startIndex = (page - 1) * pageSize;
-
   return (
     <div className="">
       <div className="flex items-center">
-        <div className="bg-[#032e4e] rounded-[5px] ml-5 h-[30px] w-[10px]"></div>
-        <div className="text-xl font-bold mx-2 my-8">Tasks</div>
+        <div className="text-2xl font-bold mx-2 my-8 px-4 ">Tasks</div>
       </div>
       <div className="flex justify-between">
         {(userInfo.role === "Employee" || userInfo.role === "employee") && (
@@ -170,7 +177,7 @@ const Tasks = () => {
                 onChange={handleChange}
                 type="text"
                 name="search"
-                className={`text-black border-[1px] rounded-lg bg-white p-2 m-5`}
+                className={`text-black border-[1px] border-gray-400 rounded-lg bg-white p-2 m-5`}
               />
             </div>
           </>
@@ -235,7 +242,7 @@ const Tasks = () => {
           Reset
         </button>
       </div>
-      {tasks.length > 0 ? (
+      {Object.keys(tasks).length > 0 ? (
         <div className="relative overflow-x-auto m-5 mb-0">
           <table className="w-full text-sm text-left rtl:text-right border-2 border-gray-300">
             <thead className="text-xs text uppercase bg-gray-200">
@@ -269,74 +276,100 @@ const Tasks = () => {
                 </th>
               </tr>
             </thead>
-
             <tbody>
-              {tasks.map((item, index) => (
-                <tr key={item._id} className="bg-white border-b">
-                  <th
-                    scope="row"
-                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap border-2 border-gray-300"
-                  >
-                    {startIndex + index + 1}
-                  </th>
-                  <th
-                    scope="row"
-                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap border-2 border-gray-300"
-                  >
-                    {item?.date.split("T")[0]}
-                  </th>
-                  <td className="px-6 py-4 border-2 border-gray-300">
-                    {item?.task_name}
-                  </td>
-                  <td className="px-6 py-4 border-2 border-gray-300">
-                    {item?.project_name}
-                  </td>
-                  <td className="px-6 py-4 border-2 border-gray-300">
-                    {item?.plan_for_tommorow}
-                  </td>
-                  <td className="px-6 py-4 border-2 border-gray-300">
-                    {item?.additional_comment}
-                  </td>
-                  <td className="px-6 py-4 border-2 border-gray-300">
-                    {item?.backlog}
-                  </td>
-                  <td className="px-6 py-2 border-2 border-gray-300">
-                    {item?.task_time} Hours
-                  </td>
-                  <td className=" py-5  gap-1 border-2 border-l-0 border-r-0 border-t-0 border-gray-300">
-                    <div className="flex items-center justify-center">
-                      {userInfo.role === "employee" ||
-                      userInfo.role === "Employee" ? (
-                        <>
-                          <NavLink to={`/tasks/edittask/${item._id}`}>
-                            <CiEdit className="text-2xl cursor-pointer text-green-900" />
-                          </NavLink>
-                          <MdDelete
-                            onClick={(e) => handleDelete(e, item._id)}
-                            className="text-2xl cursor-pointer text-red-900"
-                          />
-                          <IoMdDownload
-                            onClick={() =>
-                              handleDownload(item?.attachment?.url)
-                            }
-                            className="cursor-pointer text-lg"
-                          />
-                        </>
-                      ) : (
-                        <IoMdDownload
-                          onClick={() => handleDownload(item?.attachment?.url)}
-                          className="cursor-pointer text-lg"
-                        />
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {Object.keys(tasks).map((date, dateIndex) => {
+                const taskList = tasks[date];
+                let totalTaskTimeForDate = 0;
+
+                taskList.map((task) => {
+                  totalTaskTimeForDate += parseFloat(task.task_time);
+                });
+
+                return (
+                  <React.Fragment key={date}>
+                    {taskList.map((task, index) => (
+                      <tr
+                        className="bg-white border-b border-gray-300"
+                        key={task._id}
+                      >
+                        <th
+                          scope="row"
+                          className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap border-2 border-gray-300"
+                        >
+                          {index + 1}
+                        </th>
+                        <td className="px-6 py-4 border-2 border-gray-300">
+                          {task.date}
+                        </td>
+                        <td className="px-6 py-4 border-2 border-gray-300">
+                          {task.task_name}
+                        </td>
+                        <td className="px-6 py-4 border-2 border-gray-300">
+                          {task.project_name}
+                        </td>
+                        <td className="px-6 py-4 border-2 border-gray-300">
+                          {task?.plan_for_tommorow}
+                        </td>
+                        <td className="px-6 py-4 border-2 border-gray-300">
+                          {task?.additional_comment}
+                        </td>
+                        <td className="px-6 py-4 border-2 border-gray-300">
+                          {task?.backlog}
+                        </td>
+                        <td className="px-6 py-4 border-2 border-gray-300">
+                          {task.task_time} hours
+                        </td>
+                        <td className=" py-5  gap-1 border-2 border-l-0 border-r-0 border-t-0 border-gray-300">
+                        <div className="flex items-center justify-center">
+                          {userInfo.role === "employee" ||
+                          userInfo.role === "Employee" ? (
+                            <>
+                              <NavLink to={`/tasks/edittask/${task._id}`}>
+                                <CiEdit className="text-2xl cursor-pointer text-green-900" />
+                              </NavLink>
+                              <MdDelete
+                                onClick={(e) => handleDelete(e, task._id)}
+                                className="text-2xl cursor-pointer text-red-900"
+                              />
+                              <IoMdDownload
+                                onClick={() =>
+                                  handleDownload(task?.attachment?.url)
+                                }
+                                className="cursor-pointer text-lg"
+                              />
+                            </>
+                          ) : (
+                            <IoMdDownload
+                              onClick={() => handleDownload(task?.attachment?.url)}
+                              className="cursor-pointer text-lg"
+                            />
+                          )}
+                        </div>
+                      </td>
+                      </tr>
+                    ))}
+
+                    {/* Row for displaying total task time for this date */}
+                    <tr className="bg-gray-200">
+                      <td
+                        colSpan={8}
+                        className="px-6 py-4 text-right font-bold"
+                      >
+                        Total Task Time for {date}:
+                      </td>
+                      <td className="px-6 py-4 font-bold">
+                        {totalTaskTimeForDate} hours
+                      </td>
+                      <td colSpan={4}></td>
+                    </tr>
+                  </React.Fragment>
+                );
+              })}
             </tbody>
           </table>
         </div>
       ) : (
-        !loader && <div className="m-8 flex justify-center">No Tasks Found</div>
+        <p className="m-6 text-gray-500">No tasks found</p>
       )}
     </div>
   );

@@ -4,6 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import getUserFromToken from "../utils/getUserFromToken";
+import $ from "jquery";
+import 'jquery-validation';
 
 const EditTask = () => {
   const userInfo = getUserFromToken();
@@ -67,33 +69,100 @@ const EditTask = () => {
     setOldData({ ...oldData, attachment: file });
   };
 
-  const validateTaskTime = (time) => {
-    const taskTime = parseFloat(time);
-    return (
-      taskTime >= 1 &&
-      taskTime <= 3 &&
-      time.match(/^(1(\.0|\.3|\.30)?|2(\.0|\.3|\.30)?|3(\.0|\.3|\.30)?)$/)
-    );
+
+ 
+  $.validator.addMethod("validTime", function(value, element) {
+    // Regular expression to match numbers between 1 and 3 with up to two decimal places,
+    // and ensure that decimal values are not greater than .60
+    var isValid = this.optional(element) || /^([1-2](\.\d{1,2})?|3(\.0{1,2})?)$/.test(value);
+    
+    // Further check if the value has decimal places and those decimal places do not exceed .60
+    if (isValid && value.includes(".")) {
+        var parts = value.split(".");
+        if (parts[1] && parseInt(parts[1], 10) > 60) {
+            return false;
+        }
+    }
+    
+    return isValid;
+}, "Please enter a time between 1 and 3, with up to two decimal places, where decimal values should not exceed .60 minutes.");
+
+
+  const validattaskForm = () => {
+    // Initialize jQuery validation
+    $("#taskform").validate({
+      rules: {
+        date: {
+          required: true
+        },
+        task_name: {
+          required: true
+        },
+        project_name: {
+          required: true
+        },   
+        task_time: {
+          required: true,
+          validTime:true,
+        }, 
+           
+      },
+      messages: {
+        date: {
+          required: "Please select date"
+        }, 
+        task_name: {
+          required: "Please enter task name"
+        },     
+        project_name: {
+          required: "Please enter project name"
+        }, 
+      
+        task_time: {
+          required: "Please enter task time",
+          taskvalidation: "Invalid task time. Must be between 1 and 3 hours with up to one decimal place."
+     
+        }, 
+      },
+      errorElement: 'div',
+      errorPlacement: function(error, element) {
+        error.addClass('invalid-feedback');
+        error.insertAfter(element);
+      },
+      highlight: function(element, errorClass, validClass) {
+        $(element).addClass('is-invalid').removeClass('is-valid');
+      },
+      unhighlight: function(element, errorClass, validClass) {
+        $(element).removeClass('is-invalid').addClass('is-valid');
+      }
+    });
+  
+    // Return validation status
+    return $("#taskform").valid();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateTaskTime(oldData.task_time)) {
-      toast.error(
-        "Task time should be between 1 and 3, and rounded figures like 1.3 or 1.30 are acceptable.",
-        {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        }
-      );
-      return;
-    }
+    if (!validattaskForm()) {
+      // setError("Please fill in all required fields.");
+        return;
+      }
+    // if (!validateTaskTime(oldData.task_time)) {
+    //   toast.error(
+    //     "Task time should be between 1 and 3, and rounded figures like 1.3 or 1.30 are acceptable.",
+    //     {
+    //       position: "top-right",
+    //       autoClose: 2000,
+    //       hideProgressBar: false,
+    //       closeOnClick: true,
+    //       pauseOnHover: true,
+    //       draggable: true,
+    //       progress: undefined,
+    //       theme: "light",
+    //     }
+    //   );
+    //   return;
+    // }
 
     const formData = new FormData();
     Object.keys(oldData).forEach((key) => {
@@ -150,13 +219,13 @@ const EditTask = () => {
           />
         </div>
         <div className="flex items-center">
-          <div className="bg-[#032e4e] rounded-[5px] ml-5 h-[30px] w-[10px]"></div>
+          
           <div className="text-xl font-bold mx-2 my-8">Edit Task</div>
         </div>
       </div>
 
       <div className="w-[70%] m-auto my-10">
-        <form onSubmit={handleSubmit} encType="multipart/form-oldData">
+        <form id="taskform" onSubmit={handleSubmit} encType="multipart/form-oldData">
           <div className="grid gap-6 mb-6 md:grid-cols-2">
             <div>
               <label
@@ -173,7 +242,7 @@ const EditTask = () => {
                 id="date"
                 className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
                 placeholder="Enter the task name"
-                required
+                
               />
             </div>
             <div>
@@ -191,7 +260,7 @@ const EditTask = () => {
                 id="taskname"
                 className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
                 placeholder="Enter the task name"
-                required
+                
               />
             </div>
           </div>
@@ -209,7 +278,7 @@ const EditTask = () => {
                 value={oldData?.project_name}
                 onChange={handleChange}
                 className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
-                required
+                
               >
                 <option value="">Select a project name</option>
                 {projects.map((option) => {
@@ -241,7 +310,7 @@ const EditTask = () => {
                 id="tasktime"
                 className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
                 placeholder="Enter the task completion time"
-                required
+                
               />
             </div>
           </div>

@@ -3,6 +3,9 @@ import getUserFromToken from "./utils/getUserFromToken";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "react-toastify/dist/ReactToastify.css";
+import $ from "jquery";
+import "jquery-validation";
 
 const Setting = () => {
   const userData = getUserFromToken();
@@ -11,9 +14,55 @@ const Setting = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const validatesettingForm = () => {
+    // Initialize jQuery validation
+    $("#settingform").validate({
+      rules: {
+        oldPassword: {
+          required: true,
+        },
+        newPassword: {
+          required: true,
+        },
+        confirmPassword: {
+          required: true,
+          equalTo: "#newPassword", // Ensures confirmPassword matches newPassword
+        },
+      },
+      messages: {
+        oldPassword: {
+          required: "Please enter old Password",
+        },
+        newPassword: {
+          required: "Please enter new Password",
+        },
+        confirmPassword: {
+          required: "Please confirm your Password",
+          equalTo: "Passwords do not match",
+        },
+      },
+      errorElement: "div",
+      errorPlacement: function (error, element) {
+        error.addClass("invalid-feedback");
+        error.insertAfter(element);
+      },
+      highlight: function (element) {
+        $(element).addClass("is-invalid").removeClass("is-valid");
+      },
+      unhighlight: function (element) {
+        $(element).removeClass("is-invalid").addClass("is-valid");
+      },
+    });
+
+    // Return validation status
+    return $("#settingform").valid();
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validatesettingForm()) {
+      return; // If validation fails, stop submission
+    }
     if(!oldPassword || !newPassword || !confirmPassword) {
       setError("Please Provide all the fields")
       return 
@@ -78,12 +127,12 @@ const Setting = () => {
         theme="light"
       />
       <div className="flex items-center">
-        <div className="bg-[#032e4e] rounded-[5px] ml-5 h-[30px] w-[10px]"></div>
+        
         <div className="text-xl font-bold mx-2 my-8">Account Setting</div>
       </div>
       <div className="flex flex-col items-center justify-center w-[70%] m-auto">
         <div className="text-2xl my-5 font-light ">Change Password</div>
-        <form className="w-[60%]">
+        <form id="settingform" className="w-[60%]">
           <div className="my-4">
             <label
               htmlFor="oldPassword"

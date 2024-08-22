@@ -47,7 +47,7 @@ const getAllattendence = async (req, res) => {
       .sort({ createdAt: -1 })
       .skip((page - 1) * pageSize)
       .limit(pageSize);
-    const count = await Attendence.find(query).countDocuments()
+    const count = await Attendence.find(query).countDocuments();
     res.status(200).json({ success: true, result, count });
   } catch (error) {
     res.status(500).json({
@@ -74,17 +74,23 @@ function getCurrentTime() {
 }
 // Function to parse time string and return a Date object for the current date
 const parseTimeString = (timeString) => {
-  const [time, period] = timeString.split(' ');
-  let [hours, minutes] = time.split(':').map(Number);
+  const [time, period] = timeString.split(" ");
+  let [hours, minutes] = time.split(":").map(Number);
 
-  if (period === 'PM' && hours !== 12) {
+  if (period === "PM" && hours !== 12) {
     hours += 12;
-  } else if (period === 'AM' && hours === 12) {
+  } else if (period === "AM" && hours === 12) {
     hours = 0;
   }
 
   const now = new Date();
-  const date = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+  const date = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    hours,
+    minutes
+  );
   return date;
 };
 
@@ -108,13 +114,18 @@ const updateattendence = async (req, res) => {
     });
 
     if (!result) {
-      return res.status(404).json({ success: false, message: "Employee not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Employee not found" });
     }
 
     const check_in = result["check_in"];
     const check_out_time = check_out; // This should be in string format like "2:29 PM"
 
-    const roundedDurationHours = calculateWorkingHours(check_in, check_out_time);
+    const roundedDurationHours = calculateWorkingHours(
+      check_in,
+      check_out_time
+    );
     let attendance_status;
     if (roundedDurationHours >= 8) {
       attendance_status = "present";
@@ -142,8 +153,6 @@ const updateattendence = async (req, res) => {
   }
 };
 
-
-
 const deleteattendence = async (req, res) => {
   const { id } = req.body;
   try {
@@ -166,19 +175,34 @@ const deleteattendence = async (req, res) => {
   }
 };
 const getSingleattendence = async (req, res) => {
-  const { id } = req.body;
+  const { id, date } = req.body; // date from frontend, e.g., '2024-08-21'
+
+  // Create a start of day and end of day date range
+  const startDate = new Date(date);
+  const endDate = new Date(date);
+  endDate.setDate(endDate.getDate() + 1); // Move to the next day
+
   try {
-    const result = await Attendence.findOne({ emp_id: id });
+    // Query for attendance with emp_id and date within the same day
+    const result = await Attendence.findOne({
+      emp_id: id,
+      date: {
+        $gte: startDate,
+        $lt: endDate,
+      },
+    });
+
     if (!result) {
       return res
         .status(404)
-        .json({ success: false, message: "attedendence not found" });
+        .json({ success: false, message: "Attendance not found" });
     }
+
     res.status(200).json({ success: true, result: result });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "error fetching data",
+      message: "Error fetching data",
       error: error.message,
     });
   }

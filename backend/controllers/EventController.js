@@ -27,7 +27,7 @@ const getAllevent = async (req,res) => {
             .sort({ createdAt: -1 })
             .skip((page - 1) * pageSize)
             .limit(pageSize);
-        const count = Event.countDocuments;
+        const count = await Event.find(query).countDocuments();
         res.status(200).json({ success: true, result, count });
 
     }catch(error){

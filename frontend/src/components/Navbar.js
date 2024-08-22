@@ -61,12 +61,22 @@ const Navbar = ({ toggleSideBar }) => {
       clearTimeout(timeoutId);
     };
   }, []);
+  const currentDate = () => {
+    const currentDate = new Date();
 
+    // Get the year, month, and day
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+    const day = String(currentDate.getDate()).padStart(2, "0");
+
+    // Format the date as YYYY-MM-DD
+    return `${year}-${month}-${day}`;
+  };
   const fetchCheckInRecord = async () => {
     const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getSingleattendence`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: userInfo.id }),
+      body: JSON.stringify({ id: userInfo.id, date: currentDate() }),
     });
     const response = await res.json();
     if (response.success && !response.result.check_out) {
@@ -111,13 +121,35 @@ const Navbar = ({ toggleSideBar }) => {
     }
   };
 
+  const getLocationURL = async () => {
+    return new Promise((resolve, reject) => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            // Replace with actual URL encoding logic if using a real mapping service
+            const locationURL = `https://maps.google.com/?q=${latitude},${longitude}`;
+            resolve(locationURL);
+          },
+          (error) => {
+            reject(error);
+          }
+        );
+      } else {
+        reject(new Error("Geolocation is not supported by this browser."));
+      }
+    });
+  };
+  
+  
+
   const handleCheckIn = async () => {
     // const isoCheckIn = date.toISOString();
-    console.log(date);
+    const locationURL = await getLocationURL()
     const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertattendence`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ date: date, emp_id, check_in: checkInTime }),
+      body: JSON.stringify({ date: date, emp_id, check_in: checkInTime,  location_url: locationURL, }),
     });
     const response = await res.json();
     if (response.success) {
@@ -173,7 +205,7 @@ const Navbar = ({ toggleSideBar }) => {
         theme="light"
       />
       <nav
-        className="relative w-full bg-white border border-gray-200  px-4 flex items-center justify-between py-6 "
+        className="relative w-full bg-white border border-gray-200  px-4 flex items-center justify-between py-3"
         aria-label="Global"
       >
         <div className="flex items-center ">
@@ -226,34 +258,33 @@ const Navbar = ({ toggleSideBar }) => {
           className="hs-collapse  overflow-hidden transition-all duration-300 "
         >
           <div className="flex flex-row items-center justify-end ">
-            {(userInfo.role === "Employee" || userInfo.role === "employee") &&
-    (
-                <div className="mx-3">
-                  {checkInValue && localStorage.getItem("status") !== "true" ? (
-                    <button
-                      type="button"
-                      onClick={handleCheckIn}
-                      className="text-white bg-purple-500 hover:bg-purple-800   rounded-full text-[14px] font-bold px-5 py-2.5 text-center "
-                    >
-                      CheckIn
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      className={`${
-                        localStorage.getItem("status") === "true" && "hidden"
-                      } text-white  bg-red-500 hover:bg-red-800  rounded-full text-[14px] font-bold px-5 py-2.5 text-center`}
-                      onClick={handleCheckOut}
-                    >
-                      CheckOut
-                    </button>
-                  )}
-                  <div className="text-lg ">
-                    {localStorage.getItem("status") === "true" &&
-                      localStorage.getItem("message")}
-                  </div>
+            {(userInfo.role === "Employee" || userInfo.role === "employee") && (
+              <div className="mx-3">
+                {checkInValue && localStorage.getItem("status") !== "true" ? (
+                  <button
+                    type="button"
+                    onClick={handleCheckIn}
+                    className="text-white bg-[#032e4e] hover:bg-[#001424]   rounded-full text-[14px] font-bold  text-center h-10 w-28 "
+                  >
+                    CheckIn
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className={`${
+                      localStorage.getItem("status") === "true" && "hidden"
+                    } text-white  bg-[#032e4e] hover:bg-[#001424]  rounded-full text-[14px] font-bold text-center h-10 w-28`}
+                    onClick={handleCheckOut}
+                  >
+                    CheckOut
+                  </button>
+                )}
+                <div className="text-lg ">
+                  {localStorage.getItem("status") === "true" &&
+                    localStorage.getItem("message")}
                 </div>
-              )}
+              </div>
+            )}
             {!token ? (
               <NavLink
                 className="flex items-center  font-medium text-black hover:text-blue-600 md:border-s md:border-gray-300 "
@@ -281,9 +312,9 @@ const Navbar = ({ toggleSideBar }) => {
                 <PiLineVerticalThin className="mx-2 text-2xl" />
                 <button
                   onClick={handleLogout}
-                  className="flex items-center text-lg  font-medium text-black hover:text-blue-600 "
+                  className="flex items-center text-[16px]  font-medium text-black hover:text-blue-900 "
                 >
-                  <CgLogOut className="text-xl mx-2" />
+                  <CgLogOut className="text-lg mx-2" />
                   Logout
                 </button>
               </>

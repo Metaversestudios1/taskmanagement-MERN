@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import getUserFromToken from "../components/utils/getUserFromToken";
+import { NavLink } from "react-router-dom";
 const Home = () => {
   const userInfo = getUserFromToken();
   const [totalUsers, setTotalUsers] = useState(0);
@@ -41,6 +42,9 @@ const Home = () => {
           <>
             {" "}
             <div className="bg-white shadow-lg shadow-gray-200 rounded-2xl p-4">
+            <NavLink
+                to="/employees">
+                
               <div className="flex items-center">
                 <div className="inline-flex flex-shrink-0 justify-center items-center w-12 h-12 text-white bg-[#ff0080] to-voilet-500 rounded-lg">
                   <svg
@@ -64,9 +68,13 @@ const Home = () => {
                     Total Users
                   </h3>
                 </div>
+               
               </div>
+              </NavLink>
             </div>
             <div className="bg-white shadow-lg shadow-gray-200 rounded-2xl p-4">
+               <NavLink
+                to="/projects">
               <div className="flex items-center">
                 <div className="inline-flex flex-shrink-0 justify-center items-center w-12 h-12 text-white bg-[#ff0080] to-voilet-500 rounded-lg">
                   <svg
@@ -83,16 +91,20 @@ const Home = () => {
                   </svg>
                 </div>
                 <div className="flex-shrink-0 ml-3">
+               
                   <span className="text-2xl font-bold leading-none text-gray-900 sm:text-3xl">
                     {totalProjects}
                   </span>
                   <h3 className="text-base font-normal text-gray-500">
                     Total Projects
-                  </h3>
+                  </h3>              
                 </div>
               </div>
+              </NavLink>
             </div>
             <div className="bg-white shadow-lg shadow-gray-200 rounded-2xl p-4">
+            <NavLink
+                to="/tasks">
               <div className="flex items-center">
                 <div className="inline-flex flex-shrink-0 justify-center items-center w-12 h-12 text-white bg-[#ff0080] to-voilet-500 rounded-lg">
                   <svg
@@ -117,11 +129,13 @@ const Home = () => {
                   </h3>
                 </div>
               </div>
+              </NavLink>
             </div>
           </>
         ) : (
           <>
             <div className="bg-white shadow-lg shadow-gray-200 rounded-2xl p-4">
+              
               <div className="flex items-center">
                 <div className="inline-flex flex-shrink-0 justify-center items-center w-12 h-12 text-white bg-[#ff0080] to-voilet-500 rounded-lg">
                   <svg

@@ -22,7 +22,7 @@ const EventSchema = new mongoose.Schema({
     },
     duration: {
         type: String,  // Store as a string "Start Time - End Time" or "Number of Hours"
-        required: true
+      
     },
     comments: {
         type: String

@@ -4,6 +4,10 @@ import { AiOutlineFundProjectionScreen } from "react-icons/ai";
 import { NavLink } from "react-router-dom";
 import getUserFromToken from "./utils/getUserFromToken";
 import { SlCalender } from "react-icons/sl";
+import { MdOutlineHolidayVillage } from "react-icons/md";
+import { MdEvent } from "react-icons/md";
+import { IoSettingsOutline } from "react-icons/io5";
+import { GoTasklist } from "react-icons/go";
 
 const Sidebar = ({ sidebar }) => {
   const { role } = getUserFromToken();
@@ -40,7 +44,7 @@ const Sidebar = ({ sidebar }) => {
             </a>
           </div>
           <nav
-            className="hs-accordion-group p-6 w-full flex flex-col flex-wrap mt-8"
+            className="hs-accordion-group p-3 w-full flex flex-col flex-wrap mt-8"
             data-hs-accordion-always-open
           >
             <ul className="space-y-1.5">
@@ -361,7 +365,7 @@ const Sidebar = ({ sidebar }) => {
                       : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg hover:text-black hover:bg-white"
                   }
                 >
-                  <AiOutlineFundProjectionScreen className="text-lg" />
+                  <GoTasklist className="text-lg" />
                   Tasks
                 </NavLink>
               </li>
@@ -374,7 +378,7 @@ const Sidebar = ({ sidebar }) => {
                       : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg hover:text-black hover:bg-white"
                   }
                 >
-                  <AiOutlineFundProjectionScreen className="text-lg" />
+                  <MdOutlineHolidayVillage className="text-lg" />
                   Holiday
                 </NavLink>
               </li>
@@ -387,7 +391,7 @@ const Sidebar = ({ sidebar }) => {
                     : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg hover:text-black hover:bg-white"
                 }
               >
-                <AiOutlineFundProjectionScreen className="text-lg" />
+                <MdEvent className="text-lg" />
                 Activity
               </NavLink>
             </li>
@@ -400,7 +404,7 @@ const Sidebar = ({ sidebar }) => {
                       : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg hover:text-black hover:bg-white"
                   }
                 >
-                  <AiOutlineFundProjectionScreen className="text-lg" />
+                  <IoSettingsOutline className="text-lg" />
                   Setting
                 </NavLink>
               </li>

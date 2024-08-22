@@ -167,7 +167,7 @@ const EditRole = () => {
           />
         </div>
         <div className="flex items-center">
-          <div className="bg-[#032e4e] rounded-[5px] ml-5 h-[30px] w-[10px]"></div>
+          
           <div className="text-xl font-bold mx-2 my-8">Edit Role</div>
         </div>
       </div>

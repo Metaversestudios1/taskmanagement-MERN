@@ -17,6 +17,7 @@ const AttendenceSchema = new mongoose.Schema({
         type:String,
         default:null
     },
+    location_url:{type: String},
     working_hours:{
         type:Number,
         default:null
