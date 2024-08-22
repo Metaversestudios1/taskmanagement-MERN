@@ -25,8 +25,8 @@ const Login = () => {
       }, 500);
     } else {
       setLoading(false);
+      fetchRoles();
     }
-    fetchRoles();
   },[]);
 
   const fetchRoles = async () => {
