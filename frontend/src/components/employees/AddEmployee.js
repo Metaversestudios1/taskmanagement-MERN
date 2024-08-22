@@ -168,7 +168,7 @@ const AddEmployee = () => {
         </div>
         <div className="flex items-center">
           
-          <div className="text-xl font-bold mx-2 my-8">Add Employee</div>
+          <div className="text-2xl font-bold mx-2 my-8 px-4">Add Employee</div>
         </div>
       </div>
 

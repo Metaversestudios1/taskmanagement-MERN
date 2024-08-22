@@ -128,7 +128,7 @@ const Setting = () => {
       />
       <div className="flex items-center">
         
-        <div className="text-xl font-bold mx-2 my-8">Account Setting</div>
+        <div className="text-2xl font-bold mx-2 my-8 px-4">Account Setting</div>
       </div>
       <div className="flex flex-col items-center justify-center w-[70%] m-auto">
         <div className="text-2xl my-5 font-light ">Change Password</div>

@@ -204,7 +204,7 @@ const AddTask = () => {
         </div>
         <div className="flex items-center">
           
-          <div className="text-xl font-bold mx-2 my-8">Add Task</div>
+          <div className="text-2xl font-bold mx-2 my-8 px-4">Add Task</div>
         </div>
       </div>
 

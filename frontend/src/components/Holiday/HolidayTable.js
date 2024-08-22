@@ -71,7 +71,7 @@ const HolidayTable = () => {
     <div className="">
       <div className="flex items-center">
         
-        <div className="text-xl font-bold mx-2 my-8">Holiday</div>
+        <div className="text-2xl font-bold mx-2 my-8 px-4">Holiday</div>
       </div>
       <div className="flex justify-between">
       {(userInfo.role ==="admin" || userInfo.role ==="Admin") && <NavLink to="/holiday/addholiday">

@@ -137,7 +137,7 @@ const handleSubmit = async (e) => {
         </div>
         <div className="flex items-center">
           
-          <div className="text-xl font-bold mx-2 my-8">Add Holiday</div>
+          <div className="text-2xl font-bold mx-2 my-8 px-4">Add Holiday</div>
         </div>
       </div>
 

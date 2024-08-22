@@ -65,7 +65,7 @@ const PermissionsTable = () => {
     <div className="">
     <div className="flex items-center">
       
-      <div className="text-xl font-bold mx-2 my-8">Permission</div>
+      <div className="text-2xl font-bold mx-2 my-8 px-4">Permission</div>
     </div>
     <div className="flex justify-between">
       <NavLink to="/permissionstable/addpermission">

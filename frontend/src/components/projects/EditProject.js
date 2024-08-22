@@ -98,7 +98,7 @@ const EditProject = () => {
     </div>
     <div className="flex items-center">
       
-      <div className="text-xl font-bold mx-2 my-8">Edit Project</div>
+      <div className="text-2xl font-bold mx-2 my-8 px-4">Edit Project</div>
     </div>
   </div>
         <div className="w-[70%] m-auto my-10">

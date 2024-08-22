@@ -132,7 +132,7 @@ const LeaveRequests = () => {
     <div className="">
       <div className="flex items-center">
         
-        <div className="text-xl font-bold mx-2 my-8">Leave Requests</div>
+        <div className="text-2xl font-bold mx-2 my-8 px-4">Leave Requests</div>
       </div>
       <div className="flex justify-between">
         {(userInfo.role==="Employee" || userInfo.role === "employee") && <NavLink to="/leaverequests/addleave">
