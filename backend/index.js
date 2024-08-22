@@ -7,8 +7,8 @@ const auth = require('./Middleware/auth'); // Adjust the path as needed
 const session= require('express-session');
 const cookieParser = require('cookie-parser');
 const app = express();
-app.use(express.json());
-app.use(cookieParser());
+ // include before other routes
+
 
 dotenv.config();
 connectDB();
@@ -17,12 +17,15 @@ const corsOption = {
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   preflightContinue: false,
   credentials: true,
+  allowedHeaders: "Content-Type,Authorization",
   optionsSuccessStatus: 204
 }
  
+app.options('*', cors(corsOption));
 // Enable CORS with specific options
 app.use(cors(corsOption)); 
-
+app.use(express.json());
+app.use(cookieParser());
 app.use(session({
   secret: process.env.SESSION_SECRET, // Use session secret from environment variables
   resave: false,
