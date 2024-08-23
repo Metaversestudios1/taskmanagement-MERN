@@ -13,10 +13,19 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadImage = (buffer, originalname) => {
+const uploadImage = (buffer, originalname, mimetype) => {
   return new Promise((resolve, reject) => {
+    // Determine the appropriate resource type based on the file's MIME type
+    let resourceType = "raw"; // Default to 'raw' for non-image/video files
+
+    if (mimetype.startsWith("image")) {
+      resourceType = "image";
+    } else if (mimetype.startsWith("video")) {
+      resourceType = "video";
+    }
+
     const options = {
-      resource_type: "raw", // Always treat the file as 'raw'
+      resource_type: resourceType,
       public_id: originalname.split('.')[0], // Use the original file name without extension
       use_filename: true,
       unique_filename: false,
@@ -35,18 +44,75 @@ const uploadImage = (buffer, originalname) => {
   });
 };
 
-
 const insertTask = async (req, res) => {
   if (req.file) {
     console.log("req.file is present");
-    const { originalname, buffer } = req.file;
+    const { originalname, buffer, mimetype } = req.file;
 
     try {
       const taskData = req.body;
       console.log("Uploading file to Cloudinary...");
       
       // Upload file to Cloudinary
-      const uploadResult = await uploadImage(buffer, originalname);
+      const uploadResult = await uploadImage(buffer, originalname, mimetype);
+      if (!uploadResult) {
+        return res.status(500).json({ success: false, message: "File upload error" });
+      }
+    
+      // Create new task with file information
+      const newTask = new Task({
+        ...taskData,
+        attachment: {
+          publicId: uploadResult.public_id,
+          url: uploadResult.secure_url,
+          originalname: originalname,
+          mimetype: mimetype,
+        },
+      });
+
+      await newTask.save();
+      res.status(201).json({ success: true });
+    } catch (error) {
+      console.error("Error inserting task:", error.message);
+      res.status(500).json({
+        success: false,
+        message: "Error inserting Task",
+        error: error.message,
+      });
+    }
+  } else {
+    console.log("req.file is not present");
+    try {
+      const taskData = req.body;
+
+      // Create new task without file information
+      const newTask = new Task({
+        ...taskData,
+      });
+
+      await newTask.save();
+      res.status(201).json({ success: true });
+    } catch (error) {
+      console.error("Error inserting task without file:", error.message);
+      res.status(500).json({
+        success: false,
+        message: "Error inserting Task",
+        error: error.message,
+      });
+    }
+
+
+const insertTask = async (req, res) => {
+  if (req.file) {
+    console.log("req.file is present");
+    const { originalname, buffer, mimetype } = req.file;
+
+    try {
+      const taskData = req.body;
+      console.log("Uploading file to Cloudinary...");
+      
+      // Upload file to Cloudinary
+      const uploadResult = await uploadImage(buffer, originalname, mimetype);
       if (!uploadResult) {
         return res.status(500).json({ success: false, message: "File upload error" });
       }
