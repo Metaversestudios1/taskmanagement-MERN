@@ -13,7 +13,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadImage = (buffer, originalname, mimetype) => {
+const uploadFile = (buffer, originalname, mimetype) => {
   return new Promise((resolve, reject) => {
     // Determine the appropriate resource type based on the file's MIME type
     let resourceType = "raw"; // Default to 'raw' for non-image/video files
@@ -24,6 +24,8 @@ const uploadImage = (buffer, originalname, mimetype) => {
       resourceType = "video";
     }
 
+    console.log(`Uploading file with resource type: ${resourceType}`);
+    
     const options = {
       resource_type: resourceType,
       public_id: originalname.split('.')[0], // Use the original file name without extension
@@ -37,6 +39,7 @@ const uploadImage = (buffer, originalname, mimetype) => {
         console.error("Cloudinary upload error:", error);
         return reject(new Error("Cloudinary upload failed"));
       }
+      console.log("Cloudinary upload result:", result);
       resolve(result); // Resolve the promise with the result
     });
 
@@ -45,19 +48,18 @@ const uploadImage = (buffer, originalname, mimetype) => {
 };
 
 
+
 const insertTask = async (req, res) => {
   if (req.file) {
     console.log("req.file is present");
-    const { originalname, buffer, mimetype } = req.file;
-
+    const { originalname, buffer } = req.file;
 
     try {
       const taskData = req.body;
       console.log("Uploading file to Cloudinary...");
       
       // Upload file to Cloudinary
-      const uploadResult = await uploadImage(buffer, originalname, mimetype);
-     
+      const uploadResult = await uploadImage(buffer, originalname);
       if (!uploadResult) {
         return res.status(500).json({ success: false, message: "File upload error" });
       }
