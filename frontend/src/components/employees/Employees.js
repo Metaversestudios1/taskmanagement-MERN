@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { MdDelete } from "react-icons/md";
 import { CiEdit } from "react-icons/ci";
 import { NavLink } from "react-router-dom";
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const Employees = () => {
   const [users, setUsers] = useState([]);
   const [loader, setLoader] = useState(true);
