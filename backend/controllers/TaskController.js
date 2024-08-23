@@ -20,6 +20,12 @@ const uploadImage = (buffer, originalname, mimetype) => {
       return reject(new Error("MIME type is required and must be a string"));
     }
 
+   if (mimetype.startsWith("image")) {
+        resourceType = "image";
+      } else if (mimetype.startsWith("video")) {
+        resourceType = "video";
+      }
+
     // Use 'raw' resource type for files to maintain original format
     const options = {
       resource_type: 'raw',
