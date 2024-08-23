@@ -33,7 +33,7 @@ const uploadImage = (buffer, originalname, mimetype) => {
     //console.log(`Uploading file with resource type: ${resourceType}`);
 
     const options = {
-      resource_type: 'raw',
+      resource_type: 'auto',
       public_id: originalname.split('.')[0], // Use the original file name without extension
       use_filename: true,
       unique_filename: false,
