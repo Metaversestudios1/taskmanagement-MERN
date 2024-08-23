@@ -13,15 +13,10 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadImage = (buffer, originalname, mimetype) => {
+const uploadImage = (buffer, originalname) => {
   return new Promise((resolve, reject) => {
     // Determine the appropriate resource type based on the file's MIME type
     let resourceType = "raw"; // Default to 'raw' for non-image/video files
-
-    if (!mimetype) {
-      console.error("MIME type is undefined or null");
-      return reject(new Error("MIME type is required"));
-    }
 
     console.log(`Uploading file with resource type: ${resourceType}`);
     
