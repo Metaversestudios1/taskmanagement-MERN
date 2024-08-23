@@ -13,28 +13,36 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadImage = (buffer, originalname) => {
-  return new Promise((resolve, reject) => {
-    const options = {
-      resource_type: "raw", // Always treat the file as 'raw'
-      public_id: originalname.split('.')[0], // Use the original file name without extension
-      use_filename: true,
-      unique_filename: false,
-      overwrite: true,
-    };
+const uploadImage = async (buffer, originalname) => {
+  const options = {
+    use_filename: true,
+    unique_filename: false,
+    overwrite: true,
+    resource_type: "raw", // Set resource type to 'raw' for generic files
+  };
 
-    const uploadStream = cloudinary.uploader.upload_stream(options, (error, result) => {
-      if (error) {
-        console.error("Cloudinary upload error:", error);
-        return reject(new Error("Cloudinary upload failed"));
+  try {
+    const result = await cloudinary.uploader.upload_stream(
+      {
+        resource_type: "raw", // Automatically detect file type
+        public_id: originalname.split('.')[0],
+        ...options,
+      },
+      (error, result) => {
+        if (error) {
+          console.error("Cloudinary upload error:", error);
+          throw new Error("Cloudinary upload failed");
+        }
+        return result;
       }
-      resolve(result); // Resolve the promise with the result
-    });
+    ).end(buffer);
 
-    uploadStream.end(buffer); // Upload the file from the buffer
-  });
+    return result; // Return the secure URL
+  } catch (error) {
+    console.error("Cloudinary upload error:", error);
+    throw new Error("Cloudinary upload failed");
+  }
 };
-
 
 const insertTask = async (req, res) => {
   if (req.file) {
