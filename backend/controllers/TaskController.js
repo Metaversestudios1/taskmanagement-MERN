@@ -15,25 +15,14 @@ cloudinary.config({
 
 const uploadImage = (buffer, originalname, mimetype) => {
   return new Promise((resolve, reject) => {
-    // Ensure mimetype is defined
     if (!mimetype || typeof mimetype !== 'string') {
       console.error("MIME type is undefined or not a string");
       return reject(new Error("MIME type is required and must be a string"));
     }
 
-    // Determine the appropriate resource type based on the file's MIME type
- // Default to 'raw' for non-image/video files
-
-    // if (mimetype.startsWith("image")) {
-    //   resourceType = "image";
-    // } else if (mimetype.startsWith("video")) {
-    //   resourceType = "video";
-    // }
-
-    //console.log(`Uploading file with resource type: ${resourceType}`);
-
+    // Use 'raw' resource type for files to maintain original format
     const options = {
-      resource_type: 'auto',
+      resource_type: 'raw',
       public_id: originalname.split('.')[0], // Use the original file name without extension
       use_filename: true,
       unique_filename: false,
@@ -52,7 +41,6 @@ const uploadImage = (buffer, originalname, mimetype) => {
     uploadStream.end(buffer); // Upload the file from the buffer
   });
 };
-
 
 const insertTask = async (req, res) => {
   if (req.file) {
