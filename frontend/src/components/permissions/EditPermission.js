@@ -105,15 +105,6 @@ const EditPermission = () => {
   return (
     <>
       <style>
-      {`
-          .error {
-            color: red; /* Error messages in red */
-          }
-          label,
-          input {
-            color: black; /* Keep label, input, and notes in black */
-          }
-        `}
       </style>
 
       <div className="flex items-center">
