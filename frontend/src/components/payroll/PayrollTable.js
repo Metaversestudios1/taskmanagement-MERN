@@ -147,7 +147,7 @@ const  PayrollTable = () => {
             onChange={handleChange}
             className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-[60%] p-2.5 m-auto"
           >
-            <option value="">Select an employee for leaves.</option>
+            <option value="">Select an employee</option>
             {employees.map((item) => (
               <option
                 key={item._id}
