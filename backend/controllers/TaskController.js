@@ -13,40 +13,51 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadImage = async (filePath) => {
+const uploadImage = async (buffer, originalname) => {
   const options = {
     use_filename: true,
     unique_filename: false,
     overwrite: true,
-    resource_type: "row", // Set resource type to 'raw' for ZIP files
+    resource_type: "raw", // Set resource type to 'raw' for generic files
   };
 
   try {
-    const result = await cloudinary.uploader.upload(filePath, {
-      resource_type: "row", // Automatically detect file type
-      ...options, // Spread any additional options
-    });
+    const result = await cloudinary.uploader.upload_stream(
+      {
+        resource_type: "raw", // Automatically detect file type
+        public_id: originalname.split('.')[0],
+        ...options,
+      },
+      (error, result) => {
+        if (error) {
+          console.error("Cloudinary upload error:", error);
+          throw new Error("Cloudinary upload failed");
+        }
+        return result;
+      }
+    ).end(buffer);
+
     return result; // Return the secure URL
   } catch (error) {
     console.error("Cloudinary upload error:", error);
     throw new Error("Cloudinary upload failed");
   }
 };
+
 const insertTask = async (req, res) => {
   if (req.file) {
     console.log("req.file is present");
-    const { originalname, path: filePath } = req.file;
+    const { originalname, buffer } = req.file;
 
     try {
       const taskData = req.body;
       console.log("Uploading file to Cloudinary...");
       
       // Upload file to Cloudinary
-      const uploadResult = await uploadImage(filePath);
+      const uploadResult = await uploadImage(buffer, originalname);
       if (!uploadResult) {
         return res.status(500).json({ success: false, message: "File upload error" });
       }
-
       console.log("File uploaded successfully:", uploadResult);
 
       // Create new task with file information
