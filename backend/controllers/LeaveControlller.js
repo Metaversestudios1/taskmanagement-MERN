@@ -102,5 +102,6 @@ module.exports={
     updateleave,
     deleteleave,
     getSingleleave,
-    getAllLeave
+    getAllLeave,
+    updateLeaveStatus
 }
