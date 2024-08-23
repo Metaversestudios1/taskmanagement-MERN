@@ -4,7 +4,7 @@ const roleSchema = new mongoose.Schema({
     role: {
         type: String,
         required: true,
-        unique: true
+        // unique: true
     },
     permission: {
         type: [String], // Array of strings
