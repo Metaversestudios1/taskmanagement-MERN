@@ -44,10 +44,12 @@ const uploadImage = (buffer, originalname, mimetype) => {
   });
 };
 
+
 const insertTask = async (req, res) => {
   if (req.file) {
     console.log("req.file is present");
     const { originalname, buffer, mimetype } = req.file;
+
 
     try {
       const taskData = req.body;
@@ -55,64 +57,7 @@ const insertTask = async (req, res) => {
       
       // Upload file to Cloudinary
       const uploadResult = await uploadImage(buffer, originalname, mimetype);
-      if (!uploadResult) {
-        return res.status(500).json({ success: false, message: "File upload error" });
-      }
-    
-      // Create new task with file information
-      const newTask = new Task({
-        ...taskData,
-        attachment: {
-          publicId: uploadResult.public_id,
-          url: uploadResult.secure_url,
-          originalname: originalname,
-          mimetype: mimetype,
-        },
-      });
-
-      await newTask.save();
-      res.status(201).json({ success: true });
-    } catch (error) {
-      console.error("Error inserting task:", error.message);
-      res.status(500).json({
-        success: false,
-        message: "Error inserting Task",
-        error: error.message,
-      });
-    }
-  } else {
-    console.log("req.file is not present");
-    try {
-      const taskData = req.body;
-
-      // Create new task without file information
-      const newTask = new Task({
-        ...taskData,
-      });
-
-      await newTask.save();
-      res.status(201).json({ success: true });
-    } catch (error) {
-      console.error("Error inserting task without file:", error.message);
-      res.status(500).json({
-        success: false,
-        message: "Error inserting Task",
-        error: error.message,
-      });
-    }
-
-
-const insertTask = async (req, res) => {
-  if (req.file) {
-    console.log("req.file is present");
-    const { originalname, buffer, mimetype } = req.file;
-
-    try {
-      const taskData = req.body;
-      console.log("Uploading file to Cloudinary...");
-      
-      // Upload file to Cloudinary
-      const uploadResult = await uploadImage(buffer, originalname, mimetype);
+     
       if (!uploadResult) {
         return res.status(500).json({ success: false, message: "File upload error" });
       }
