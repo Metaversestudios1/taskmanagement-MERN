@@ -3,6 +3,8 @@ import { MdDelete } from "react-icons/md";
 import { GrFormView } from "react-icons/gr";
 import { CiEdit } from "react-icons/ci";
 import { NavLink } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const PermissionsTable = () => {
   const [permissions, setPermissions] = useState([]);
   const [loader, setLoader] = useState(true);
@@ -16,7 +18,7 @@ const PermissionsTable = () => {
   const fetchPermissions = async () => {
     setLoader(true)
     const res = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/getpermission?page=${page}&limit=${pageSize}&search=${search}`
+      `http://localhost:3000/api/getpermission?page=${page}&limit=${pageSize}&search=${search}`
     );
     const response = await res.json();
     if(response.success) {
@@ -34,7 +36,7 @@ const PermissionsTable = () => {
     if (count === 1) {
       permOne = false;
     }
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/deletepermission`, {
+    const res = await fetch(`http://localhost:3000/api/deletepermission`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
@@ -44,6 +46,16 @@ const PermissionsTable = () => {
     }
     const response = await res.json();
     if (response.success) {
+      toast.success('Permission is deleted Successfully!', {
+        position: "top-right",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        });
       if (permOne) {
         setPage(page - 1);
       } else {
@@ -63,6 +75,18 @@ const PermissionsTable = () => {
 
   return (
     <div className="">
+      <ToastContainer
+          position="top-right"
+          autoClose={2000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
     <div className="flex items-center">
       
       <div className="text-2xl font-bold mx-2 my-8 px-4">Permission</div>

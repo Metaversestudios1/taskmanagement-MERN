@@ -30,7 +30,7 @@ const EditRole = () => {
   }, [oldData]);
 
   const fetchOldData = async () => {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getSingleRole`, {
+    const res = await fetch(`http://localhost:3000/api/getSingleRole`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
@@ -42,7 +42,7 @@ const EditRole = () => {
   };
 
   const fetchAllPermissions = async () => {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getpermission`);
+    const res = await fetch(`http://localhost:3000/api/getpermission`);
     const response = await res.json();
     if (response.success) {
       setPermissions(response.result);
@@ -50,20 +50,15 @@ const EditRole = () => {
   };
 
   const validateRoleForm = () => {
-    $.validator.addMethod("requiredCheckbox", function(value, element) {
-      return $(element).closest('form').find('input[name="permission"]:checked').length > 0;
-    }, "Please select at least one permission.");
-  
     $("#roleform").validate({
       rules: {
         role: {
           required: true,
-          
           minlength: 2,
         },
         permission: {
-          requiredCheckbox: true  // Custom validation for permissions
-        }
+          required: true,
+        },
       },
       messages: {
         role: {
@@ -71,13 +66,18 @@ const EditRole = () => {
           minlength: "Role name must be at least 2 characters",
         },
         permission: {
-          requiredCheckbox: "Please select at least one permission"
-        }
+          required: "Please select at least one permission",
+        },
       },
       errorElement: 'div',
       errorPlacement: function(error, element) {
-        error.addClass('invalid-feedback');
-        error.insertAfter(element);
+        if (element.attr("name") === "permission") {
+          // Place error message after the checkbox container
+          error.insertAfter(element.closest('.form-group').find('.checkbox-container'));
+        } else {
+          error.addClass('invalid-feedback');
+          error.insertAfter(element);
+        }
       },
       highlight: function(element, errorClass, validClass) {
         $(element).addClass('is-invalid').removeClass('is-valid');
@@ -86,8 +86,6 @@ const EditRole = () => {
         $(element).removeClass('is-invalid').addClass('is-valid');
       }
     });
-  
-    return $("#roleform").valid();
   };
 
   const handleChange = (e) => {
@@ -107,13 +105,13 @@ const EditRole = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateRoleForm()) {
+    if (!$("#roleform").valid()) {
       return;
     }
   
     try {
       const updateData = { id, oldData };
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updaterole`, {
+      const res = await fetch(`http://localhost:3000/api/updaterole`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updateData),
@@ -192,8 +190,9 @@ const EditRole = () => {
               required
             />
           </div>
-          <div>
+            <div className="form-group">
             <div className="mt-4">Permissions</div>
+            <div className="checkbox-container"> 
             {permissions.map((item) => {
               const isChecked = oldData.permission.includes(item._id);
               return (
@@ -237,6 +236,7 @@ const EditRole = () => {
                 </div>
               );
             })}
+            </div>
           </div>
           {error && <p className="text-red-900 text-[17px] mb-5">{error}</p>}
 

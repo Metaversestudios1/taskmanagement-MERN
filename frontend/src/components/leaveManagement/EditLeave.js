@@ -4,6 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import getUserFromToken from "../utils/getUserFromToken";
+import $ from "jquery";
+import 'jquery-validation';
 
 const EditLeave = () => {
     const {id} = useParams()
@@ -13,11 +15,11 @@ const EditLeave = () => {
         {name: "sick leave", id:1},
         {name: "casual leave", id:2},
     ]
-    const status = [
-        {name: "Pending", id:1},
-        {name: "Rejected", id:2},
-        {name: "Approved", id:3},
-    ]
+    // const status = [
+    //     {name: "Pending", id:1},
+    //     {name: "Rejected", id:2},
+    //     {name: "Approved", id:3},
+    // ]
   const initialState = {
     leave_from: "",
     leave_to: "",
@@ -25,7 +27,6 @@ const EditLeave = () => {
     remarks: "",
     no_of_days: "",
     leave_type: "",
-    status: "",
     emp_id : userInfo.id
   };
 
@@ -34,7 +35,7 @@ useEffect(()=>{
 fetchOldData()
 },[])
 const fetchOldData = async ()=>{
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getSingleleave`,{
+    const res = await fetch(`http://localhost:3000/api/getSingleleave`,{
         method:"POST",
         headers:{"Content-Type":"application/json"},
         body: JSON.stringify({id})
@@ -48,7 +49,6 @@ const fetchOldData = async ()=>{
         remarks: response.result?.remarks,
         no_of_days: response.result?.no_of_days,
         leave_type: response.result?.leave_type,
-        status: response.result?.status,
         emp_id : response.result?.emp_id
     })
 }
@@ -58,12 +58,73 @@ const fetchOldData = async ()=>{
     setData({ ...data, [name]: value });
   };
 
+  const validateleaveForm = () => {
+    // Initialize jQuery validation
+    $("#leaveform").validate({
+      rules: {
+        leave_from: {
+          required: true
+        }, 
+        leave_to: {
+          required: true
+        }, 
+        leave_type: {
+          required: true
+        }, 
+        no_of_days: {
+          required: true
+        }, 
+        reason: {
+          required: true
+        }, 
+        
+             
+      },
+      messages: {
+        leave_from: {
+          required: "Please select leave from date"
+        },     
+        leave_to: {
+          required: "Please select leave to date"
+        },     
+      
+        leave_type: {
+          required: "Please select leave type"
+        },  
+        no_of_days: {
+          required: "Please enter number of day's "
+        },
+        reason: {
+          required: "Please enter reason"
+        },     
+      
+      },
+      errorElement: 'div',
+      errorPlacement: function(error, element) {
+        error.addClass('invalid-feedback');
+        error.insertAfter(element);
+      },
+      highlight: function(element, errorClass, validClass) {
+        $(element).addClass('is-invalid').removeClass('is-valid');
+      },
+      unhighlight: function(element, errorClass, validClass) {
+        $(element).removeClass('is-invalid').addClass('is-valid');
+      }
+    });
+  
+    // Return validation status
+    return $("#leaveform").valid();
+  };
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateleaveForm()) {
+      // setError("Please fill in all required fields.");
+        return;
+      }
     const updateData = {data, id}
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateleave`, {
+    const res = await fetch(`http://localhost:3000/api/updateleave`, {
       method: "PUT",
       headers:{"Content-Type":"application/json"},
       body: JSON.stringify(updateData),
@@ -120,7 +181,7 @@ console.log(data)
       </div>
 
       <div className="w-[70%] m-auto my-10">
-        <form onSubmit={handleSubmit} encType="multipart/form-data">
+        <form onSubmit={handleSubmit} id="leaveform" encType="multipart/form-data">
           
           <div className="grid gap-6 mb-6 md:grid-cols-2">
           <div className="">
@@ -170,7 +231,7 @@ console.log(data)
                 value={data?.leave_type}
                 onChange={handleChange}
                 className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
-                required
+                
               >
                 <option value="">Choose leave type</option>
                 {leaveTypes.map((option) => {
@@ -201,41 +262,12 @@ console.log(data)
                 id="no_of_days"
                 className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
                 placeholder="Enter the Number of days"
-                required
+                
               />
             </div>
           </div>
-          <div className="grid gap-6 mb-6 md:grid-cols-2">
-           <div>
-              <label
-                htmlFor="status"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
-              >
-                Status
-                <span className="text-red-900 text-lg ">&#x2a;</span>
-              </label>
-              <select
-                name="status"
-                value={data?.status}
-                onChange={handleChange}
-                className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
-                required
-              >
-                <option value="">Select status</option>
-                {status.map((option) => {
-                  return (
-                    <option
-                      key={option.id}
-                      value={option.name}
-                      className=" bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
-                    >
-                      {option.name}
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
-          <div className="mb-6">
+           
+          <div className="mb-12">
             <label
               htmlFor="reason"
               className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
@@ -250,10 +282,10 @@ console.log(data)
               id="reason"
               className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
               placeholder="Reason for leave"
-              required
+              
             />
           </div>
-          </div>
+          
           
           <div className="mb-6">
             <label
@@ -266,7 +298,7 @@ console.log(data)
               name="remarks"
               value={data?.remarks}
               onChange={handleChange}
-              rows={6}
+              rows={2}
               id="remarks"
               className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
             />

@@ -25,7 +25,7 @@ const AddRole = () => {
   }, [permissions]);
 
   const fetchPermissions = async () => {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getpermission`);
+    const res = await fetch(`http://localhost:3000/api/getpermission`);
     const response = await res.json();
     if (response.success) {
       setPermissions(response.result);
@@ -46,7 +46,6 @@ const AddRole = () => {
       setData({ ...data, [name]: value });
     }
   };
-
   const validateRoleForm = () => {
     $("#roleForm").validate({
       rules: {
@@ -67,27 +66,32 @@ const AddRole = () => {
           required: "Please select at least one permission",
         },
       },
-      errorElement: "div",
-      errorPlacement: function (error, element) {
-        error.addClass("invalid-feedback");
-        error.insertAfter(element);
+      errorElement: 'div',
+      errorPlacement: function(error, element) {
+        if (element.attr("name") === "permission") {
+          // Place error message after the checkbox container
+          error.insertAfter(element.closest('.form-group').find('.checkbox-container'));
+        } else {
+          error.addClass('invalid-feedback');
+          error.insertAfter(element);
+        }
       },
-      highlight: function (element, errorClass, validClass) {
-        $(element).addClass("is-invalid").removeClass("is-valid");
+      highlight: function(element, errorClass, validClass) {
+        $(element).addClass('is-invalid').removeClass('is-valid');
       },
-      unhighlight: function (element, errorClass, validClass) {
-        $(element).removeClass("is-invalid").addClass("is-valid");
-      },
+      unhighlight: function(element, errorClass, validClass) {
+        $(element).removeClass('is-invalid').addClass('is-valid');
+      }
     });
   };
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!$("#roleForm").valid()) {
       return;
     }
 
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertrole`, {
+    const res = await fetch(`http://localhost:3000/api/insertrole`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -161,34 +165,37 @@ const AddRole = () => {
               required
             />
           </div>
-          <div>
-            <div className="mt-4">
-              Permissions<span className="text-red-900 text-lg ">&#x2a;</span>
-            </div>
-            {permissions.map((item) => (
-              <div key={item._id} className="flex flex-row items-center">
-                <label
-                  className="relative flex items-center p-3 rounded-full cursor-pointer"
-                  htmlFor={`check-${item._id}`}
-                >
-                  <input
-                    value={item._id}
-                    onChange={handleChange}
-                    type="checkbox"
-                    name="permission"
-                    className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all checked:border-gray-900 checked:bg-gray-900"
-                    id={`check-${item._id}`}
-                  />
-                </label>
-                <label
-                  className="mt-px font-light text-gray-700 cursor-pointer select-none"
-                  htmlFor={`check-${item._id}`}
-                >
-                  {item.permission}
-                </label>
-              </div>
-            ))}
-          </div>
+          <div className="form-group">
+  <div className="mt-4">
+    Permissions<span className="text-red-900 text-lg ">&#x2a;</span>
+  </div>
+  <div className="checkbox-container"> {/* Container for checkboxes */}
+    {permissions.map((item) => (
+      <div key={item._id} className="flex flex-row items-center">
+        <label
+          className="relative flex items-center p-3 rounded-full cursor-pointer"
+          htmlFor={`check-${item._id}`}
+        >
+          <input
+            value={item._id}
+            onChange={handleChange}
+            type="checkbox"
+            name="permission"
+            className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all checked:border-gray-900 checked:bg-gray-900"
+            id={`check-${item._id}`}
+          />
+        </label>
+        <label
+          className="mt-px font-light text-gray-700 cursor-pointer select-none"
+          htmlFor={`check-${item._id}`}
+        >
+          {item.permission}
+        </label>
+      </div>
+    ))}
+  </div>
+</div>
+
           {error && <p className="text-red-900 text-[17px] mb-5">{error}</p>}
           <div>
             <button

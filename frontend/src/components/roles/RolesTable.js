@@ -3,6 +3,8 @@ import { MdDelete } from "react-icons/md";
 import { GrFormView } from "react-icons/gr";
 import { CiEdit } from "react-icons/ci";
 import { NavLink } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const RolesTable = () => {
   const [roles, setRoles] = useState([]);
   const [loader, setLoader] = useState(true);
@@ -16,7 +18,7 @@ const RolesTable = () => {
 
   const fetchPermissions = async (id) => {
     const permRes = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/getesinglepermission`,
+      `http://localhost:3000/api/getesinglepermission`,
       {
         method: "POST",
         headers: { "Content-type": "application/json" },
@@ -30,7 +32,7 @@ const RolesTable = () => {
   const fetchRoles = async () => {
     setLoader(true);
     const res = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/getrole?page=${page}&limit=${pageSize}&search=${search}`
+      `http://localhost:3000/api/getrole?page=${page}&limit=${pageSize}&search=${search}`
     );
     const response = await res.json();
     if (response.success) {
@@ -59,7 +61,7 @@ const RolesTable = () => {
     if (count === 1) {
       roleOne = false;
     }
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/deleterole`, {
+    const res = await fetch(`http://localhost:3000/api/deleterole`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
@@ -69,6 +71,16 @@ const RolesTable = () => {
     }
     const response = await res.json();
     if (response.success) {
+      toast.success('Role is deleted Successfully!', {
+        position: "top-right",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        });
       if (roleOne) {
         setPage(page - 1);
       } else {
@@ -88,6 +100,18 @@ const RolesTable = () => {
 
   return (
     <div className="">
+      <ToastContainer
+          position="top-right"
+          autoClose={2000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
       <div className="flex items-center">
         
         <div className="text-2xl font-bold mx-2 my-8 px-4">Roles</div>

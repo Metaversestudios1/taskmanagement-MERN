@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import getUserFromToken from "../utils/getUserFromToken";
+import $ from "jquery";
+import 'jquery-validation';
 
 const AddLeave = () => {
   const { id } = getUserFromToken();
@@ -30,28 +32,73 @@ const AddLeave = () => {
     setData({ ...data, [name]: value });
   };
 
-
+  const validateleaveForm = () => {
+    // Initialize jQuery validation
+    $("#leaveform").validate({
+      rules: {
+        leave_from: {
+          required: true
+        }, 
+        leave_to: {
+          required: true
+        }, 
+        leave_type: {
+          required: true
+        }, 
+        no_of_days: {
+          required: true
+        }, 
+        reason: {
+          required: true
+        }, 
+        
+             
+      },
+      messages: {
+        leave_from: {
+          required: "Please select leave from date"
+        },     
+        leave_to: {
+          required: "Please select leave to date"
+        },     
+      
+        leave_type: {
+          required: "Please select leave type"
+        },  
+        no_of_days: {
+          required: "Please enter number of day's "
+        },
+        reason: {
+          required: "Please enter reason"
+        },     
+      
+      },
+      errorElement: 'div',
+      errorPlacement: function(error, element) {
+        error.addClass('invalid-feedback');
+        error.insertAfter(element);
+      },
+      highlight: function(element, errorClass, validClass) {
+        $(element).addClass('is-invalid').removeClass('is-valid');
+      },
+      unhighlight: function(element, errorClass, validClass) {
+        $(element).removeClass('is-invalid').addClass('is-valid');
+      }
+    });
+  
+    // Return validation status
+    return $("#leaveform").valid();
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // if (!validateTaskTime(data.task_time)) {
-    //   toast.error(
-    //     "Task time should be between 1 and 3, and rounded figures like 1.3 or 1.30 are acceptable.",
-    //     {
-    //       position: "top-right",
-    //       autoClose: 2000,
-    //       hideProgressBar: false,
-    //       closeOnClick: true,
-    //       pauseOnHover: true,
-    //       draggable: true,
-    //       progress: undefined,
-    //       theme: "light",
-    //     }
-    //   );
-    //   return;
-    // }
+    if (!validateleaveForm()) {
+      // setError("Please fill in all required fields.");
+        return;
+      }
+  
    
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertleave`, {
+    const res = await fetch(`http://localhost:3000/api/insertleave`, {
       method: "POST",
       headers:{"Content-Type":"application/json"},
       body: JSON.stringify(data),
@@ -108,7 +155,7 @@ console.log(data)
       </div>
 
       <div className="w-[70%] m-auto my-10">
-        <form onSubmit={handleSubmit} encType="multipart/form-data">
+        <form onSubmit={handleSubmit} id="leaveform" encType="multipart/form-data">
           
           <div className="grid gap-6 mb-6 md:grid-cols-2">
           <div className="">
@@ -158,7 +205,7 @@ console.log(data)
                 value={data?.leave_type}
                 onChange={handleChange}
                 className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
-                required
+                
               >
                 <option value="">Choose leave type</option>
                 {leaveTypes.map((option) => {
@@ -189,7 +236,7 @@ console.log(data)
                 id="no_of_days"
                 className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
                 placeholder="Enter the Number of days"
-                required
+                
               />
             </div>
           </div>
@@ -208,7 +255,7 @@ console.log(data)
               id="reason"
               className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
               placeholder="Reason for leave"
-              required
+              
             />
           </div>
           
@@ -223,7 +270,7 @@ console.log(data)
               name="remarks"
               value={data?.remarks}
               onChange={handleChange}
-              rows={6}
+              rows={2}
               id="remarks"
               className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
             />

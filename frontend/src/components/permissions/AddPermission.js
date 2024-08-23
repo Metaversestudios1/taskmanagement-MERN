@@ -14,44 +14,49 @@ const AddPermission = () => {
   const [data, setData] = useState(initialState);
 
   useEffect(() => {
-    // Adding a custom validation method for checking hyphen or underscore
-    $.validator.addMethod(
-      "containsDashOrUnderscore",
-      function (value, element) {
-        return value.includes("-") || value.includes("_");
-      },
-      "Input is wrong! Please read the NOTE carefully."
-    );
+    // Initialize validation when the component mounts
+    //validatePermissionForm();
+  }, []);
 
+  const validatepermissionForm = () => {
+    // Adding a custom validation method for checking hyphen or underscore
+    $.validator.addMethod("noSpaces", function(value, element) {
+      return this.optional(element) || /^[a-zA-Z0-9_]+$/.test(value);
+  }, "Permission should not contain spaces, use _ instead.");
     // Initialize jQuery validation when the component mounts
     $("#permissionForm").validate({
       rules: {
         permission: {
           required: true,
-          containsDashOrUnderscore: true, // Applying custom validation rule
+          noSpaces: true, // Applying custom validation rule
         },
       },
       messages: {
         permission: {
           required: "Permission is required.",
-          containsDashOrUnderscore:
-            "Input is wrong! Please read the NOTE carefully.",
         },
       },
-      submitHandler: function (form) {
-        handleSubmit();
-      },
+     
     });
-  }, []);
+    return $("#permissionForm").valid();
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log(e.target);
     setData({ ...data, [name]: value });
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+
+    e.preventDefault();
+    if (!validatepermissionForm()) {
+      // setError("Please fill in all required fields.");
+      return;
+    }
+    console.log(data);
     try {
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertpermission`, {
+      const res = await fetch(`http://localhost:3000/api/insertpermission`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -123,7 +128,7 @@ const AddPermission = () => {
       </div>
 
       <div className="w-[70%] m-auto my-10">
-        <form id="permissionForm">
+        <form onSubmit={handleSubmit} id="permissionForm" >
           <div>
             <label
               htmlFor="permission"
@@ -139,14 +144,14 @@ const AddPermission = () => {
               id="permission"
               className="bg-gray-200 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 mb-5"
               placeholder="Enter the Permission name"
-              required
+
             />
           </div>
-          <div className="form-note mb-2 text-green-800">
+          {/* <div className="form-note mb-2 text-green-800">
           NOTE&#58;Space&#40;s&#41; are not allowed in between Permission
           name&#46;&#40;Example:permission-table, permission_table is
           allowed&#41;
-          </div>
+          </div> */}
           <div>
             <button
               type="submit"
