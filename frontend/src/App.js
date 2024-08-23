@@ -36,6 +36,9 @@ import EditHoliday from "./components/Holiday/EditHoliday";
 import AddActivity from "./components/Activity/AddActivity";
 import ActivityTable from "./components/Activity/ActivityTable";
 import EditActivity from "./components/Activity/EditActivity";
+import PayrollTable from "./components/payroll/PayrollTable";
+import AddPayroll from "./components/payroll/AddPayroll";
+import EditPayroll from "./components/payroll/EditPayroll";
 
 function App() {
   const [sideBar, setSideBar] = useState(true);
@@ -534,6 +537,60 @@ function App() {
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
                   <EditActivity />
+                </div>
+              </div>
+            </div>
+          </AdminRoute>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/payroll",
+      element: (
+        <PrivateRoute>
+          <AdminRoute>
+            <div className="flex h-screen">
+              <Sidebar sidebar={sideBar} />
+              <div className="flex flex-col flex-grow overflow-y-auto">
+                <Navbar toggleSideBar={toggleSideBar} />
+                <div className="flex-grow ">
+                  <PayrollTable />
+                </div>
+              </div>
+            </div>
+          </AdminRoute>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/payroll/editpayroll/:id",
+      element: (
+        <PrivateRoute>
+          <AdminRoute>
+            <div className="flex h-screen">
+              <Sidebar sidebar={sideBar} />
+              <div className="flex flex-col flex-grow overflow-y-auto">
+                <Navbar toggleSideBar={toggleSideBar} />
+                <div className="flex-grow ">
+                  <EditPayroll />
+                </div>
+              </div>
+            </div>
+          </AdminRoute>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/payroll/addpayroll",
+      element: (
+        <PrivateRoute>
+          <AdminRoute>
+            <div className="flex h-screen">
+              <Sidebar sidebar={sideBar} />
+              <div className="flex flex-col flex-grow overflow-y-auto">
+                <Navbar toggleSideBar={toggleSideBar} />
+                <div className="flex-grow ">
+                  <AddPayroll />
                 </div>
               </div>
             </div>
