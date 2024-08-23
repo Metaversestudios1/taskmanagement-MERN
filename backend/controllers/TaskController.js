@@ -13,7 +13,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadFile = (buffer, originalname, mimetype) => {
+const uploadImage = (buffer, originalname, mimetype) => {
   return new Promise((resolve, reject) => {
     // Determine the appropriate resource type based on the file's MIME type
     let resourceType = "raw"; // Default to 'raw' for non-image/video files
