@@ -80,11 +80,6 @@ const insertTask = async (req, res) => {
         message: "Error inserting Task",
         error: error.message,
       });
-    } finally {
-      // Remove the file from the local filesystem
-      fs.unlink(filePath, (err) => {
-        if (err) console.error("Failed to delete file:", err);
-      });
     }
   } else {
     console.log("req.file is not present");
