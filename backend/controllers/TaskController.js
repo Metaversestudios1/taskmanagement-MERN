@@ -18,10 +18,9 @@ const uploadImage = (buffer, originalname, mimetype) => {
     // Determine the appropriate resource type based on the file's MIME type
     let resourceType = "raw"; // Default to 'raw' for non-image/video files
 
-    if (mimetype.startsWith("image")) {
-      resourceType = "image";
-    } else if (mimetype.startsWith("video")) {
-      resourceType = "video";
+    if (!mimetype) {
+      console.error("MIME type is undefined or null");
+      return reject(new Error("MIME type is required"));
     }
 
     console.log(`Uploading file with resource type: ${resourceType}`);
