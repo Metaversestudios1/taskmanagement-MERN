@@ -58,8 +58,7 @@ const insertTask = async (req, res) => {
       if (!uploadResult) {
         return res.status(500).json({ success: false, message: "File upload error" });
       }
-      console.log("File uploaded successfully:", uploadResult);
-
+    
       // Create new task with file information
       const newTask = new Task({
         ...taskData,
@@ -209,15 +208,13 @@ const updateTask = async (req, res) => {
   const {id} = req.params;
   if (req.file) {
     //  console.log("req.file is present");
-    const { originalname, path: filePath } = req.file;
+    const { originalname, buffer } = req.file;
 
     try {
-      // Upload file to Cloudinary
-      const uploadResult = await uploadImage(filePath);
+
+      const uploadResult = await uploadImage(buffer, originalname);
       if (!uploadResult) {
-        return res
-          .status(500)
-          .json({ success: false, message: "File upload error" });
+        return res.status(500).json({ success: false, message: "File upload error" });
       }
       const updatedTaskData = {
         ...updateData,
@@ -244,11 +241,6 @@ const updateTask = async (req, res) => {
           message: "Error updating task",
           err: err.message,
         });
-    } finally {
-      // Remove the file from the local filesystem
-      fs.unlink(filePath, (err) => {
-        if (err) console.error("Failed to delete file:", err);
-      });
     }
   } else {
     // console.log("req.file is not present");
@@ -273,61 +265,6 @@ const updateTask = async (req, res) => {
     }
   }
 };
-
-// const updateTask = async (req, res) => {
-//   const { id } = req.params;
-//   const updateData = req.body;
-
-//   try {
-//     if (req.file) {
-//       const { originalname, path: filePath } = req.file;
-
-//       // Upload file to Cloudinary
-//       const uploadResult = await uploadImage(filePath);
-//       if (!uploadResult) {
-//         return res.status(500).json({ success: false, message: "File upload error" });
-//       }
-
-//       // Prepare updated task data with file information
-//       updateData.attachment = {
-//         publicId: uploadResult.public_id,
-//         url: uploadResult.secure_url,
-//         originalname: originalname,
-//         mimetype: req.file.mimetype,
-//       };
-
-//       // Update the task in the database
-//       const result = await Task.findByIdAndUpdate(id, { $set: updateData }, { new: true });
-//       if (!result) {
-//         return res.status(404).json({ success: false, message: "Task not found or no changes made" });
-//       }
-
-//       res.status(200).json({ success: true, data: result });
-//     } else {
-//       // Update task without file
-//       const result = await Task.findByIdAndUpdate(id, { $set: updateData }, { new: true });
-//       if (!result) {
-//         return res.status(404).json({ success: false, message: "Task not found or no changes made" });
-//       }
-
-//       res.status(200).json({ success: true, data: result });
-//     }
-//   } catch (err) {
-//     res.status(500).json({
-//       success: false,
-//       message: "Error updating task",
-//       error: err.message,
-//     });
-//   } finally {
-//     if (req.file) {
-//       // Remove the file from the local filesystem
-//       fs.unlink(req.file.path, (err) => {
-//         if (err) console.error("Failed to delete file:", err);
-//       });
-//     }
-//   }
-// };
-
 
 const getSingletask = async (req, res) => {
   try {
