@@ -5,7 +5,6 @@ const { findOne } = require('../models/Employee');
 
 const insertleave = async(req, res)=>{
     try{
-        console.log(req.body)
         const newleave = new Leave(req.body);
         await newleave.save();
         res.status(201).json({success:true});
@@ -22,7 +21,6 @@ const insertleave = async(req, res)=>{
 const updateleave = async(req, res) => {
      const updateData = req.body;
      const id = updateData.id;
-     console.log(req.body);
     try{
         const result = await Leave.updateOne(
             {_id:id},
@@ -32,6 +30,21 @@ const updateleave = async(req, res) => {
             res.status(404).json({success:false,message:"leave not found"});
         }
         res.status(201).json({success:true,result:result})
+    }catch(error){
+        res.status(500).json({success:false,message:"error updating leave",error:error.message});
+    }
+}
+const updateLeaveStatus = async(req, res) => {
+     const {status, id}= req.body;
+    try{
+        const result = await Leave.updateOne(
+            {_id:id},
+            { $set:{status}},
+        );
+        if (!result) {
+            res.status(404).json({success:false,message:"leave not found"});
+        }
+        res.status(201).json({success:true})
     }catch(error){
         res.status(500).json({success:false,message:"error updating leave",error:error.message});
     }
@@ -86,7 +99,6 @@ const getAllLeave = async (req, res) => {
           } else if (endDate) {
             query.leave_from = { $lte: endDate };
           }
-          console.log(query)
         const result = await Leave.find(query)
             .sort({ createdAt: -1 })
             .skip((page - 1) * pageSize)
