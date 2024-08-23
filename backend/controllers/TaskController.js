@@ -19,16 +19,20 @@ const uploadImage = (buffer, originalname, mimetype) => {
       console.error("MIME type is undefined or not a string");
       return reject(new Error("MIME type is required and must be a string"));
     }
+    let resourceType = "raw"; // Default to 'raw' for non-image/video files
 
-   if (mimetype.startsWith("image")) {
-        resourceType = "image";
-      } else if (mimetype.startsWith("video")) {
-        resourceType = "video";
-      }
+    if (mimetype.startsWith("image")) {
+      resourceType = "image";
+    } else if (mimetype.startsWith("video")) {
+      resourceType = "video";
+    }
+
+    console.log(`Uploading file with resource type: ${resourceType}`);
+
 
     // Use 'raw' resource type for files to maintain original format
     const options = {
-      resource_type: 'raw',
+      resource_type: resourceType,
       public_id: originalname.split('.')[0], // Use the original file name without extension
       use_filename: true,
       unique_filename: false,
