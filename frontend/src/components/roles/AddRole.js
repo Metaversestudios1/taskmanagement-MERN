@@ -25,7 +25,7 @@ const AddRole = () => {
   }, [permissions]);
 
   const fetchPermissions = async () => {
-    const res = await fetch(`http://localhost:3000/api/getpermission`);
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getpermission`);
     const response = await res.json();
     if (response.success) {
       setPermissions(response.result);
@@ -91,7 +91,7 @@ const AddRole = () => {
       return;
     }
 
-    const res = await fetch(`http://localhost:3000/api/insertrole`, {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertrole`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),

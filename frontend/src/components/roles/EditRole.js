@@ -30,7 +30,7 @@ const EditRole = () => {
   }, [oldData]);
 
   const fetchOldData = async () => {
-    const res = await fetch(`http://localhost:3000/api/getSingleRole`, {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getSingleRole`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
@@ -42,7 +42,7 @@ const EditRole = () => {
   };
 
   const fetchAllPermissions = async () => {
-    const res = await fetch(`http://localhost:3000/api/getpermission`);
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getpermission`);
     const response = await res.json();
     if (response.success) {
       setPermissions(response.result);
@@ -111,7 +111,7 @@ const EditRole = () => {
   
     try {
       const updateData = { id, oldData };
-      const res = await fetch(`http://localhost:3000/api/updaterole`, {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updaterole`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updateData),
