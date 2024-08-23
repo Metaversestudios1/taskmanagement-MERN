@@ -88,7 +88,7 @@ const AddPayroll = () => {
           />
         </div>
         <div className="flex items-center">
-          <div className="text-2xl font-bold mx-2 my-8 px-4">Add Leave</div>
+          <div className="text-2xl font-bold mx-2 my-8 px-4">Add Payroll</div>
         </div>
       </div>
 
