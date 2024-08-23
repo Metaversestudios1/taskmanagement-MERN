@@ -66,6 +66,16 @@ const Employees = () => {
     }
     const response = await res.json();
     if (response.success) {
+      toast.success('Employee is deleted Successfully!', {
+        position: "top-right",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        });
       if (userOne) {
         setPage(page - 1);
       } else {
@@ -87,7 +97,18 @@ const Employees = () => {
 
   return (
     <div className="">
-    
+      <ToastContainer
+          position="top-right"
+          autoClose={2000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
       <div className="flex items-center">
         <div className="text-2xl font-bold mx-2 my-8 px-4">Employees List</div>
       </div>
