@@ -22,18 +22,18 @@ const uploadImage = (buffer, originalname, mimetype) => {
     }
 
     // Determine the appropriate resource type based on the file's MIME type
-    let resourceType = "raw"; // Default to 'raw' for non-image/video files
+ // Default to 'raw' for non-image/video files
 
-    if (mimetype.startsWith("image")) {
-      resourceType = "image";
-    } else if (mimetype.startsWith("video")) {
-      resourceType = "video";
-    }
+    // if (mimetype.startsWith("image")) {
+    //   resourceType = "image";
+    // } else if (mimetype.startsWith("video")) {
+    //   resourceType = "video";
+    // }
 
     console.log(`Uploading file with resource type: ${resourceType}`);
 
     const options = {
-      resource_type: resourceType,
+      resource_type: raw,
       public_id: originalname.split('.')[0], // Use the original file name without extension
       use_filename: true,
       unique_filename: false,
