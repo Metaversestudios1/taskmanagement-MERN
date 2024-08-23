@@ -54,8 +54,6 @@ const uploadImage = (buffer, originalname, mimetype) => {
 };
 
 
-
-
 const insertTask = async (req, res) => {
   if (req.file) {
     console.log("req.file is present");
