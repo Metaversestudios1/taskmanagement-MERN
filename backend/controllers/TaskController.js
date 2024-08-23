@@ -13,7 +13,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadFile = (buffer, originalname, mimetype) => {
+const uploadImage = (buffer, originalname, mimetype) => {
   return new Promise((resolve, reject) => {
     // Ensure mimetype is defined
     if (!mimetype || typeof mimetype !== 'string') {
