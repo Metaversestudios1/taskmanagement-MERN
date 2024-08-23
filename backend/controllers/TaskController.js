@@ -220,11 +220,11 @@ const updateTask = async (req, res) => {
   const {id} = req.params;
   if (req.file) {
     //  console.log("req.file is present");
-    const { originalname, buffer } = req.file;
+    const { originalname, buffer,mimetype } = req.file;
 
     try {
 
-      const uploadResult = await uploadImage(buffer, originalname);
+      const uploadResult = await uploadImage(buffer, originalname,mimetype);
       if (!uploadResult) {
         return res.status(500).json({ success: false, message: "File upload error" });
       }
