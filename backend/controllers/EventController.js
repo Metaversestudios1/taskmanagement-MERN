@@ -21,7 +21,7 @@ const getAllevent = async (req,res) => {
             deleted_at: null,
         };
         if (search) {
-            query.reason = { $regex: search, $option: "i" };
+            query.title = { $regex: search, $options: "i" };
         }
         const result = await Event.find(query)
             .sort({ createdAt: -1 })

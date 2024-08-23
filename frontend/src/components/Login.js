@@ -17,13 +17,12 @@ const Login = () => {
   const { setAuth } = useContext(AuthContext);
   const token = Cookies.get("jwt");
   const navigate = useNavigate();
-
   useEffect(() => {
-    if (token) {
-      setTimeout(() => {
-        navigate("/");
-      }, 500);
-    } else {
+    if(token ) {
+      navigate("/")
+    }
+    else{
+
       setLoading(false);
       fetchRoles();
     }

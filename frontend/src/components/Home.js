@@ -31,14 +31,14 @@ const Home = () => {
     setTodayTasks(response.count);
   };
   const fetchTotalTasks = async () => {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/gettotaltasks?id=${userInfo.id}`);
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/gettotaltasks?id=${userInfo?.id}`);
     const response = await res.json();
     setTotalTasks(response)
   };
   return (
     <div>
       <div className="grid grid-cols-1 gap-6 p-3 mb-6 w-full xl:grid-cols-2 2xl:grid-cols-4">
-        {userInfo.role === "admin" || userInfo.role === "Admin" ? (
+        {userInfo?.role === "admin" || userInfo?.role === "Admin" ? (
           <>
             {" "}
             <div className="bg-white shadow-lg shadow-gray-200 rounded-2xl p-4">

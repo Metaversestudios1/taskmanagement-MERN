@@ -9,12 +9,15 @@ import { PiLineVerticalThin } from "react-icons/pi";
 import "react-toastify/dist/ReactToastify.css";
 import getUserFromToken from "./utils/getUserFromToken";
 const Navbar = ({ toggleSideBar }) => {
+  const now = new Date();
+  const offset = now.getTimezoneOffset() * 60000; // Offset in milliseconds
+  const localDate = new Date(now.getTime() - offset);
   const navigate = useNavigate();
   const userInfo = getUserFromToken();
   const [checkInValue, setCheckInValue] = useState(true);
-  const [date, setDate] = useState(null);
-  const [checkInTime, setCheckInTime] = useState(getCurrentTime());
-  const [emp_id, setEmpId] = useState(userInfo.id);
+  const [date, setDate] = useState(localDate);
+  const [checkInTime, setCheckInTime] = useState("");
+  const [emp_id, setEmpId] = useState(userInfo?.id);
   const [isMidnight, setIsMidnight] = useState(false);
   const token = Cookies.get("jwt");
   function getCurrentTime() {
@@ -53,9 +56,7 @@ const Navbar = ({ toggleSideBar }) => {
       setInterval(changeStateAtMidnight, 24 * 60 * 60 * 1000);
     }, timeUntilMidnight);
 
-    // Clean up the timeout and interval on component unmount
-
-    fetchCheckInRecord();
+      fetchCheckInRecord();
 
     return () => {
       clearTimeout(timeoutId);
@@ -76,19 +77,16 @@ const Navbar = ({ toggleSideBar }) => {
     const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getSingleattendence`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: userInfo.id, date: currentDate() }),
+      body: JSON.stringify({ id: userInfo?.id, date: currentDate() }),
     });
     const response = await res.json();
+    console.log(response)
     if (response.success && !response.result.check_out) {
       setCheckInValue(false);
       setCheckInTime(response.result?.check_in); // Store the check-in date
       setDate(response.result?.date);
     } else {
       setCheckInValue(true);
-      const now = new Date();
-      const offset = now.getTimezoneOffset() * 60000; // Offset in milliseconds
-      const localDate = new Date(now.getTime() - offset);
-      setDate(localDate);
     }
   };
 
@@ -149,7 +147,7 @@ const Navbar = ({ toggleSideBar }) => {
     const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertattendence`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ date: date, emp_id, check_in: checkInTime,  location_url: locationURL, }),
+      body: JSON.stringify({ date: date, emp_id, check_in: getCurrentTime(),  location_url: locationURL }),
     });
     const response = await res.json();
     if (response.success) {
@@ -171,7 +169,7 @@ const Navbar = ({ toggleSideBar }) => {
     const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateattendence`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ emp_id: userInfo.id, date: date }),
+      body: JSON.stringify({ emp_id: userInfo?.id, date: date }),
     });
     const response = await res.json();
     if (response.success) {
@@ -258,7 +256,7 @@ const Navbar = ({ toggleSideBar }) => {
           className="hs-collapse  overflow-hidden transition-all duration-300 "
         >
           <div className="flex flex-row items-center justify-end ">
-            {(userInfo.role === "Employee" || userInfo.role === "employee") && (
+            {(userInfo?.role === "Employee" || userInfo?.role === "employee") && (
               <div className="mx-3">
                 {checkInValue && localStorage.getItem("status") !== "true" ? (
                   <button

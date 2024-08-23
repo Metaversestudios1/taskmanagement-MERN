@@ -55,7 +55,7 @@ const Tasks = () => {
     );
     const projectData = await projectRes.json();
 
-    return projectData.success ? projectData.result[0].name : "Unknown";
+    return projectData.success ? projectData?.result[0]?.name : "Unknown";
   };
 
   const fetchTasks = async () => {
@@ -184,63 +184,73 @@ const Tasks = () => {
         )}
       </div>
 
-      {(userInfo.role === "Admin" || userInfo.role === "admin") && (
-        <div className="w-full ">
-          <label
-            htmlFor="employees"
-            className="block mb-2 text-lg font-medium text-gray-900 dark:text-black w-[60%] m-auto"
+      <div className="flex justify-center items-center flex-wrap">
+        {(userInfo.role === "Admin" || userInfo.role === "admin") && (
+          <div className="mx-5">
+            <select
+              name="employees"
+              value={employee}
+              onChange={handleChange}
+              className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block  p-2.5 m-auto"
+            >
+              <option value="">Select an employee for attendance.</option>
+              {employees.map((item) => (
+                <option
+                  key={item._id}
+                  value={item._id}
+                  className=" bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5"
+                >
+                  {item.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+        <div className="flex ">
+          <div className="flex items-center mx-4">
+            <label
+              htmlFor="startDate"
+              className="block text-lg font-medium text-gray-900 w-36  "
+            >
+              Start Date:
+            </label>
+            <input
+              name="startDate"
+              value={startDate}
+              onChange={handleChange}
+              type="date"
+              id="date"
+              className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
+              placeholder="Enter the task name"
+            />
+          </div>
+          <div className="flex items-center mx-4">
+            <label
+              htmlFor="endDate"
+              className="block  text-lg font-medium text-gray-900 w-36"
+            >
+              End Date:
+            </label>
+            <input
+              name="endDate"
+              value={endDate}
+              onChange={handleChange}
+              type="date"
+              id="endDate"
+              className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
+              placeholder="Enter the task name"
+            />
+          </div>
+          <button
+            onClick={() => {
+              setStartDate("");
+              setEndDate("");
+            }}
+            className="bg-blue-800 text-white px-4 py-2  text-sm rounded-lg"
           >
-            Select an Employee
-          </label>
-          <select
-            name="employees"
-            value={employee}
-            onChange={handleChange}
-            className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-[60%] p-2.5 m-auto"
-          >
-            <option value="">Select an employee for tasks.</option>
-            {employees.map((item) => (
-              <option
-                key={item._id}
-                value={item._id}
-                className=" bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5"
-              >
-                {item.name}
-              </option>
-            ))}
-          </select>
+            Reset
+          </button>
         </div>
-      )}
-      <div className="flex mt-10 ml-6 flex-wrap">
-        <div className="flex items-center mx-2">
-          <label className="font-bold ">Start Date:</label>
-          <input
-            type="date"
-            name="startDate"
-            value={startDate}
-            onChange={handleChange}
-            className="border-2 p-1 mb-1"
-          />
-        </div>
-        <div className="flex   items-center mx-2">
-          <label className="font-bold ">End Date:</label>
-          <input
-            type="date"
-            name="endDate"
-            value={endDate}
-            onChange={handleChange}
-            className="border-2 p-1 mb-1"
-          />
-        </div>
-        <button
-          onClick={() => {
-            setStartDate("");
-            setEndDate("");
-          }}
-          className="bg-blue-800 text-white px-4 py-2  text-sm rounded-lg"
-        >
-          Reset
-        </button>
       </div>
       {Object.keys(tasks).length > 0 ? (
         <div className="relative overflow-x-auto m-5 mb-0">
@@ -369,7 +379,7 @@ const Tasks = () => {
           </table>
         </div>
       ) : (
-        <p className="m-6 text-gray-500">No tasks found</p>
+        <div className="m-8 flex justify-center">No Tasks Found</div>
       )}
     </div>
   );

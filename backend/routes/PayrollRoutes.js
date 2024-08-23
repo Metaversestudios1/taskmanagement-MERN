@@ -4,7 +4,7 @@ const{ insertpayroll, getSinglepayroll, updatepayroll, getAllPayroll, deletepayr
 const router = express.Router();
  
 router.post('/insertpayroll',insertpayroll);
-router.get('/getSinglepayroll',getSinglepayroll);
+router.post('/getSinglepayroll',getSinglepayroll);
 router.put('/updatepayroll',updatepayroll);
 router.get('/getAllPayroll',getAllPayroll);
 router.delete('/deletepayroll',deletepayroll);

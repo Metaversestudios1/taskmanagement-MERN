@@ -3,7 +3,7 @@ const { json }= require('body-parser');
 const mongoose = require('mongoose');
 
 const insertpayroll= async(req,res) => {
-    console.log(req.body)
+
     try{
         const newroll =  new Payroll(req.body);
         await newroll.save();
@@ -14,17 +14,17 @@ const insertpayroll= async(req,res) => {
     }
 }
 const getAllPayroll = async (req, res) => {
-    console.log(req.body);
+
     try {
       const pageSize = req.query.limit;
       const page = req.query.page;
-      const search = req.query.search;
+      const id = req.query.id;
       const query = {
         deleted_at: null,
       };
   
-      if (search) {
-        query.Payroll = { $regex: search, $options: "i" }; // Add search condition if provided
+      if(id) {
+        query.emp_id = id
       }
       const result = await Payroll.find(query)
       .sort({ createdAt: -1 })
@@ -63,7 +63,7 @@ const getAllPayroll = async (req, res) => {
     //const id = req.body.id; // Extract the ID from the request parameters
     const updateData = req.body; // Extract the update data from the request body
     const id = updateData.id;
-    
+
     try {
     
       const result = await Payroll.updateOne(

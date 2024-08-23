@@ -66,7 +66,7 @@ const HolidayTable = () => {
     }
   };
 
-  const startIndex = (page - 1) * pageSize;
+  const startIndex = (page - 1) * pageSize; 
   return (
     <div className="">
       <div className="flex items-center">
@@ -86,7 +86,7 @@ const HolidayTable = () => {
             name="search"
             value={search}
             onChange={handleChange}
-            className={`text-black border-[1px] rounded-lg bg-white p-2 m-5`}
+            className={`text-black border-[1px] border-gray-400 rounded-lg bg-white p-2 m-5`}
           />
         </div>
       </div>

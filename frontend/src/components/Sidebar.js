@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { FaAngleDown, FaAngleRight } from "react-icons/fa6";
-import { AiOutlineFundProjectionScreen } from "react-icons/ai";
 import { NavLink } from "react-router-dom";
 import getUserFromToken from "./utils/getUserFromToken";
 import { SlCalender } from "react-icons/sl";
@@ -8,11 +7,9 @@ import { MdOutlineHolidayVillage } from "react-icons/md";
 import { MdEvent } from "react-icons/md";
 import { IoSettingsOutline } from "react-icons/io5";
 import { GoTasklist } from "react-icons/go";
-
+import { MdOutlineAttachMoney } from "react-icons/md";
 const Sidebar = ({ sidebar }) => {
-  const { role } = getUserFromToken();
-  console.log(role);
-
+  const  userInfo = getUserFromToken();
   const [openSubMenu, setOpenSubMenu] = useState({
     attendance: false,
     admin: false,
@@ -40,7 +37,7 @@ const Sidebar = ({ sidebar }) => {
               href="/"
               aria-label="Brand"
             >
-              TMS
+              {(userInfo?.role==="employee" || userInfo?.role==="Employee") ? (userInfo?.name)?.charAt(0).toUpperCase() + (userInfo?.name)?.slice(1) : "Admin"}
             </a>
           </div>
           <nav
@@ -48,7 +45,7 @@ const Sidebar = ({ sidebar }) => {
             data-hs-accordion-always-open
           >
             <ul className="space-y-1.5">
-              <li>
+              <li className=" hover:scale-105 transition-transform duration-200">
                 <NavLink
                   to="/"
                   className={({ isActive }) =>
@@ -76,7 +73,7 @@ const Sidebar = ({ sidebar }) => {
                 </NavLink>
               </li>
 
-              <li className="hs-accordion" id="users-accordion">
+              <li className="hs-accordion transition-all duration-200 hover:scale-105" id="users-accordion">
                 <button
                   onClick={() => toggleSubMenu("attendance")}
                   type="button"
@@ -97,7 +94,7 @@ const Sidebar = ({ sidebar }) => {
                 <ul>
                   <li
                     id="users-accordion"
-                    className="hs-accordion-content w-full my-2 overflow-hidden transition-[height] duration-300"
+                    className="hs-accordion-content w-full my-2 overflow-hidden duration-200 hover:scale-110 transition-all "
                   >
                     <div className="hs-accordion" id="users-accordion-sub-1">
                       <NavLink
@@ -118,7 +115,7 @@ const Sidebar = ({ sidebar }) => {
                 <button
                   onClick={() => toggleSubMenu("leave")}
                   type="button"
-                  className="justify-between active:bg-gray-100 hs-accordion-toggle w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg hover:bg-gray-100 hover:text-black"
+                  className="justify-between active:bg-gray-100 hs-accordion-toggle w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg hover:bg-gray-100 hover:text-black transition-all duration-200 hover:scale-105"
                 >
                   <div className="flex items-center">
                     <svg
@@ -151,7 +148,7 @@ const Sidebar = ({ sidebar }) => {
                 <ul>
                   <li
                     id="users-accordion"
-                    className="hs-accordion-content w-full my-2 overflow-hidden transition-[height] duration-300"
+                    className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110 "
                   >
                     <div className="hs-accordion" id="users-accordion-sub-1">
                       <NavLink
@@ -168,7 +165,7 @@ const Sidebar = ({ sidebar }) => {
                   </li>
                   {/* <li
                       id="users-accordion"
-                      className="hs-accordion-content w-full my-2 overflow-hidden transition-[height] duration-300"
+                      className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
                     >
                       <div className="hs-accordion" id="users-accordion-sub-1">
                         <NavLink
@@ -185,13 +182,13 @@ const Sidebar = ({ sidebar }) => {
                         </li>*/}
                 </ul>
               )}
-              {(role === "Admin" || role === "admin") &&  (
+              {(userInfo?.role === "Admin" || userInfo?.role === "admin") &&  (
                 <>
                   <li className="hs-accordion" id="users-accordion">
                     <button
                       onClick={() => toggleSubMenu("admin")}
                       type="button"
-                      className="justify-between active:bg-gray-100 hs-accordion-toggle w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg hover:bg-gray-100 hover:text-black"
+                      className="justify-between active:bg-gray-100 hs-accordion-toggle w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg hover:bg-gray-100 hover:text-black transition-all duration-200 hover:scale-105"
                     >
                       <div className="flex items-center">
                         <svg
@@ -224,7 +221,7 @@ const Sidebar = ({ sidebar }) => {
                   {openSubMenu.admin && <ul>
                     <li
                       id="users-accordion"
-                      className="hs-accordion-content w-full my-2 overflow-hidden transition-[height] duration-300"
+                      className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
                     >
                       <div className="hs-accordion" id="users-accordion-sub-1">
                         <NavLink
@@ -241,7 +238,7 @@ const Sidebar = ({ sidebar }) => {
                     </li>
                     <li
                       id="users-accordion"
-                      className="hs-accordion-content w-full my-2 overflow-hidden transition-[height] duration-300"
+                      className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
                     >
                       <div className="hs-accordion" id="users-accordion-sub-1">
                         <NavLink
@@ -258,7 +255,7 @@ const Sidebar = ({ sidebar }) => {
                     </li>
                     <li
                       id="users-accordion"
-                      className="hs-accordion-content w-full my-2 overflow-hidden transition-[height] duration-300"
+                      className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
                     >
                       <div className="hs-accordion" id="users-accordion-sub-1">
                         <NavLink
@@ -275,7 +272,7 @@ const Sidebar = ({ sidebar }) => {
                     </li>
                     <li
                       id="users-accordion"
-                      className="hs-accordion-content w-full my-2 overflow-hidden transition-[height] duration-300"
+                      className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
                     >
                       <div className="hs-accordion" id="users-accordion-sub-1">
                         <NavLink
@@ -292,7 +289,7 @@ const Sidebar = ({ sidebar }) => {
                     </li>
                     <li
                       id="users-accordion"
-                      className="hs-accordion-content w-full my-2 overflow-hidden transition-[height] duration-300"
+                      className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
                     >
                       <div className="hs-accordion" id="users-accordion-sub-1">
                         <NavLink
@@ -309,7 +306,7 @@ const Sidebar = ({ sidebar }) => {
                     </li>
                     <li
                       id="users-accordion"
-                      className="hs-accordion-content w-full my-2 overflow-hidden transition-[height] duration-300"
+                      className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
                     >
                       <div className="hs-accordion" id="users-accordion-sub-1">
                         <NavLink
@@ -324,7 +321,7 @@ const Sidebar = ({ sidebar }) => {
                         </NavLink>
                       </div>
                     </li>
-                    <li>
+                    <li className="transition-all duration-200 hover:scale-110">
                       <NavLink
                         to="/projects"
                         className={({ isActive }) =>
@@ -338,7 +335,7 @@ const Sidebar = ({ sidebar }) => {
                     </li>
                     <li
                       id="users-accordion"
-                      className="hs-accordion-content w-full my-2 overflow-hidden transition-[height] duration-300"
+                      className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
                     >
                       <div className="hs-accordion" id="users-accordion-sub-1">
                         <NavLink
@@ -356,7 +353,7 @@ const Sidebar = ({ sidebar }) => {
                   </ul>}
                 </>
               )}
-              <li>
+              <li className = "transition-all duration-200 hover:scale-105">
                 <NavLink
                   to="/tasks"
                   className={({ isActive }) =>
@@ -369,7 +366,20 @@ const Sidebar = ({ sidebar }) => {
                   Tasks
                 </NavLink>
               </li>
-              <li>
+              {(userInfo?.role==="Admin" || userInfo?.role==="admin") &&  <li className = "transition-all duration-200 hover:scale-105">
+                <NavLink
+                  to="/payroll"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg"
+                      : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg hover:text-black hover:bg-white"
+                  }
+                >
+                  <MdOutlineAttachMoney className="text-lg" />
+                  Payroll Management
+                </NavLink>
+              </li>}
+              <li className = "transition-all duration-200 hover:scale-105">
                 <NavLink
                   to="/holiday"
                   className={({ isActive }) =>
@@ -382,7 +392,7 @@ const Sidebar = ({ sidebar }) => {
                   Holiday
                 </NavLink>
               </li>
-              <li>
+              <li className = "transition-all duration-200 hover:scale-105">
               <NavLink
                 to="/activity"
                 className={({ isActive }) =>
@@ -395,7 +405,7 @@ const Sidebar = ({ sidebar }) => {
                 Activity
               </NavLink>
             </li>
-              <li>
+              <li className = "transition-all duration-200 hover:scale-105">
                 <NavLink
                   to="/setting"
                   className={({ isActive }) =>

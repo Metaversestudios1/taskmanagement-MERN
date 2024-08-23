@@ -39,7 +39,7 @@ const Attendance = () => {
     const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getemployee`);
     const response = await res.json();
     if (response.success) {
-      setEmployees(response.result); 
+      setEmployees(response.result);
     }
   };
 
@@ -53,7 +53,6 @@ const Attendance = () => {
       }
     );
     const employeeName = await nameRes.json();
-    console.log(employeeName)
     return employeeName.success ? employeeName.data[0].name : "Unknown";
   };
 
@@ -63,7 +62,6 @@ const Attendance = () => {
       `${process.env.REACT_APP_BACKEND_URL}/api/getAllattendence?page=${page}&limit=${pageSize}&id=${employee}&startDate=${startDate}&endDate=${endDate}`
     );
     const response = await res.json();
-    console.log(response)
     if (response.success) {
       const attendanceWithEmployeeNames = await Promise.all(
         response.result.map(async (attendance) => {
@@ -80,35 +78,6 @@ const Attendance = () => {
     }
   };
 
-  // const handleDelete = async (e, id) => {
-  //   e.preventDefault();
-  //   const permissionOfDelete = window.confirm(
-  //     "Are you sure, you want to delete the attendance?"
-  //   );
-  //   if (permissionOfDelete) {
-  //     let attendanceOne = attendance.length === 1;
-  //     if (count === 1) {
-  //       attendanceOne = false;
-  //     }
-  //     const res = await fetch(`${process.env.REACT_APP_REACT_APP_BACKEND_URL}/api/deletetask`, {
-  //       method: "DELETE",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ id }),
-  //     });
-  //     if (!res.ok) {
-  //       throw new Error("Network response was not ok");
-  //     }
-  //     const response = await res.json();
-  //     if (response.success) {
-  //       if (taskOne) {
-  //         setPage(page - 1);
-  //       } else {
-  //         fetchAttendance();
-  //       }
-  //     }
-  //   }
-  // };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (
@@ -116,7 +85,8 @@ const Attendance = () => {
       name === "employees"
     ) {
       setEmployee(value);
-    } if (name === "startDate") {
+    }
+    if (name === "startDate") {
       setStartDate(value);
       setPage(1);
     } else if (name === "endDate") {
@@ -125,90 +95,82 @@ const Attendance = () => {
     }
   };
 
-  // const handleDownload = (url) => {
-  //   if (!url) {
-  //     return window.alert("There is no attachment with this task.");
-  //   }
-  //   const isImage = url.match(/\.(jpeg|jpg|gif|png)$/) != null;
-
-  //   if (isImage) {
-  //     window.open(url, "_blank");
-  //   } else {
-  //     const link = document.createElement("a");
-  //     link.href = url;
-  //     link.download = url.substring(url.lastIndexOf("/") + 1);
-  //     document.body.appendChild(link);
-  //     link.click();
-  //     document.body.removeChild(link);
-  //   }
-  // };
-
   const startIndex = (page - 1) * pageSize;
   return (
     <div className="">
       <div className="flex items-center">
-        
-        <div className="text-2xl font-bold mx-2 my-8 px-4">Attendance Sheet</div>
+        <div className="text-2xl font-bold mx-2 my-8 px-4">
+          Attendance Sheet
+        </div>
       </div>
-      
 
-      {(userInfo.role === "Admin" || userInfo.role === "admin") && (
-        <div className="w-full ">
-          <label
-            htmlFor="employees"
-            className="block mb-2 text-lg font-medium text-gray-900 dark:text-black w-[60%] m-auto"
+      <div className="flex justify-center items-center flex-wrap">
+        {(userInfo.role === "Admin" || userInfo.role === "admin") && (
+          <div className="mx-5">
+            <select
+              name="employees"
+              value={employee}
+              onChange={handleChange}
+              className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block  p-2.5 m-auto"
+            >
+              <option value="">Select an employee for attendance.</option>
+              {employees.map((item) => (
+                <option
+                  key={item._id}
+                  value={item._id}
+                  className=" bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5"
+                >
+                  {item.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+        <div className="flex ">
+          <div className="flex items-center mx-4">
+            <label
+              htmlFor="startDate"
+              className="block text-lg font-medium text-gray-900 w-36  "
+            >
+              Start Date:
+            </label>
+            <input
+              name="startDate"
+              value={startDate}
+              onChange={handleChange}
+              type="date"
+              id="date"
+              className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
+              placeholder="Enter the task name"
+            />
+          </div>
+          <div className="flex items-center mx-4">
+            <label
+              htmlFor="endDate"
+              className="block  text-lg font-medium text-gray-900 w-36"
+            >
+              End Date:
+            </label>
+            <input
+              name="endDate"
+              value={endDate}
+              onChange={handleChange}
+              type="date"
+              id="endDate"
+              className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
+              placeholder="Enter the task name"
+            />
+          </div>
+          <button
+            onClick={() => {
+              setStartDate("");
+              setEndDate("");
+            }}
+            className="bg-blue-800 text-white px-4 py-2  text-sm rounded-lg"
           >
-            Select an employee
-          </label>
-          <select
-            name="employees"
-            value={employee}
-            onChange={handleChange}
-            className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-[60%] p-2.5 m-auto"
-          >
-            <option value="">Select an employee for attendance.</option>
-            {employees.map((item) => (
-              <option
-                key={item._id}
-                value={item._id}
-                className=" bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5"
-              >
-                {item.name}
-              </option>
-            ))}
-          </select>
+            Reset
+          </button>
         </div>
-      )}
-      <div className="flex mt-10 ml-6 flex-wrap">
-        <div className="flex items-center mx-2">
-          <label className="font-bold ">Start Date:</label>
-          <input
-            type="date"
-            name="startDate"
-            value={startDate}
-            onChange={handleChange}
-            className="border-2 p-1 mb-1"
-          />
-        </div>
-        <div className="flex   items-center mx-2">
-          <label className="font-bold ">End Date:</label>
-          <input
-            type="date"
-            name="endDate"
-            value={endDate}
-            onChange={handleChange}
-            className="border-2 p-1 mb-1"
-          />
-        </div>
-        <button
-          onClick={() => {
-            setStartDate("");
-            setEndDate("");
-          }}
-          className="bg-blue-800 text-white px-4 py-2  text-sm rounded-lg"
-        >
-          Reset
-        </button>
       </div>
       {attendance.length > 0 ? (
         <div className="relative overflow-x-auto m-5 mb-0">
@@ -262,7 +224,7 @@ const Attendance = () => {
                       {item?.check_in}
                     </td>
                     <td className="px-6 py-4 border-2 border-gray-300">
-                      {item?.check_out || "-" }
+                      {item?.check_out || "-"}
                     </td>
                     <td className="px-6 py-4 border-2 border-gray-300">
                       {item?.working_hours || "-"}
@@ -290,8 +252,7 @@ const Attendance = () => {
             <span className="font-semibold text-black">
               {Math.min(startIndex + pageSize, count)}
             </span>{" "}
-            of <span className="font-semibold text-black">{count}</span>{" "}
-            Entries
+            of <span className="font-semibold text-black">{count}</span> Entries
           </span>
           <div className="inline-flex mt-2 xs:mt-0">
             <button
