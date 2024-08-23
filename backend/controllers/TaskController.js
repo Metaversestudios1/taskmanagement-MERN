@@ -59,14 +59,18 @@ const uploadImage = (buffer, originalname, mimetype) => {
 const insertTask = async (req, res) => {
   if (req.file) {
     console.log("req.file is present");
-    const { originalname, buffer } = req.file;
+    const { originalname, buffer, mimetype } = req.file;
+    if (!mimetype || typeof mimetype !== 'string') {
+      console.error("Invalid MIME type:", mimetype);
+      return res.status(400).json({ success: false, message: "Invalid MIME type" });
+    }
 
     try {
       const taskData = req.body;
       console.log("Uploading file to Cloudinary...");
       
       // Upload file to Cloudinary
-      const uploadResult = await uploadImage(buffer, originalname);
+      const uploadResult = await uploadImage(buffer, originalname,mimetype);
       if (!uploadResult) {
         return res.status(500).json({ success: false, message: "File upload error" });
       }
