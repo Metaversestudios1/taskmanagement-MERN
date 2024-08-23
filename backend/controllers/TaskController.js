@@ -30,7 +30,7 @@ const uploadImage = (buffer, originalname, mimetype) => {
     //   resourceType = "video";
     // }
 
-    console.log(`Uploading file with resource type: ${resourceType}`);
+    //console.log(`Uploading file with resource type: ${resourceType}`);
 
     const options = {
       resource_type: raw,
