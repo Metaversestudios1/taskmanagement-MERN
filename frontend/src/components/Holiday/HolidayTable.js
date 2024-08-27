@@ -39,7 +39,7 @@ const HolidayTable = () => {
       if (count === 1) {
         holiOne = false;
       }
-      const res = await fetch("${process.env.REACT_APP_BACKEND_URL}/api/deleteholiday", {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/deleteholiday`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
