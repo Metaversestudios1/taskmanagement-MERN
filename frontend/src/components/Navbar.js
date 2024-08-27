@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import Cookies from "js-cookie";
@@ -8,7 +8,9 @@ import { PiLineVerticalThin } from "react-icons/pi";
 
 import "react-toastify/dist/ReactToastify.css";
 import getUserFromToken from "./utils/getUserFromToken";
+import { AuthContext } from "../context/AuthContext";
 const Navbar = ({ toggleSideBar }) => {
+  const {setAuth} = useContext(AuthContext)
   const now = new Date();
   const offset = now.getTimezoneOffset() * 60000; // Offset in milliseconds
   const localDate = new Date(now.getTime() - offset);
@@ -100,6 +102,7 @@ const Navbar = ({ toggleSideBar }) => {
       const response = await res.json();
       if (response.status) {
         Cookies.remove("jwt");
+
         toast.success(response.message, {
           position: "top-right",
           autoClose: 1000,
@@ -110,6 +113,7 @@ const Navbar = ({ toggleSideBar }) => {
           progress: undefined,
           theme: "light",
         });
+        setAuth({ isAuthenticated: false, user:null })
         setTimeout(() => {
           navigate("/login");
         }, 1500);
@@ -143,11 +147,11 @@ const Navbar = ({ toggleSideBar }) => {
 
   const handleCheckIn = async () => {
     // const isoCheckIn = date.toISOString();
-    const locationURL = await getLocationURL()
+    const checkIn_location_url = await getLocationURL()
     const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertattendence`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ date: date, emp_id, check_in: getCurrentTime(),  location_url: locationURL }),
+      body: JSON.stringify({ date: date, emp_id, check_in: getCurrentTime(),  checkIn_location_url }),
     });
     const response = await res.json();
     if (response.success) {
@@ -166,10 +170,11 @@ const Navbar = ({ toggleSideBar }) => {
   };
 
   const handleCheckOut = async () => {
+    const checkOut_location_url = await getLocationURL()
     const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateattendence`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ emp_id: userInfo?.id, date: date }),
+      body: JSON.stringify({ emp_id: userInfo?.id, date: date,  checkOut_location_url  }),
     });
     const response = await res.json();
     if (response.success) {

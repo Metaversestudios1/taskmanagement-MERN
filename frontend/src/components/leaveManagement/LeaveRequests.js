@@ -125,104 +125,104 @@ const LeaveRequests = () => {
     }
   };
 
-  const handleLeaveStatus = async(e,status, id) =>{
-    e.preventDefault()
+  const handleLeaveStatus = async (e, status, id) => {
+    e.preventDefault();
     const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateLeaveStatus`, {
       method: "PUT",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({status, id})
-    })
-    const response =await res.json()
-    if(response.success) {
-      navigate(0)
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status, id }),
+    });
+    const response = await res.json();
+    if (response.success) {
+      navigate(0);
     }
-  }
+  };
 
   const startIndex = (page - 1) * pageSize;
 
   return (
     <div className="">
       <div className="flex items-center">
-        
         <div className="text-2xl font-bold mx-2 my-8 px-4">Leave Requests</div>
       </div>
       <div className="flex justify-between">
-        {(userInfo.role==="Employee" || userInfo.role === "employee") && <NavLink to="/leaverequests/addleave">
-          <button className="bg-blue-800 text-white p-3 m-5 text-sm rounded-lg">
-            Add New
-          </button>
-        </NavLink>}
-        
+        {(userInfo.role === "Employee" || userInfo.role === "employee") && (
+          <NavLink to="/leaverequests/addleave">
+            <button className="bg-blue-800 text-white p-3 m-5 text-sm rounded-lg">
+              Add New
+            </button>
+          </NavLink>
+        )}
       </div>
 
       <div className="flex justify-center items-center flex-wrap">
-      {(userInfo.role === "Admin" || userInfo.role === "admin") && (
-        <div className="mx-5">
-          <select
-            name="employees"
-            value={employee}
-            onChange={handleChange}
-            className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block  p-2.5 m-auto"
+        {(userInfo.role === "Admin" || userInfo.role === "admin") && (
+          <div className="mx-5">
+            <select
+              name="employees"
+              value={employee}
+              onChange={handleChange}
+              className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block  p-2.5 m-auto"
+            >
+              <option value="">Select an employee for attendance.</option>
+              {employees.map((item) => (
+                <option
+                  key={item._id}
+                  value={item._id}
+                  className=" bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5"
+                >
+                  {item.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+        <div className="flex flex-wrap">
+          <div className="flex items-center mx-4">
+            <label
+              htmlFor="startDate"
+              className="block text-lg font-medium text-gray-900 w-36  "
+            >
+              Start Date:
+            </label>
+            <input
+              name="startDate"
+              value={startDate}
+              onChange={handleChange}
+              type="date"
+              id="date"
+              className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
+              placeholder="Enter the task name"
+            />
+          </div>
+          <div className="flex items-center mx-4">
+            <label
+              htmlFor="endDate"
+              className="block  text-lg font-medium text-gray-900 w-36"
+            >
+              End Date:
+            </label>
+            <input
+              name="endDate"
+              value={endDate}
+              onChange={handleChange}
+              type="date"
+              id="endDate"
+              className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
+              placeholder="Enter the task name"
+            />
+          </div>
+          <button
+            onClick={() => {
+              setStartDate("");
+              setEndDate("");
+            }}
+            className="bg-blue-800 text-white px-4 py-2  text-sm rounded-lg"
           >
-            <option value="">Select an employee for attendance.</option>
-            {employees.map((item) => (
-              <option
-                key={item._id}
-                value={item._id}
-                className=" bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5"
-              >
-                {item.name}
-              </option>
-            ))}
-          </select>
+            Reset
+          </button>
         </div>
-      )}
-      <div className="flex flex-wrap">
-        <div className="flex items-center mx-4">
-          <label
-            htmlFor="startDate"
-            className="block text-lg font-medium text-gray-900 w-36  "
-          >
-            Start Date:
-          </label>
-          <input
-            name="startDate"
-            value={startDate}
-            onChange={handleChange}
-            type="date"
-            id="date"
-            className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
-            placeholder="Enter the task name"
-          />
-        </div>
-        <div className="flex items-center mx-4">
-          <label
-            htmlFor="endDate"
-            className="block  text-lg font-medium text-gray-900 w-36"
-          >
-            End Date:
-          </label>
-          <input
-            name="endDate"
-            value={endDate}
-            onChange={handleChange}
-            type="date"
-            id="endDate"
-            className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
-            placeholder="Enter the task name"
-          />
-        </div>
-        <button
-          onClick={() => {
-            setStartDate("");
-            setEndDate("");
-          }}
-          className="bg-blue-800 text-white px-4 py-2  text-sm rounded-lg"
-        >
-          Reset
-        </button>
       </div>
-    </div>
       {leaves.length > 0 ? (
         <div className="relative overflow-x-auto m-5 mb-0">
           <table className="w-full text-sm text-left rtl:text-right border-2 border-gray-300">
@@ -296,17 +296,33 @@ const LeaveRequests = () => {
                       {item?.remarks || "NA"}
                     </td>
                     <td className="px-6 py-2 border-2 border-gray-300">
-                    <div>
-                    {item?.status}
-                    <div className="flex justify-center items-center py-2">
-                    {(item.status==="Pending" || item.status==="pending") && <><ImCross onClick={(e)=>handleLeaveStatus(e,"rejected", item._id)} className = "cursor-pointer text-sm mr-1"/>
-                    <FcApproval onClick={(e)=>handleLeaveStatus(e,"approved", item._id)} className = "cursor-pointer text-xl ml-1"/></>}
-                    </div>
-                    </div>
+                      <div className="flex  items-center flex-col">
+                        {item?.status}
+                        <div className="flex justify-center items-center py-2">
+                          {(item.status === "Pending" ||
+                            item.status === "pending") &&
+                            (userInfo.role === "admin" ||
+                              userInfo.role === "Admin") && (
+                              <>
+                                <ImCross
+                                  onClick={(e) =>
+                                    handleLeaveStatus(e, "rejected", item._id)
+                                  }
+                                  className="cursor-pointer text-sm mr-1"
+                                />
+                                <FcApproval
+                                  onClick={(e) =>
+                                    handleLeaveStatus(e, "approved", item._id)
+                                  }
+                                  className="cursor-pointer text-xl ml-1"
+                                />
+                              </>
+                            )}
+                        </div>
+                      </div>
                     </td>
                     <td className=" py-5  gap-1 border-2 border-l-0 border-r-0 border-t-0 border-gray-300">
                       <div className="flex items-center justify-center">
-                       
                         <MdDelete
                           onClick={(e) => handleDelete(e, item._id)}
                           className="text-2xl cursor-pointer text-red-900"
@@ -333,8 +349,7 @@ const LeaveRequests = () => {
             <span className="font-semibold text-black">
               {Math.min(startIndex + pageSize, count)}
             </span>{" "}
-            of <span className="font-semibold text-black">{count}</span>{" "}
-            Entries
+            of <span className="font-semibold text-black">{count}</span> Entries
           </span>
           <div className="inline-flex mt-2 xs:mt-0">
             <button
@@ -356,7 +371,6 @@ const LeaveRequests = () => {
           </div>
         </div>
       )}
-
     </div>
   );
 };

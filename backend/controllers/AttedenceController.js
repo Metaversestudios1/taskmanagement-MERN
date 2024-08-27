@@ -105,7 +105,9 @@ const calculateWorkingHours = (checkInTime, checkOutTime) => {
 };
 
 const updateattendence = async (req, res) => {
-  const { emp_id, date } = req.body;
+  const { emp_id, date, checkOut_location_url } = req.body;
+  console.log(checkOut_location_url)
+
   const check_out = getCurrentTime();
   try {
     const result = await Attendence.findOne({
@@ -140,6 +142,7 @@ const updateattendence = async (req, res) => {
           check_out: check_out_time, // Save as a string
           working_hours: roundedDurationHours,
           attendance_status: attendance_status,
+          checkOut_location_url
         },
       }
     );

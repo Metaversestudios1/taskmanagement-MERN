@@ -21,12 +21,10 @@ const insertEmployee = async (req, res) => {
         .json({ success: false, message: "Please provide all fields" });
     }
     if (password.length < 4) {
-      return res
-        .status(401)
-        .json({
-          success: false,
-          message: "Password must contain minimum 4 digits",
-        });
+      return res.status(401).json({
+        success: false,
+        message: "Password must contain minimum 4 digits",
+      });
     }
     // Hash the password
     const salt = await bcrypt.genSalt(10);
@@ -41,13 +39,11 @@ const insertEmployee = async (req, res) => {
     await newEmployee.save();
     res.status(201).json({ success: true });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error inserting employee",
-        error: error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Error inserting employee",
+      error: error.message,
+    });
   }
 };
 
@@ -156,8 +152,8 @@ const login = async (req, res) => {
     const user = await Employee.findOne({ email, role });
     if (!user) {
       return res
-        .status(404)
-        .json({ success: false, message: "Employee not found" });
+      .status(404)
+      .json({ success: false, message: "Employee not found" });
     }
     // Check password
     const isMatch = await bcrypt.compare(password, user.password);
@@ -169,7 +165,7 @@ const login = async (req, res) => {
     const rolename = await Role.findOne({ _id: user.role, deleted: null });
 
     const token = jwt.sign(
-      { id: user._id, email: user.email, role: rolename.role },
+      { id: user._id, name: user.name, email: user.email, role: rolename.role },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
@@ -229,12 +225,10 @@ const changePassword = async (req, res) => {
     // Save the new password
     await user.save();
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Password has been changed successfully",
-      });
+    res.status(200).json({
+      success: true,
+      message: "Password has been changed successfully",
+    });
   } catch (err) {
     res
       .status(500)

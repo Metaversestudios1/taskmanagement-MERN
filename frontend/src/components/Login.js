@@ -5,28 +5,30 @@ import Cookies from "js-cookie";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { LuEyeOff } from "react-icons/lu";
+import $ from 'jquery';
+import 'jquery-validation';
+
 const Login = () => {
   const ref = useRef();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
+  const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [roles, setRoles] = useState([]);
-  const [error, setError] = useState("");
   const [passEye, setPassEye] = useState("");
   const { setAuth } = useContext(AuthContext);
   const token = Cookies.get("jwt");
   const navigate = useNavigate();
-  useEffect(() => {
-    if(token ) {
-      navigate("/")
-    }
-    else{
 
+  useEffect(() => {
+    if (token) {
+      navigate("/");
+    } else {
       setLoading(false);
       fetchRoles();
     }
-  },[]);
+  }, []);
 
   const fetchRoles = async () => {
     try {
@@ -50,11 +52,54 @@ const Login = () => {
       setPassEye("text");
     }
   };
+
+  const validateLoginForm = () => {
+    $("#loginform").validate({
+      rules: {
+        role: {
+          required: true
+        },
+        email: {
+          required: true,
+          email: true
+        },
+        password: {
+          required: true
+        },
+      },
+      messages: {
+        role: {
+          required: "Please select a role"
+        },
+        email: {
+          required: "Please enter email",
+          email: "Please enter a valid email address"
+        },
+        password: {
+          required: "Please enter password"
+        },
+      },
+      errorElement: 'div',
+      errorPlacement: function(error, element) {
+        error.addClass('invalid-feedback');
+        error.insertAfter(element.parent());  // Insert error after the parent container
+      },
+      highlight: function(element, errorClass, validClass) {
+        $(element).addClass('is-invalid').removeClass('is-valid');
+      },
+      unhighlight: function(element, errorClass, validClass) {
+        $(element).removeClass('is-invalid').addClass('is-valid');
+      }
+    });
+
+    // Return validation status
+    return $("#loginform").valid();
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (!email.includes("@") || !email.split("@")[1].includes(".")) {
-        setError("Email is not valid");
+      if (!validateLoginForm()) {
         return;
       }
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/login`, {
@@ -67,7 +112,7 @@ const Login = () => {
       });
       const response = await res.json();
       if (response.success) {
-        setError("");
+        setError("")
         toast.success("You are logged in Successfully!", {
           position: "top-right",
           autoClose: 1000,
@@ -83,8 +128,8 @@ const Login = () => {
         setTimeout(() => {
           navigate("/");
         }, 1500);
-      } else {
-        setError(response.message);
+      }else {
+        setError(response.message)
       }
     } catch (error) {
       console.error("Error during login:", error);
@@ -109,14 +154,15 @@ const Login = () => {
           <div className="min-h-screen flex flex-col items-center justify-center">
             <div className="grid md:grid-cols-2 items-center gap-4 max-md:gap-8 max-w-6xl max-md:max-w-lg w-full p-4 m-4 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] rounded-md">
               <div className="md:max-w-md w-full px-4 py-4">
-                <form>
+                <form id="loginform">
                   <div className="mb-12">
                     <h3 className="text-gray-800 text-3xl font-extrabold">
                       Log In
                     </h3>
                   </div>
 
-                  <div>
+                  {/* Email Field */}
+                  <div className="mb-6">
                     <label className="text-gray-800 text-xs block mb-2">
                       Email
                     </label>
@@ -165,10 +211,11 @@ const Login = () => {
                     </div>
                   </div>
 
-                  <div className="mt-8">
+                  {/* Password Field */}
+                  <div className="mb-6">
                     <label className="text-gray-800 text-xs block mb-2">
                       Password
-                    </label> 
+                    </label>
                     <div className="relative flex items-center">
                       <input
                         ref={ref}
@@ -190,43 +237,36 @@ const Login = () => {
                           viewBox="0 0 128 128"
                         >
                           <path
-                            d="M64 104C22.127 104 1.367 67.496.504 65.943a4 4 0 0 1 0-3.887C1.367 60.504 22.127 24 64 24s62.633 36.504 63.496 38.057a4 4 0 0 1 0 3.887C126.633 67.496 105.873 104 64 104zM8.707 63.994C13.465 71.205 32.146 96 64 96c31.955 0 50.553-24.775 55.293-31.994C114.535 56.795 95.854 32 64 32 32.045 32 13.447 56.775 8.707 63.994zM64 88c-13.234 0-24-10.766-24-24s10.766-24 24-24 24 10.766 24 24-10.766 24-24 24zm0-40c-8.822 0-16 7.178-16 16s7.178 16 16 16 16-7.178 16-16-7.178-16-16-16z"
-                            data-original="#000000"
+                            d="M64 104C22.127 104 1.367 67.496.504 65.943a4 4 0 0 1 0-3.887C1.367 60.504 22.127 24 64 24s62.633 36.504 63.496 38.057a4 4 0 0 1 0 3.887C126.633 67.496 105.873 104 64 104zM8.707 63.994C13.465 71.205 32.146 96 64 96c31.955 0 50.553-24.775 55.294-32.006C114.557 56.787 95.876 32 64 32c-31.955 0-50.553 24.775-55.294 32.006zM64 76c-6.627 0-12-5.373-12-12s5.373-12 12-12 12 5.373 12 12-5.373 12-12 12zm0-16c-2.205 0-4 1.794-4 4s1.795 4 4 4 4-1.794 4-4-1.795-4-4-4z"
                           ></path>
                         </svg>
                       ) : (
                         <LuEyeOff
                           onClick={handlePasswordType}
-                          className="text-lg opacity-25 absolute right-2 cursor-pointer"
+                          className="absolute right-2 text-[18px] cursor-pointer"
                         />
                       )}
                     </div>
                   </div>
-                  <div className="my-6">
-                    <label
-                      htmlFor="role"
-                      className="block mb-2 text-xs font-medium text-gray-900 "
-                    >
+
+                  {/* Role Dropdown */}
+                  <div className="mb-6">
+                    <label className="text-gray-800 text-xs block mb-2">
                       Role
                     </label>
                     <select
                       name="role"
                       value={role}
                       onChange={(e) => setRole(e.target.value)}
-                      className="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 mb-5"
+                      className="w-full text-gray-800 text-sm border-b border-gray-300 focus:border-blue-600 px-2 py-3 outline-none"
+                      required
                     >
-                      <option value="">Select a role</option>
-                      {roles.map((option) => {
-                        return (
-                          <option
-                            key={option._id}
-                            value={option._id}
-                            className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
-                          >
-                            {option.role}
-                          </option>
-                        );
-                      })}
+                      <option value="">Select role</option>
+                      {roles.map((r, index) => (
+                        <option key={index} value={r._id}>
+                          {r.role}
+                        </option>
+                      ))}
                     </select>
                   </div>
                   {error && (
@@ -234,25 +274,21 @@ const Login = () => {
                       {error}
                     </div>
                   )}
-                  <div className="mt-5">
-                    <button
-                      type="button"
-                      onClick={handleSubmit}
-                      className="w-full shadow-xl py-2.5 px-4 text-sm tracking-wide rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
-                    >
-                      Log In
-                    </button>
-                  </div>
+                  <button
+                    onClick={handleSubmit}
+                    className="w-full bg-blue-600 text-white text-sm font-semibold py-2 rounded hover:bg-blue-700 transition-colors"
+                  >
+                    Log In
+                  </button>
                 </form>
               </div>
-
               <div className="md:h-full bg-[#000842] rounded-xl lg:p-12 p-8">
-                <img
-                  src="https://readymadeui.com/signin-image.webp"
-                  className="w-full h-full object-contain"
-                  alt="login-image"
-                />
-              </div>
+              <img
+                src="https://readymadeui.com/signin-image.webp"
+                className="w-full h-full object-contain"
+                alt="login-image"
+              />
+            </div>
             </div>
           </div>
         </div>

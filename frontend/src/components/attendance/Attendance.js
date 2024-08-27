@@ -196,6 +196,9 @@ const Attendance = () => {
                   Working Hours
                 </th>
                 <th scope="col" className="px-6 py-3 border-2 border-gray-300">
+                  Live location
+                </th>
+                <th scope="col" className="px-6 py-3 border-2 border-gray-300">
                   Attendance status
                 </th>
               </tr>
@@ -228,6 +231,12 @@ const Attendance = () => {
                     </td>
                     <td className="px-6 py-4 border-2 border-gray-300">
                       {item?.working_hours || "-"}
+                    </td>
+                    <td className="px-2 py-4 border-2 border-gray-300">
+                    <div className="flex flex-col justify-center items-center">
+                      <div><a className = "text-blue-900" href={item?.checkIn_location_url} target="_blank">Check In</a></div>
+                      <div><a className = "text-blue-900" href={item?.checkOut_location_url} target="_blank">Check Out</a></div>
+                    </div>
                     </td>
                     <td className="px-6 py-4 border-2 border-gray-300">
                       {item?.attendance_status || "-"}

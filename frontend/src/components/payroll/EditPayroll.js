@@ -4,7 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import getUserFromToken from "../utils/getUserFromToken";
-
+import $ from 'jquery';
+import 'jquery-validation';
 const EditPayroll = () => {
   const userInfo = getUserFromToken();
 const {id} = useParams()
@@ -50,8 +51,53 @@ const fetchOldData = async()=>{
         })
       }
 }
+
+const validatePayrollForm = () => {
+  $("#payrollform").validate({
+    rules: {
+      emp_id: {
+        required: true
+      },
+      salary: {
+        required: true,
+      },
+      designation: {
+        required: true
+      },
+    },
+    messages: {
+      emp_id: {
+        required: "Please Select employee name"
+      },
+      salary: {
+        required: "Please enter salary"
+      },
+      designation: {
+        required: "Please enter designation"
+      },
+    },
+    errorElement: 'div',
+    errorPlacement: function(error, element) {
+      error.addClass('invalid-feedback');
+      error.insertAfter(element.parent());  // Insert error after the parent container
+    },
+    highlight: function(element, errorClass, validClass) {
+      $(element).addClass('is-invalid').removeClass('is-valid');
+    },
+    unhighlight: function(element, errorClass, validClass) {
+      $(element).removeClass('is-invalid').addClass('is-valid');
+    }
+  });
+
+  // Return validation status
+  return $("#payrollform").valid();
+};
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if(!validatePayrollForm() ){
+      return ;
+    }
     const updateData = {oldData, id}
     const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updatepayroll`, {
       method: "PUT",
@@ -108,8 +154,8 @@ const fetchOldData = async()=>{
       </div>
 
       <div className="w-[70%] m-auto my-10">
-        <form onSubmit={handleSubmit} encType="multipart/form-data">
-          <div className="mb-6">
+        <form onSubmit={handleSubmit} encType="multipart/form-data" id="payrollform">
+          <div className="mb-1">
             <label
               htmlFor="employees"
               className="block mb-2 text-lg font-medium text-gray-900 dark:text-black  m-auto"
@@ -136,7 +182,7 @@ const fetchOldData = async()=>{
               ))}
             </select>
           </div>
-          <div className="mb-6">
+          <div className="mb-1">
             <label
               htmlFor="salary"
               className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
@@ -153,7 +199,7 @@ const fetchOldData = async()=>{
             />
           </div>
 
-          <div className="mb-6">
+          <div className="mb-1">
             <label
               htmlFor="designation"
               className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
@@ -168,7 +214,6 @@ const fetchOldData = async()=>{
               id="designation"
               className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
               placeholder="Enter the Number of days"
-              required
             />
           </div>
 

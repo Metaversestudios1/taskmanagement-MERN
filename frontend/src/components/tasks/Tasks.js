@@ -156,6 +156,7 @@ const Tasks = () => {
       document.body.removeChild(link);
     }
   };
+  const startIndex = (page - 1) * pageSize;
 
   return (
     <div className=""> 
@@ -380,6 +381,39 @@ const Tasks = () => {
         </div>
       ) : (
         <div className="m-8 flex justify-center">No Tasks Found</div>
+      )}
+
+      {tasks.length > 0 && (
+        <div className="flex flex-col items-center my-10">
+          <span className="text-sm text-black">
+            Showing{" "}
+            <span className="font-semibold text-black">{startIndex + 1}</span>{" "}
+            to{" "}
+            <span className="font-semibold text-black">
+              {Math.min(startIndex + pageSize, count)}
+            </span>{" "}
+            of <span className="font-semibold text-black">{count}</span>{" "}
+            Entries
+          </span>
+          <div className="inline-flex mt-2 xs:mt-0">
+            <button
+              onClick={() => setPage(page - 1)}
+              disabled={page === 1}
+              className="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 rounded-s hover:bg-gray-900"
+            >
+              Prev
+            </button>
+            <button
+              onClick={() => setPage(page + 1)}
+              disabled={
+                tasks.length < pageSize || startIndex + pageSize >= count
+              }
+              className="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 border-0 border-s border-gray-700 rounded-e hover:bg-gray-900"
+            >
+              Next
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
