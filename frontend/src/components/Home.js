@@ -135,7 +135,8 @@ const Home = () => {
         ) : (
           <>
             <div className="bg-white shadow-lg shadow-gray-200 rounded-2xl p-4">
-              
+            <NavLink
+                to="/tasks">
               <div className="flex items-center">
                 <div className="inline-flex flex-shrink-0 justify-center items-center w-12 h-12 text-white bg-[#ff0080] to-voilet-500 rounded-lg">
                   <svg
@@ -160,8 +161,12 @@ const Home = () => {
                   </h3>
                 </div>
               </div>
+            </NavLink>
             </div>
             <div className="bg-white shadow-lg shadow-gray-200 rounded-2xl p-4">
+              
+            <NavLink
+                to="/tasks">
               <div className="flex items-center">
                 <div className="inline-flex flex-shrink-0 justify-center items-center w-12 h-12 text-white bg-[#ff0080] to-voilet-500 rounded-lg">
                   <svg
@@ -186,6 +191,7 @@ const Home = () => {
                   </h3>
                 </div>
               </div>
+              </NavLink>
             </div>
           </>
         )}

@@ -307,16 +307,16 @@ const deleteTask = async (req, res) => {
 };
 
 const updateTask = async (req, res) => {
-  const { originalname, buffer, mimetype } = req.file;
-  if (!mimetype || typeof mimetype !== 'string') {
-    console.error("Invalid MIME type:", mimetype);
-    return res.status(400).json({ success: false, message: "Invalid MIME type" });
-  }
+ 
   const updateData = req.body;
   const {id} = req.params;
   if (req.file) {
     console.log("req.file is present");
-    
+    const { originalname, buffer, mimetype } = req.file;
+    if (!mimetype || typeof mimetype !== 'string') {
+      console.error("Invalid MIME type:", mimetype);
+      return res.status(400).json({ success: false, message: "Invalid MIME type" });
+    }
     try {
       // Upload file to Cloudinary
       const uploadResult = await uploadImage(buffer, originalname,mimetype);
@@ -348,11 +348,6 @@ const updateTask = async (req, res) => {
           message: "Error updating task",
           err: err.message,
         });
-    } finally {
-      // Remove the file from the local filesystem
-      fs.unlink(filePath, (err) => {
-        if (err) console.error("Failed to delete file:", err);
-      });
     }
   } else {
     // console.log("req.file is not present");

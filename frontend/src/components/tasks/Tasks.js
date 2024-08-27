@@ -289,13 +289,24 @@ const Tasks = () => {
             </thead>
             <tbody>
               {Object.keys(tasks).map((date, dateIndex) => {
+                // const taskList = tasks[date];
+                // let totalTaskTimeForDate = 0;
                 const taskList = tasks[date];
                 let totalTaskTimeForDate = 0;
+                let totalMinutesForDate = 0;
 
                 taskList.map((task) => {
-                  totalTaskTimeForDate += parseFloat(task.task_time);
+                  // totalTaskTimeForDate += parseFloat(task.task_time);
+                  const [hours, minutes] = task.task_time.split('.').map(Number);
+                  totalTaskTimeForDate += hours;
+                  totalMinutesForDate += minutes;
+            
+                  if (totalMinutesForDate >= 60) {
+                    totalTaskTimeForDate += Math.floor(totalMinutesForDate / 60);
+                    totalMinutesForDate = totalMinutesForDate % 60;
+                  }
                 });
-
+                const formattedTotalTime = `${totalTaskTimeForDate}.${totalMinutesForDate < 10 ? '0' : ''}${totalMinutesForDate}`;
                 return (
                   <React.Fragment key={date}>
                     {taskList.map((task, index) => (
@@ -369,7 +380,7 @@ const Tasks = () => {
                         Total Task Time for {date}:
                       </td>
                       <td className="px-6 py-4 font-bold">
-                        {totalTaskTimeForDate} hours
+                        {formattedTotalTime} hours
                       </td>
                       <td colSpan={4}></td>
                     </tr>

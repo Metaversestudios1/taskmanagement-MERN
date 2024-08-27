@@ -254,10 +254,10 @@ const AddActivity = () => {
               </label>
               <input
                 name="comments"
-                value={data.comment}
+                value={data.comments}
                 onChange={handleChange}
                 type="text"
-                id="comment"
+                id="comments"
                 placeholder="Comments"
                 className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5"
               />
