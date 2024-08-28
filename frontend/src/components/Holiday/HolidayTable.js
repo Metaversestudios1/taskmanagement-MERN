@@ -3,6 +3,8 @@ import { MdDelete } from "react-icons/md";
 import { CiEdit } from "react-icons/ci";
 import { NavLink } from "react-router-dom";
 import getUserFromToken from "../utils/getUserFromToken"
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const HolidayTable = () => {
   const userInfo = getUserFromToken()
   const [holiday, setHoliday] = useState([]);
@@ -79,6 +81,18 @@ const HolidayTable = () => {
   const startIndex = (page - 1) * pageSize; 
   return (
     <div className="">
+         <ToastContainer
+          position="top-right"
+          autoClose={2000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
       <div className="flex items-center">
         
         <div className="text-2xl font-bold mx-2 my-8 px-4">Holiday</div>
