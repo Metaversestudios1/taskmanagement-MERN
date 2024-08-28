@@ -295,19 +295,25 @@ const Tasks = () => {
                 let totalTaskTimeForDate = 0;
                 let totalMinutesForDate = 0;
 
-                taskList.map((task) => {
-                  // totalTaskTimeForDate += parseFloat(task.task_time);
-                  const [hours, minutes] = task.task_time.split('.').map(Number);
-                  totalTaskTimeForDate += hours;
-                  totalMinutesForDate += minutes;
-            
-                  if (totalMinutesForDate >= 60) {
-                    totalTaskTimeForDate += Math.floor(totalMinutesForDate / 60);
-                    totalMinutesForDate = totalMinutesForDate % 60;
-                  }
-                });
-                const formattedTotalTime = `${totalTaskTimeForDate}.${totalMinutesForDate < 10 ? '0' : ''}${totalMinutesForDate}`;
-                return (
+               taskList.map((task) => {
+  // Split the task time into hours and minutes
+  const [hours, minutes] = task.task_time.split('.').map(Number);
+
+  // Add hours to the total time for the date
+  totalTaskTimeForDate += hours;
+
+  // Add minutes to the total minutes for the date
+  totalMinutesForDate += minutes;
+
+  // If total minutes exceed or equal to 60, convert them to hours
+  if (totalMinutesForDate >= 60) {
+    totalTaskTimeForDate += Math.floor(totalMinutesForDate / 60);
+    totalMinutesForDate = totalMinutesForDate % 60;
+  }
+});
+
+// Format the total time with proper formatting
+const formattedTotalTime = `${totalTaskTimeForDate}.${totalMinutesForDate < 10 ? '0' : ''}${totalMinutesForDate}`; return (
                   <React.Fragment key={date}>
                     {taskList.map((task, index) => (
                       <tr
