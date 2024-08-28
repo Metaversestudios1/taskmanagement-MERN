@@ -49,6 +49,16 @@ const HolidayTable = () => {
       }
       const response = await res.json();
       if (response.success) {
+        toast.success('Holiday is deleted Successfully!', {
+          position: "top-right",
+          autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          });
         if (holiOne) {
           setPage(page - 1);
         } else {
