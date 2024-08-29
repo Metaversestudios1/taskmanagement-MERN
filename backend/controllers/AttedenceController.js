@@ -58,20 +58,7 @@ const getAllattendence = async (req, res) => {
   }
 };
 
-function getCurrentTime() {
-  const date = new Date();
-  let hours = date.getHours();
-  const minutes = date.getMinutes();
-  const ampm = hours >= 12 ? "PM" : "AM";
 
-  hours = hours % 12;
-  hours = hours ? hours : 12; // Hour '0' should be '12'
-
-  const minutesStr = minutes < 10 ? `0${minutes}` : minutes;
-  const timeString = `${hours}:${minutesStr} ${ampm}`;
-
-  return timeString;
-}
 // Function to parse time string and return a Date object for the current date
 const parseTimeString = (timeString) => {
   const [time, period] = timeString.split(" ");
@@ -116,9 +103,8 @@ const calculateWorkingHours = (checkInTime, checkOutTime) => {
 
 
 const updateattendence = async (req, res) => {
-  const { emp_id, date, checkOut_location_url } = req.body;
+  const { emp_id, date, checkOut_location_url, check_out_time } = req.body;
 
-  const check_out = getCurrentTime();
   try {
     const result = await Attendence.findOne({
       emp_id,
@@ -132,7 +118,6 @@ const updateattendence = async (req, res) => {
     }
 
     const check_in = result["check_in"];
-    const check_out_time = check_out; // This should be in string format like "2:29 PM"
 
     const roundedDurationHours = calculateWorkingHours(
       check_in,
@@ -186,7 +171,7 @@ const updateAttendanceStatus = async(req, res) =>{
 
 const deleteattendence = async (req, res) => {
   const { id } = req.body;
-  try {
+  try { 
     const result = await Attendence.findByIdAndUpdate(
       id,
       { deleted_at: new Date() },

@@ -53,7 +53,7 @@ const Navbar = ({ toggleSideBar }) => {
     return `${year}-${month}-${day}`; 
   };
   const fetchCheckInRecord = async () => {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getSingleattendence`, {
+    const res = await fetch(`http://localhost:3000/api/getSingleattendence`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: userInfo?.id, date: currentDate() }),
@@ -74,7 +74,7 @@ const Navbar = ({ toggleSideBar }) => {
   const handleLogout = async () => {
     try {
       // Perform logout logic (e.g., API call to logout)
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/logout`, {
+      const res = await fetch(`http://localhost:3000/api/logout`, {
         method: "POST",
         credentials: "include", // Send cookies with the request
       });
@@ -127,7 +127,7 @@ const Navbar = ({ toggleSideBar }) => {
   const handleCheckIn = async () => {
     // const isoCheckIn = date.toISOString();
     const checkIn_location_url = await getLocationURL()
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertattendence`, {
+    const res = await fetch(`http://localhost:3000/api/insertattendence`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ date: date, emp_id, check_in: getCurrentTime(),  checkIn_location_url }),
@@ -150,10 +150,10 @@ const Navbar = ({ toggleSideBar }) => {
 
   const handleCheckOut = async () => {
     const checkOut_location_url = await getLocationURL()
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateattendence`, {
+    const res = await fetch(`http://localhost:3000/api/updateattendence`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ emp_id: userInfo?.id, date: date,  checkOut_location_url  }),
+      body: JSON.stringify({ emp_id: userInfo?.id, date: date,  checkOut_location_url, check_out_time:getCurrentTime()  }),
     });
     const response = await res.json();
     console.log(response)
