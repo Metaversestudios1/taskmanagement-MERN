@@ -39,6 +39,7 @@ import EditActivity from "./components/Activity/EditActivity";
 import PayrollTable from "./components/payroll/PayrollTable";
 import AddPayroll from "./components/payroll/AddPayroll";
 import EditPayroll from "./components/payroll/EditPayroll";
+import ForgotPassword from "./components/forgotPassword/ForgotPassword";
 
 function App() {
   const [sideBar, setSideBar] = useState(true);
@@ -51,6 +52,14 @@ function App() {
       element: (
         <div>
           <Login />
+        </div>
+      ),
+    },
+    {
+      path: "/forgotpassword",
+      element: (
+        <div>
+          <ForgotPassword />
         </div>
       ),
     },

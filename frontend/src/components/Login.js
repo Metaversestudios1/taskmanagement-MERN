@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { LuEyeOff } from "react-icons/lu";
 import $ from 'jquery';
 import 'jquery-validation';
+import { NavLink } from "react-router-dom";
 
 const Login = () => {
   const ref = useRef();
@@ -32,7 +33,7 @@ const Login = () => {
 
   const fetchRoles = async () => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getrole`);
+      const res = await fetch(`http://localhost:3000/api/getrole`);
       const response = await res.json();
       if (response.success) {
         setRoles(response.result);
@@ -102,7 +103,7 @@ const Login = () => {
       if (!validateLoginForm()) {
         return;
       }
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/login`, {
+      const res = await fetch(`http://localhost:3000/api/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -274,6 +275,7 @@ const Login = () => {
                       {error}
                     </div>
                   )}
+                  <NavLink to = "/forgotpassword" ><div className="text-blue-600 text-sm text-right my-2">Forgot Password</div></NavLink>
                   <button
                     onClick={handleSubmit}
                     className="w-full bg-blue-600 text-white text-sm font-semibold py-2 rounded hover:bg-blue-700 transition-colors"

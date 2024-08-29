@@ -19,8 +19,8 @@ const Navbar = ({ toggleSideBar }) => {
   const [checkInValue, setCheckInValue] = useState(true);
   const [date, setDate] = useState(localDate);
   const [checkInTime, setCheckInTime] = useState("");
+  const [checkInStatus, setCheckInStatus] = useState("");
   const [emp_id, setEmpId] = useState(userInfo?.id);
-  const [isMidnight, setIsMidnight] = useState(false);
   const token = Cookies.get("jwt");
   function getCurrentTime() {
     const date = new Date();
@@ -37,32 +37,9 @@ const Navbar = ({ toggleSideBar }) => {
     return timeString;
   }
   useEffect(() => {
-    // Function to change state at midnight
-    const changeStateAtMidnight = () => {
-      setIsMidnight(true);
-      localStorage.removeItem("status");
-      localStorage.removeItem("message");
-    };
-
-    // Calculate time until midnight
-    const now = new Date();
-    const midnight = new Date();
-    midnight.setHours(24, 0, 0, 0); // Set time to 00:00:00
-
-    const timeUntilMidnight = midnight.getTime() - now.getTime();
-    // Set a timeout to change the state at midnight
-    const timeoutId = setTimeout(() => {
-      changeStateAtMidnight();
-
-      // Set an interval to trigger every 24 hours after that
-      setInterval(changeStateAtMidnight, 24 * 60 * 60 * 1000);
-    }, timeUntilMidnight);
-
+   
       fetchCheckInRecord();
 
-    return () => {
-      clearTimeout(timeoutId);
-    };
   }, []);
   const currentDate = () => {
     const currentDate = new Date();
@@ -73,20 +50,22 @@ const Navbar = ({ toggleSideBar }) => {
     const day = String(currentDate.getDate()).padStart(2, "0");
 
     // Format the date as YYYY-MM-DD
-    return `${year}-${month}-${day}`;
+    return `${year}-${month}-${day}`; 
   };
   const fetchCheckInRecord = async () => {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getSingleattendence`, {
+    const res = await fetch(`http://localhost:3000/api/getSingleattendence`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: userInfo?.id, date: currentDate() }),
     });
     const response = await res.json();
-    console.log(response)
-    if (response.success && !response.result.check_out) {
+    if (response.success && !response?.result?.check_out) {
       setCheckInValue(false);
       setCheckInTime(response.result?.check_in); // Store the check-in date
       setDate(response.result?.date);
+    }else if(response.success && response?.result?.check_out){
+      setCheckInValue(false);
+      setCheckInStatus("Your status is recorded. Thank You!")
     } else {
       setCheckInValue(true);
     }
@@ -95,7 +74,7 @@ const Navbar = ({ toggleSideBar }) => {
   const handleLogout = async () => {
     try {
       // Perform logout logic (e.g., API call to logout)
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/logout`, {
+      const res = await fetch(`http://localhost:3000/api/logout`, {
         method: "POST",
         credentials: "include", // Send cookies with the request
       });
@@ -148,7 +127,7 @@ const Navbar = ({ toggleSideBar }) => {
   const handleCheckIn = async () => {
     // const isoCheckIn = date.toISOString();
     const checkIn_location_url = await getLocationURL()
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertattendence`, {
+    const res = await fetch(`http://localhost:3000/api/insertattendence`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ date: date, emp_id, check_in: getCurrentTime(),  checkIn_location_url }),
@@ -171,15 +150,14 @@ const Navbar = ({ toggleSideBar }) => {
 
   const handleCheckOut = async () => {
     const checkOut_location_url = await getLocationURL()
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateattendence`, {
+    const res = await fetch(`http://localhost:3000/api/updateattendence`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ emp_id: userInfo?.id, date: date,  checkOut_location_url  }),
     });
     const response = await res.json();
+    console.log(response)
     if (response.success) {
-      localStorage.setItem("status", "true");
-      localStorage.setItem("message", "Your status is recorded. Thank you!");
       toast.success("You are Check Out!", {
         position: "top-right",
         autoClose: 1000,
@@ -263,7 +241,7 @@ const Navbar = ({ toggleSideBar }) => {
           <div className="flex flex-row items-center justify-end ">
             {(userInfo?.role === "Employee" || userInfo?.role === "employee") && (
               <div className="mx-3">
-                {checkInValue && localStorage.getItem("status") !== "true" ? (
+                {checkInValue  ? (
                   <button
                     type="button"
                     onClick={handleCheckIn}
@@ -275,7 +253,7 @@ const Navbar = ({ toggleSideBar }) => {
                   <button
                     type="button"
                     className={`${
-                      localStorage.getItem("status") === "true" && "hidden"
+                      checkInStatus && "hidden"
                     } text-white  bg-[#032e4e] hover:bg-[#001424]  rounded-full text-[14px] font-bold text-center h-10 w-28`}
                     onClick={handleCheckOut}
                   >
@@ -283,8 +261,8 @@ const Navbar = ({ toggleSideBar }) => {
                   </button>
                 )}
                 <div className="text-lg ">
-                  {localStorage.getItem("status") === "true" &&
-                    localStorage.getItem("message")}
+                  {checkInStatus &&
+                    checkInStatus}
                 </div>
               </div>
             )}

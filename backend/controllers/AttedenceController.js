@@ -95,18 +95,28 @@ const parseTimeString = (timeString) => {
 };
 
 // Function to calculate working hours
+// Function to calculate working hours in a simplified manner
 const calculateWorkingHours = (checkInTime, checkOutTime) => {
   const checkInDate = parseTimeString(checkInTime);
   const checkOutDate = parseTimeString(checkOutTime);
-
+  
   const diffMs = checkOutDate - checkInDate; // Difference in milliseconds
-  const diffHours = diffMs / (1000 * 60 * 60); // Convert to hours
-  return Math.round(diffHours * 100) / 100; // Round to 2 decimal places
+  const diffMinutes = diffMs / (1000 * 60); // Convert to minutes
+  
+  const diffHours = Math.floor(diffMinutes / 60); // Whole hours
+  const fractionalMinutes = diffMinutes % 60; // Remaining minutes
+  
+  // Convert minutes to fractional hours, each minute is 1/100 of an hour
+  const fractionalHours = fractionalMinutes / 100;
+  
+  // Sum whole hours and fractional hours, round to 2 decimal places
+  const totalHours = diffHours + fractionalHours;
+  return Math.round(totalHours * 100) / 100; // Rounded to 2 decimal places
 };
+
 
 const updateattendence = async (req, res) => {
   const { emp_id, date, checkOut_location_url } = req.body;
-  console.log(checkOut_location_url)
 
   const check_out = getCurrentTime();
   try {
@@ -155,6 +165,24 @@ const updateattendence = async (req, res) => {
     });
   }
 };
+const updateAttendanceStatus = async(req, res) =>{
+  const {id, status} = req.body
+  console.log(id, status)
+  try{
+    await Attendence.updateOne(
+      { _id: id},
+      {
+        $set: {
+          attendance_status:status
+        },
+      }
+    )
+    res.status(200).json({ success: true });
+  }catch(err) {
+    
+    res.status(401).json({ err });
+  }
+}
 
 const deleteattendence = async (req, res) => {
   const { id } = req.body;
@@ -217,4 +245,5 @@ module.exports = {
   getAllattendence,
   deleteattendence,
   getSingleattendence,
+  updateAttendanceStatus
 };

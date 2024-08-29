@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { MdDelete } from "react-icons/md";
-import { CiEdit } from "react-icons/ci";
-import { NavLink } from "react-router-dom";
-import { IoMdDownload } from "react-icons/io";
+import {useNavigate } from "react-router-dom";
 import getUserFromToken from "../utils/getUserFromToken";
 
 const Attendance = () => {
+  const navigate = useNavigate()
   const userInfo = getUserFromToken();
   const [employee, setEmployee] = useState(
     userInfo.role === "Employee" || userInfo.role === "employee"
@@ -36,7 +34,7 @@ const Attendance = () => {
   }, [page, employee, startDate, endDate]);
 
   const fetchEmployees = async () => {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getemployee`);
+    const res = await fetch(`http://localhost:3000/api/getemployee`);
     const response = await res.json();
     if (response.success) {
       setEmployees(response.result);
@@ -45,7 +43,7 @@ const Attendance = () => {
 
   const fetchEmployeeName = async (id) => {
     const nameRes = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/getesingleemployee`,
+      `http://localhost:3000/api/getesingleemployee`,
       {
         method: "POST",
         headers: { "Content-type": "application/json" },
@@ -59,7 +57,7 @@ const Attendance = () => {
   const fetchAttendance = async () => {
     setLoader(true);
     const res = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/getAllattendence?page=${page}&limit=${pageSize}&id=${employee}&startDate=${startDate}&endDate=${endDate}`
+      `http://localhost:3000/api/getAllattendence?page=${page}&limit=${pageSize}&id=${employee}&startDate=${startDate}&endDate=${endDate}`
     );
     const response = await res.json();
     if (response.success) {
@@ -95,6 +93,23 @@ const Attendance = () => {
     }
   };
 
+  const handleAttendanceStatus = async (e, status, id) => {
+    e.preventDefault();
+    const res = await fetch(
+      `http://localhost:3000/api/updateAttendanceStatus`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id, status }),
+      }
+    );
+    const response = await res.json()
+    if(response.success) {
+      navigate(0)
+    }
+  };
   const startIndex = (page - 1) * pageSize;
   return (
     <div className="">
@@ -233,13 +248,65 @@ const Attendance = () => {
                       {item?.working_hours || "-"}
                     </td>
                     <td className="px-2 py-4 border-2 border-gray-300">
-                    <div className="flex flex-col justify-center items-center">
-                      <div><a className = "text-blue-900" href={item?.checkIn_location_url} target="_blank">Check In</a></div>
-                      <div><a className = "text-blue-900" href={item?.checkOut_location_url} target="_blank">Check Out</a></div>
-                    </div>
+                      <div className="flex flex-col justify-center items-center">
+                        <div>
+                          <a
+                            className="text-blue-900"
+                            href={item?.checkIn_location_url}
+                            target="_blank"
+                          >
+                            Check In
+                          </a>
+                        </div>
+                        <div>
+                          <a
+                            className="text-blue-900"
+                            href={item?.checkOut_location_url}
+                            target="_blank"
+                          >
+                            Check Out
+                          </a>
+                        </div>
+                      </div>
                     </td>
-                    <td className="px-6 py-4 border-2 border-gray-300">
-                      {item?.attendance_status || "-"}
+                    <td className="px-6 py-1 border-2 border-gray-300">
+                      <div className="flex  items-center flex-col">
+                        {item?.attendance_status || "-"}
+                        <div className="flex justify-center items-center py-2">
+                          {(userInfo.role === "admin" ||
+                            userInfo.role === "Admin") && (
+                            <>
+                              {item?.attendance_status === "present" ? (
+                                <button
+                                  onClick={(e) =>
+                                    handleAttendanceStatus(
+                                      e,
+                                      "absent",
+                                      item._id
+                                    )
+                                  }
+                                  className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5   dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                                >
+                                  Absent
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={(e) =>
+                                    handleAttendanceStatus(
+                                      e,
+                                      "present",
+                                      item._id
+                                    )
+                                  }
+                                  className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5   dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                                >
+                                  Present
+                                </button>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      </div>
                     </td>
                   </tr>
                 );
