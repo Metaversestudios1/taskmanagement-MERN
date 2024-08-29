@@ -27,7 +27,7 @@ const ForgotPassword = () => {
 
   const handleEmailVerify = async (e) => {
     e.preventDefault();
-    const res = await fetch(`http://localhost:3000/api/sendotp`, {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/sendotp`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
@@ -43,7 +43,7 @@ const ForgotPassword = () => {
   };
   const handleOtpVerify = async (e) => {
     e.preventDefault();
-    const res = await fetch(`http://localhost:3000/api/verifyOtp`, {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/verifyOtp`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, otp }),
@@ -75,7 +75,7 @@ const ForgotPassword = () => {
     );
     if (confirmation) {
       try {
-        const res = await fetch(`http://localhost:3000/api/resetPassword`, {
+        const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/resetPassword`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, newPassword }),
