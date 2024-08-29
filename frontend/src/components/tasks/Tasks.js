@@ -311,6 +311,8 @@ const Tasks = () => {
     totalMinutesForDate = totalMinutesForDate % 60;
   }
 });
+
+// Format the total time with proper formatting
 const formattedTotalTime = `${totalTaskTimeForDate}.${totalMinutesForDate < 10 ? '0' : ''}${totalMinutesForDate}`; return (
                   <React.Fragment key={date}>
                     {taskList.map((task, index) => (
