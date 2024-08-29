@@ -37,7 +37,7 @@ const Tasks = () => {
   }, [page, search, employee, startDate, endDate]);
 
   const fetchEmployees = async () => {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getemployee`);
+    const res = await fetch(`http://localhost:3000/api/getemployee`);
     const response = await res.json();
     if (response.success) {
       setEmployees(response.result);
@@ -46,7 +46,7 @@ const Tasks = () => {
 
   const fetchProjectName = async (id) => {
     const projectRes = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/getSingleproject`,
+      `http://localhost:3000/api/getSingleproject`,
       {
         method: "POST",
         headers: { "Content-type": "application/json" },
@@ -61,7 +61,7 @@ const Tasks = () => {
   const fetchTasks = async () => {
     setLoader(true);
     const res = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/gettask?page=${page}&limit=${pageSize}&search=${search}&id=${employee}&startDate=${startDate}&endDate=${endDate}`
+      `http://localhost:3000/api/gettask?page=${page}&limit=${pageSize}&search=${search}&id=${employee}&startDate=${startDate}&endDate=${endDate}`
     );
     const response = await res.json();
     if (response.success) {
@@ -100,7 +100,7 @@ const Tasks = () => {
       if (count === 1) {
         taskOne = false;
       }
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/deletetask`, {
+      const res = await fetch(`http://localhost:3000/api/deletetask`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
@@ -294,26 +294,33 @@ const Tasks = () => {
                 const taskList = tasks[date];
                 let totalTaskTimeForDate = 0;
                 let totalMinutesForDate = 0;
-
-               taskList.map((task) => {
-  // Split the task time into hours and minutes
-  const [hours, minutes] = task.task_time.split('.').map(Number);
-
-  // Add hours to the total time for the date
-  totalTaskTimeForDate += hours;
-
-  // Add minutes to the total minutes for the date
-  totalMinutesForDate += minutes;
-
-  // If total minutes exceed or equal to 60, convert them to hours
-  if (totalMinutesForDate >= 60) {
-    totalTaskTimeForDate += Math.floor(totalMinutesForDate / 60);
-    totalMinutesForDate = totalMinutesForDate % 60;
-  }
-});
-
-// Format the total time with proper formatting
-const formattedTotalTime = `${totalTaskTimeForDate}.${totalMinutesForDate < 10 ? '0' : ''}${totalMinutesForDate}`; return (
+                
+                taskList.map((task) => {
+                  // Check if task_time is defined and follows the expected format
+                  if (task.task_time) {
+                    // Split the task time into hours and minutes
+                    const [hours, minutes] = task.task_time.split('.').map(Number);
+                
+                    // Ensure hours and minutes are valid numbers
+                    if (!isNaN(hours) && !isNaN(minutes)) {
+                      // Add hours to the total time for the date
+                      totalTaskTimeForDate += hours;
+                
+                      // Add minutes to the total minutes for the date
+                      totalMinutesForDate += minutes;
+                
+                      // If total minutes exceed or equal to 60, convert them to hours
+                      if (totalMinutesForDate >= 60) {
+                        totalTaskTimeForDate += Math.floor(totalMinutesForDate / 60);
+                        totalMinutesForDate = totalMinutesForDate % 60;
+                      }
+                    }
+                  }
+                });
+                
+                // Format the total time with proper formatting, ensuring no NaN values
+                const formattedTotalTime = `${totalTaskTimeForDate}.${totalMinutesForDate < 10 ? '0' : ''}${totalMinutesForDate}`;
+                 return (
                   <React.Fragment key={date}>
                     {taskList.map((task, index) => (
                       <tr
