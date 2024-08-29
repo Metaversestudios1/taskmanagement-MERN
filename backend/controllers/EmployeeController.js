@@ -5,6 +5,58 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const session = require("express-session");
 const jwt = require("jsonwebtoken");
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
+const path = require('path'); // Include the path module to handle file extensions
+const dotenv = require("dotenv");
+const cloudinary = require("cloudinary").v2;
+
+dotenv.config();
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+const uploadImage = (buffer, originalname, mimetype) => {
+  return new Promise((resolve, reject) => {
+    if (!mimetype || typeof mimetype !== 'string') {
+
+      return reject(new Error("MIME type is required and must be a string"));
+    }
+    
+    let resourceType = "raw"; // Default to 'raw' for non-image/video files
+
+    if (mimetype.startsWith("image")) {
+      resourceType = "image";
+    } else if (mimetype.startsWith("video")) {
+      resourceType = "video";
+    }else if (mimetype === "application/pdf") {
+      resourceType = "raw"; // Explicitly set PDFs as raw
+    }
+   
+    const fileExtension = path.extname(originalname);
+    const fileNameWithoutExtension = path.basename(originalname, fileExtension);
+    const publicId = `${fileNameWithoutExtension}${fileExtension}`; // Include extension in public_id
+   
+    const options = {
+      resource_type: resourceType,
+      public_id: publicId, // Set the public_id with extension
+      use_filename: true,
+      unique_filename: false,
+      overwrite: true,
+    };
+    
+    const uploadStream = cloudinary.uploader.upload(`data:${mimetype};base64,${buffer.toString('base64')}`, options, (error, result) => {
+      if (error) {
+          return reject(new Error("Cloudinary upload failed"));
+      }
+        resolve(result);
+    });
+
+    // uploadStream.end(buffer); // Upload the file from the buffer
+  });
+};
+
 
 const insertEmployee = async (req, res) => {
   try {
@@ -29,11 +81,32 @@ const insertEmployee = async (req, res) => {
     // Hash the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+     let photo = null;
+     try{
+
+      if (req.file && req.file.buffer) {
+        const uploadResult = await uploadImage(req.file.buffer, req.file.originalname, req.file.mimetype);
+        photo = {
+          publicId: uploadResult.public_id,
+          url: uploadResult.secure_url,
+          originalname: req.file.originalname,
+          mimetype: req.file.mimetype,
+        };
+      }
+
+    } catch (uploadError) {
+      return res.status(500).json({
+        success: false,
+        message: "Error inserting employee",
+        error: uploadError.message,
+      });
+    }
 
     // Create new employee with hashed password
     const newEmployee = new Employee({
       ...employeeData,
       password: hashedPassword,
+      photo: photo || undefined, 
     });
 
     await newEmployee.save();
@@ -101,9 +174,37 @@ const updateEmployee = async (req, res) => {
   const updateData = req.body; // Extract the update data from the request body
   const id = updateData.id;
   try {
+    let photo;
+
+    // If a file is present, handle the file upload to Cloudinary
+    if (req.file && req.file.buffer) {
+      try {
+        const uploadResult = await uploadImage(req.file.buffer, req.file.originalname, req.file.mimetype);
+        photo = {
+          publicId: uploadResult.public_id,
+          url: uploadResult.secure_url,
+          originalname: req.file.originalname,
+          mimetype: req.file.mimetype,
+        };
+      } catch (uploadError) {
+        return res.status(500).json({
+          success: false,
+          message: "Error uploading image",
+          error: uploadError.message,
+        });
+      }
+    }
+
+    // Build the update object
+    const updateFields = { ...updateData.oldData };
+    
+    if (photo) {
+      updateFields.photo = photo;
+    }
+
     const result = await Employee.updateOne(
       { _id: id },
-      { $set: updateData.oldData }
+      { $set: updateFields }
     );
     if (!result) {
       return res
@@ -236,6 +337,82 @@ const changePassword = async (req, res) => {
   }
 };
 
+const sendotp = async (req, res) => {
+  const { email } = req.body;
+  
+  try {
+    const employee = await Employee.findOne({ email });
+    if (!employee) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Employee not found" });
+    }
+      const otp = crypto.randomInt(100000, 999999).toString();
+      const otpExpires = Date.now() + 10 * 60 * 1000;       
+      const update = await Employee.updateOne(
+        { email: employee.email }, 
+        {
+          $set: {
+            resetOtp: otp,
+            otpExpires: otpExpires,
+          },
+        }
+      );
+    const transporter = nodemailer.createTransport({
+      host:"smtp.gmail.com",
+      port:587,
+      secure:false,
+      requireTLS:true,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Your OTP for Password Reset",
+      text: `Your OTP for password reset is ${otp}. It is valid for 10 minutes.`,
+    };
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({
+      success: true,
+      message: "OTP sent to email",
+    });
+  } catch (err) {
+         res
+        .status(500)
+        .json({ success: false, message: "Server error: " + err.message })
+  }
+}
+
+const verifyOtp = async (req, res) => {
+  const { email, otp } = req.body;
+  try {
+    // Find employee by email and OTP
+    const employee = await Employee.findOne({ email });
+    if (!employee || employee.resetOtp !== otp) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid OTP" });
+    }
+    if (employee.otpExpires < Date.now()) {
+      return res
+        .status(400)
+        .json({ success: false, message: "OTP expired" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "OTP verified successfully",
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server error: " + err.message });
+  }
+};
+
 module.exports = {
   insertEmployee,
   getAllEmployees,
@@ -245,4 +422,6 @@ module.exports = {
   login,
   logout,
   changePassword,
+  sendotp,
+  verifyOtp,
 };

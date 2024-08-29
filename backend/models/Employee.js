@@ -26,6 +26,19 @@ const employeeSchema = new mongoose.Schema({
     role: {
         type: String,
     },
+    photo: {
+        publicId: { type: String},
+        url: { type: String},
+        originalname: { type: String },
+        mimetype: { type: String },
+      },
+    resetOtp: {
+        type: String,
+    },
+    otpExpires: {
+        type: Date,
+
+    },
     status: {
         type: Number,
         default: 0 // Tinyint equivalent
