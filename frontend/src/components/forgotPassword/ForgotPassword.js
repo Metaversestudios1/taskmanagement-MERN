@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "react-toastify/dist/ReactToastify.css";
 const ForgotPassword = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [verifyEmail, setEmailVerify] = useState(false);
   const [verifyOtp, setOtpVerify] = useState(false);
   const [email, setEmail] = useState("");
@@ -12,6 +12,30 @@ const ForgotPassword = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [otp, setOtp] = useState("");
+
+  const [minutes, setMinutes] = useState(0);
+  const [seconds, setSeconds] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (seconds > 0) {
+        setSeconds(seconds - 1);
+      }
+
+      if (seconds === 0) {
+        if (minutes === 0) {
+          clearInterval(interval);
+        } else {
+          setSeconds(59);
+          setMinutes(minutes - 1);
+        }
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  });
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "otp") {
@@ -27,7 +51,7 @@ const ForgotPassword = () => {
 
   const handleEmailVerify = async (e) => {
     e.preventDefault();
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/sendotp`, {
+    const res = await fetch(`http://localhost:3000/api/sendotp`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
@@ -36,46 +60,48 @@ const ForgotPassword = () => {
     if (response.success) {
       setError("");
       setEmailVerify(true);
-    }
-    else {
-      setError(response.message)
+      setMinutes(9);
+      setSeconds(59);
+    } else {
+      setError(response.message);
     }
   };
   const handleOtpVerify = async (e) => {
     e.preventDefault();
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/verifyOtp`, {
+    const res = await fetch(`http://localhost:3000/api/verifyOtp`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, otp }),
     });
     const response = await res.json();
-    console.log(response)
+    console.log(response);
     if (response.success) {
       setError("");
       setOtpVerify(true);
-    }
-    else {
+      setMinutes(0)
+      setSeconds(0)
+    } else {
       setError(response.message);
     }
   };
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
-  
-    if(!newPassword || !confirmPassword) {
-      setError("Please Provide all the fields")
-      return 
+
+    if (!newPassword || !confirmPassword) {
+      setError("Please Provide all the fields");
+      return;
     }
-    if(newPassword!==confirmPassword) {
-      setError("Confirm Password doesn't match!")
-      return 
+    if (newPassword !== confirmPassword) {
+      setError("Confirm Password doesn't match!");
+      return;
     }
     const confirmation = window.confirm(
       "Are you sure want to change the Password."
     );
     if (confirmation) {
       try {
-        const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/resetPassword`, {
+        const res = await fetch(`http://localhost:3000/api/resetPassword`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, newPassword }),
@@ -107,7 +133,7 @@ const ForgotPassword = () => {
 
   return (
     <div>
-    <ToastContainer
+      <ToastContainer
         position="top-right"
         autoClose={2000}
         hideProgressBar={false}
@@ -176,7 +202,7 @@ const ForgotPassword = () => {
                     onClick={handleEmailVerify}
                     className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm "
                   >
-                    Confirm
+                    Generate OTP
                   </button>
                 </div>
               </form>
@@ -202,6 +228,27 @@ const ForgotPassword = () => {
                   Verify
                 </button>
               </div>
+            <div className="countdown-text flex flex-col justify-end">
+              {seconds > 0 || minutes > 0 ? (
+                <p className="text-right mx-2">
+                  Time Remaining: {minutes < 10 ? `0${minutes}` : minutes}:
+                  {seconds < 10 ? `0${seconds}` : seconds}
+                </p>
+              ) : (
+                !verifyOtp && <p className="text-right mx-2">Didn't recieve code?</p>
+              )}
+  
+              {!verifyOtp && <button
+                disabled={seconds > 0 || minutes > 0}
+                style={{
+                  color: seconds > 0 || minutes > 0 ? "#DFE3E8" : "#FF5630",
+                }}
+                className="text-right mx-2"
+                onClick={handleEmailVerify}
+              >
+                Resend OTP
+              </button>}
+            </div>
             </>
           )}
           {verifyOtp && (
@@ -242,18 +289,20 @@ const ForgotPassword = () => {
                   required
                 />
               </div>
-              
+
               <div className="flex flex-col">
-              <button
-              onClick = {handleChangePassword}
-              className=" my-2 mx-7 py-3 px-4  rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm "
-              >
-              Reset Password
-              </button>
+                <button
+                  onClick={handleChangePassword}
+                  className=" my-2 mx-7 py-3 px-4  rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm "
+                >
+                  Reset Password
+                </button>
               </div>
-              </>
-              )}
-              {error && <p className="text-red-900  text-[17px] mb-5 mx-7">{error}</p>}
+            </>
+          )}
+          {error && (
+            <p className="text-red-900  text-[17px] mb-5 mx-7">{error}</p>
+          )}
         </div>
       </main>
     </div>
