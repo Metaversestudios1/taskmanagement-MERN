@@ -1,10 +1,14 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
-
+import { NavLink, useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "react-toastify/dist/ReactToastify.css";
 const ForgotPassword = () => {
+  const navigate = useNavigate()
   const [verifyEmail, setEmailVerify] = useState(false);
   const [verifyOtp, setOtpVerify] = useState(false);
   const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [otp, setOtp] = useState("");
@@ -21,17 +25,100 @@ const ForgotPassword = () => {
     }
   };
 
-  const handleEmailVerify = async(e) =>{
-    e.preventDefault()
-    setEmailVerify(true)
-  }
-  const handleOtpVerify = async(e) =>{
-    e.preventDefault()
-    setOtpVerify(true)
-  }
+  const handleEmailVerify = async (e) => {
+    e.preventDefault();
+    const res = await fetch(`http://localhost:3000/api/sendotp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const response = await res.json();
+    if (response.success) {
+      setError("");
+      setEmailVerify(true);
+    }
+    else {
+      setError(response.message)
+    }
+  };
+  const handleOtpVerify = async (e) => {
+    e.preventDefault();
+    const res = await fetch(`http://localhost:3000/api/verifyOtp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, otp }),
+    });
+    const response = await res.json();
+    console.log(response)
+    if (response.success) {
+      setError("");
+      setOtpVerify(true);
+    }
+    else {
+      setError(response.message);
+    }
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+  
+    if(!newPassword || !confirmPassword) {
+      setError("Please Provide all the fields")
+      return 
+    }
+    if(newPassword!==confirmPassword) {
+      setError("Confirm Password doesn't match!")
+      return 
+    }
+    const confirmation = window.confirm(
+      "Are you sure want to change the Password."
+    );
+    if (confirmation) {
+      try {
+        const res = await fetch(`http://localhost:3000/api/resetPassword`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, newPassword }),
+        });
+        const response = await res.json();
+        if (response.success) {
+          setError("");
+          toast.success("Password changed Successfully!", {
+            position: "top-right",
+            autoClose: 1000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+          setTimeout(() => {
+            navigate("/login");
+          }, 1500);
+        } else {
+          setError(response.message);
+        }
+      } catch (err) {
+        console.err(err);
+      }
+    }
+  };
 
   return (
     <div>
+    <ToastContainer
+        position="top-right"
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <main
         id="content"
         role="main"
@@ -60,7 +147,7 @@ const ForgotPassword = () => {
                 <div className="grid gap-y-4">
                   <div>
                     <label
-                      for="email"
+                      htmlFor="email"
                       className="block text-sm font-bold ml-1 mb-2 "
                     >
                       Email address
@@ -70,6 +157,7 @@ const ForgotPassword = () => {
                         type="email"
                         id="email"
                         name="email"
+                        onChange={handleChange}
                         className="py-3 px-4 block w-full border-2 border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 shadow-sm"
                         required
                         placeholder="email"
@@ -154,16 +242,18 @@ const ForgotPassword = () => {
                   required
                 />
               </div>
+              
               <div className="flex flex-col">
               <button
-              type="submit"
+              onClick = {handleChangePassword}
               className=" my-2 mx-7 py-3 px-4  rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm "
               >
-                Reset Password
+              Reset Password
               </button>
               </div>
               </>
               )}
+              {error && <p className="text-red-900  text-[17px] mb-5 mx-7">{error}</p>}
         </div>
       </main>
     </div>

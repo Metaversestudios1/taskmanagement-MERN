@@ -337,9 +337,19 @@ const changePassword = async (req, res) => {
   }
 };
 
+const resetPassword = async(req, res)=>{
+  const {email, newPassword} = req.body
+  const user = await Employee.findOne({ email });
+
+  const salt = await bcrypt.genSalt(10);
+  user.password = await bcrypt.hash(newPassword, salt);
+
+  await user.save();
+  res.status(200).json({success: true})
+}
+
 const sendotp = async (req, res) => {
   const { email } = req.body;
-  
   try {
     const employee = await Employee.findOne({ email });
     if (!employee) {
@@ -424,4 +434,5 @@ module.exports = {
   changePassword,
   sendotp,
   verifyOtp,
+  resetPassword
 };
