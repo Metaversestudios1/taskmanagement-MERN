@@ -8,6 +8,7 @@ import $ from 'jquery';
 import 'jquery-validation'; 
 
 const AddEmployee = () => {
+  const [loader, setLoader] = useState(false)
   const [mobileValid, setMobileValid] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ const AddEmployee = () => {
     password: "",
     contact_number: "",
     role: "",
+    photo:null
   };
   const [data, setData] = useState(initialState);
   const [roles, setRoles] = useState([]);
@@ -113,15 +115,20 @@ const AddEmployee = () => {
     }
   
     try {
+      
+      setLoader(true)
+      const formData = new FormData();
+      Object.keys(data).forEach((key) => {
+        formData.append(key, data[key]);
+      });
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertemployee`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: formData,
       });
       const response = await res.json();
       if (response.success) {
         setMobileValid("");
-        toast.success("New user is added Successfully!", {
+        toast.success("New employee is added Successfully!", {
           position: "top-right",
           autoClose: 1000,
           hideProgressBar: false,
@@ -135,13 +142,17 @@ const AddEmployee = () => {
           navigate("/employees");
         }, 1500);
       } else {
+        setLoader(false)
         setError(response.message);
       }
     } catch (err) {
       console.log(err);
     }
   };
-
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setData({ ...data, photo: file });
+  };
   const handleGoBack = () => {
     navigate(-1);
   };
@@ -171,7 +182,16 @@ const AddEmployee = () => {
           <div className="text-2xl font-bold mx-2 my-8 px-4">Add Employee</div>
         </div>
       </div>
-
+      {loader ? (
+        <div className="absolute w-[80%] h-[40%] flex justify-center items-center"><div
+        className=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+        role="status">
+        <span
+          className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+          >Loading...</span
+        >
+      </div></div>
+      ) : (
       <div className="w-[70%] m-auto my-10">
         <form id="employeeform">
           <div className="grid gap-6 mb-6 md:grid-cols-2">
@@ -282,6 +302,22 @@ const AddEmployee = () => {
               required
             />
           </div>
+          <div className="mb-6">
+            <label
+              htmlFor="photo"
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
+            >
+              Profile Picture
+            </label>
+            <input
+              name="photo"
+              onChange={handleFileChange}
+              type="file"
+              id="photo"
+              className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
+              placeholder="Enter the task completion time"
+            />
+          </div>
           {error && <p className="text-red-900  text-[17px] mb-5">{error}</p>}
           <button
             type="submit"
@@ -291,93 +327,9 @@ const AddEmployee = () => {
             ADD
           </button>
         </form>
-      </div>
+      </div>)}
     </>
   );
 };
 
 export default AddEmployee;
-
-//  <div
-//           aria-label="Loading..."
-//           role="status"
-//           class="flex items-center justify-center space-x-2 mx-5"
-//         >
-//           <svg
-//             class="h-12 w-12 animate-spin stroke-gray-500"
-//             viewBox="0 0 256 256"
-//           >
-//             <line
-//               x1="128"
-//               y1="32"
-//               x2="128"
-//               y2="64"
-//               stroke-linecap="round"
-//               stroke-linejoin="round"
-//               stroke-width="24"
-//             ></line>
-//             <line
-//               x1="195.9"
-//               y1="60.1"
-//               x2="173.3"
-//               y2="82.7"
-//               stroke-linecap="round"
-//               stroke-linejoin="round"
-//               stroke-width="24"
-//             ></line>
-//             <line
-//               x1="224"
-//               y1="128"
-//               x2="192"
-//               y2="128"
-//               stroke-linecap="round"
-//               stroke-linejoin="round"
-//               stroke-width="24"
-//             ></line>
-//             <line
-//               x1="195.9"
-//               y1="195.9"
-//               x2="173.3"
-//               y2="173.3"
-//               stroke-linecap="round"
-//               stroke-linejoin="round"
-//               stroke-width="24"
-//             ></line>
-//             <line
-//               x1="128"
-//               y1="224"
-//               x2="128"
-//               y2="192"
-//               stroke-linecap="round"
-//               stroke-linejoin="round"
-//               stroke-width="24"
-//             ></line>
-//             <line
-//               x1="60.1"
-//               y1="195.9"
-//               x2="82.7"
-//               y2="173.3"
-//               stroke-linecap="round"
-//               stroke-linejoin="round"
-//               stroke-width="24"
-//             ></line>
-//             <line
-//               x1="32"
-//               y1="128"
-//               x2="64"
-//               y2="128"
-//               stroke-linecap="round"
-//               stroke-linejoin="round"
-//               stroke-width="24"
-//             ></line>
-//             <line
-//               x1="60.1"
-//               y1="60.1"
-//               x2="82.7"
-//               y2="82.7"
-//               stroke-linecap="round"
-//               stroke-linejoin="round"
-//               stroke-width="24"
-//             ></line>
-//           </svg>
-//         </div>
