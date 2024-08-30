@@ -1,21 +1,96 @@
 const { json } = require("body-parser");
-const Attendence = require("../models/Attendence"); // Import the model
+const Attendence = require("../models/Attendence");
+const Employee = require("../models/Employee"); // Import the model
 const mongoose = require("mongoose");
-// Function to insert data
+const axios = require('axios');
+const sharp = require('sharp'); // Import sharp
+const fs = require('fs');
+
+const { PNG } = require('pngjs');
+const resizeImage = async (buffer, width, height) => {
+  return sharp(buffer)
+    .resize(width, height)
+    .toBuffer();
+};
+
+const comparePhotos = async (url1, buffer2) => {
+  try {
+    const { default: pixelmatch } = await import('pixelmatch');
+    // Fetch the Cloudinary image as a buffer
+    const response1 = await axios.get(url1, { responseType: 'arraybuffer' });
+    const buffer1 = Buffer.from(response1.data);
+
+    // Get dimensions of the first image
+    const metadata1 = await sharp(buffer1).metadata();
+    const { width, height } = metadata1;
+
+    // Resize the second image to match the dimensions of the first
+    const resizedBuffer2 = await resizeImage(buffer2, width, height);
+
+    // Convert buffers to PNG images
+    const img1 = PNG.sync.read(buffer1);
+    const img2 = PNG.sync.read(resizedBuffer2);
+
+    const diff = new PNG({ width, height });
+
+    // Compare the images
+    const numDiffPixels = pixelmatch(
+      img1.data,
+      img2.data,
+      diff.data,
+      width,
+      height,
+      { threshold: 0.1 } // Adjust the threshold for sensitivity
+    );
+
+    // Calculate similarity
+    const similarity = 1 - numDiffPixels / (width * height);
+    return similarity >= 0.8; // similarity is in the range [0, 1]
+  } catch (error) {
+    console.error('Error comparing photos:', error);
+    return false;
+  }
+};
 
 const insertattendence = async (req, res) => {
   try {
+    const { emp_id } = req.body;
+    const employee = await Employee.findOne({ _id: emp_id });
+    if (req.file) {
+      if (!employee) {
+        return res.status(404).json({
+          success: false,
+          message: "Employee not found",
+        });
+      }
+      
+      if (employee.photo.url) {
+        const isMatch = await comparePhotos(employee.photo.url, req.file.buffer);
+        if (!isMatch) {
+          return res.status(400).json({
+            success: false,
+            message: "Photo does not match",
+          });
+        }
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: "upload Profile pic first.",
+        });
+      }
+    }
     const newAttendence = new Attendence(req.body);
     await newAttendence.save();
     res.status(201).json({ success: true, data: newAttendence });
   } catch (error) {
     res.status(500).json({
       success: false,
-      messsage: "inserting attendence error",
+      message: "Error in attendance error",
       error: error.message,
     });
   }
 };
+
 const getAllattendence = async (req, res) => {
   try {
     const pageSize = parseInt(req.query.limit);
@@ -58,7 +133,20 @@ const getAllattendence = async (req, res) => {
   }
 };
 
+function getCurrentTime() {
+  const date = new Date();
+  let hours = date.getHours();
+  const minutes = date.getMinutes();
+  const ampm = hours >= 12 ? "PM" : "AM";
 
+  hours = hours % 12;
+  hours = hours ? hours : 12; // Hour '0' should be '12'
+
+  const minutesStr = minutes < 10 ? `0${minutes}` : minutes;
+  const timeString = `${hours}:${minutesStr} ${ampm}`;
+
+  return timeString;
+}
 // Function to parse time string and return a Date object for the current date
 const parseTimeString = (timeString) => {
   const [time, period] = timeString.split(" ");
@@ -82,29 +170,44 @@ const parseTimeString = (timeString) => {
 };
 
 // Function to calculate working hours
-// Function to calculate working hours in a simplified manner
 const calculateWorkingHours = (checkInTime, checkOutTime) => {
   const checkInDate = parseTimeString(checkInTime);
   const checkOutDate = parseTimeString(checkOutTime);
-  
+
   const diffMs = checkOutDate - checkInDate; // Difference in milliseconds
-  const diffMinutes = diffMs / (1000 * 60); // Convert to minutes
-  
-  const diffHours = Math.floor(diffMinutes / 60); // Whole hours
-  const fractionalMinutes = diffMinutes % 60; // Remaining minutes
-  
-  // Convert minutes to fractional hours, each minute is 1/100 of an hour
-  const fractionalHours = fractionalMinutes / 100;
-  
-  // Sum whole hours and fractional hours, round to 2 decimal places
-  const totalHours = diffHours + fractionalHours;
-  return Math.round(totalHours * 100) / 100; // Rounded to 2 decimal places
+  const diffHours = diffMs / (1000 * 60 * 60); // Convert to hours
+  return Math.round(diffHours * 100) / 100; // Round to 2 decimal places
 };
 
-
 const updateattendence = async (req, res) => {
-  const { emp_id, date, checkOut_location_url, check_out_time } = req.body;
+  const { emp_id, date, checkOut_location_url } = req.body;
 
+  const employee = await Employee.findOne({ _id: emp_id });
+
+  if (req.file) {
+   
+    if (!employee) {
+      return res.status(404).json({
+        success: false,
+        message: "Employee not found",
+      });
+    }
+    if (employee.photo.url) {
+      const isMatch = await comparePhotos(employee.photo.url, req.file.buffer);
+      if (!isMatch) {
+        return res.status(400).json({
+          success: false,
+          message: "Photo does not match",
+        });
+      }
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "upload Profile pic first.",
+      });
+    }
+  }
+  const check_out = getCurrentTime();
   try {
     const result = await Attendence.findOne({
       emp_id,
@@ -118,6 +221,7 @@ const updateattendence = async (req, res) => {
     }
 
     const check_in = result["check_in"];
+    const check_out_time = check_out; // This should be in string format like "2:29 PM"
 
     const roundedDurationHours = calculateWorkingHours(
       check_in,
@@ -129,7 +233,6 @@ const updateattendence = async (req, res) => {
     } else {
       attendance_status = "absent";
     }
-
     await Attendence.updateOne(
       { emp_id, date: result.date },
       {
@@ -150,28 +253,10 @@ const updateattendence = async (req, res) => {
     });
   }
 };
-const updateAttendanceStatus = async(req, res) =>{
-  const {id, status} = req.body
-  console.log(id, status)
-  try{
-    await Attendence.updateOne(
-      { _id: id},
-      {
-        $set: {
-          attendance_status:status
-        },
-      }
-    )
-    res.status(200).json({ success: true });
-  }catch(err) {
-    
-    res.status(401).json({ err });
-  }
-}
 
 const deleteattendence = async (req, res) => {
   const { id } = req.body;
-  try { 
+  try {
     const result = await Attendence.findByIdAndUpdate(
       id,
       { deleted_at: new Date() },
@@ -230,5 +315,4 @@ module.exports = {
   getAllattendence,
   deleteattendence,
   getSingleattendence,
-  updateAttendanceStatus
 };

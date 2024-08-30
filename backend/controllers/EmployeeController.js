@@ -20,42 +20,34 @@ cloudinary.config({
 const uploadImage = (buffer, originalname, mimetype) => {
   return new Promise((resolve, reject) => {
     if (!mimetype || typeof mimetype !== 'string') {
-
       return reject(new Error("MIME type is required and must be a string"));
     }
-    
-    let resourceType = "raw"; // Default to 'raw' for non-image/video files
 
-    if (mimetype.startsWith("image")) {
-      resourceType = "image";
-    } else if (mimetype.startsWith("video")) {
-      resourceType = "video";
-    }else if (mimetype === "application/pdf") {
-      resourceType = "raw"; // Explicitly set PDFs as raw
+    if (!mimetype.startsWith("image")) {
+      return reject(new Error("Only image files are supported"));
     }
-   
-    const fileExtension = path.extname(originalname);
-    const fileNameWithoutExtension = path.basename(originalname, fileExtension);
-    const publicId = `${fileNameWithoutExtension}${fileExtension}`; // Include extension in public_id
-   
+
+    const fileNameWithoutExtension = path.basename(originalname);
+    const publicId = `${fileNameWithoutExtension}`;
     const options = {
-      resource_type: resourceType,
-      public_id: publicId, // Set the public_id with extension
+      resource_type: "image",  // Only images are allowed
+      public_id: publicId,
       use_filename: true,
       unique_filename: false,
       overwrite: true,
     };
-    
-    const uploadStream = cloudinary.uploader.upload(`data:${mimetype};base64,${buffer.toString('base64')}`, options, (error, result) => {
-      if (error) {
-          return reject(new Error("Cloudinary upload failed"));
-      }
-        resolve(result);
-    });
 
-    // uploadStream.end(buffer); // Upload the file from the buffer
+    const dataURI = `data:${mimetype};base64,${buffer.toString('base64')}`;
+    
+    cloudinary.uploader.upload(dataURI, { resource_type: 'auto' }, (error, result) => {
+      if (error) {
+        return reject(new Error(`Cloudinary upload failed: ${error.message}`));
+      }
+      resolve(result);
+    });
   });
 };
+
 
 
 const insertEmployee = async (req, res) => {
@@ -337,19 +329,9 @@ const changePassword = async (req, res) => {
   }
 };
 
-const resetPassword = async(req, res)=>{
-  const {email, newPassword} = req.body
-  const user = await Employee.findOne({ email });
-
-  const salt = await bcrypt.genSalt(10);
-  user.password = await bcrypt.hash(newPassword, salt);
-
-  await user.save();
-  res.status(200).json({success: true})
-}
-
 const sendotp = async (req, res) => {
   const { email } = req.body;
+  
   try {
     const employee = await Employee.findOne({ email });
     if (!employee) {
@@ -434,5 +416,4 @@ module.exports = {
   changePassword,
   sendotp,
   verifyOtp,
-  resetPassword
 };
