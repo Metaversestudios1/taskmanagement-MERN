@@ -308,6 +308,23 @@ const getSingleattendence = async (req, res) => {
     });
   }
 };
+const updateAttendanceStatus = async(req, res) =>{
+  const {id, status} = req.body
+  try{
+    await Attendence.updateOne(
+      { _id: id},
+      {
+        $set: {
+          attendance_status:status
+        },
+      }
+    )
+    res.status(200).json({ success: true });
+  }catch(err) {
+    
+    res.status(401).json({ err });
+  }
+}
 
 module.exports = {
   insertattendence,
@@ -315,4 +332,5 @@ module.exports = {
   getAllattendence,
   deleteattendence,
   getSingleattendence,
+  updateAttendanceStatus
 };
