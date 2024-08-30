@@ -58,6 +58,16 @@ const ForgotPassword = () => {
     });
     const response = await res.json();
     if (response.success) {
+      toast.success("OTP sent Successfully! It is valid for 10 minutes.", {
+        position: "top-right",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
       setError("");
       setEmailVerify(true);
       setMinutes(9);
@@ -74,8 +84,17 @@ const ForgotPassword = () => {
       body: JSON.stringify({ email, otp }),
     });
     const response = await res.json();
-    console.log(response);
     if (response.success) {
+      toast.success("OTP verified.", {
+        position: "top-right",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
       setError("");
       setOtpVerify(true);
       setMinutes(0)
