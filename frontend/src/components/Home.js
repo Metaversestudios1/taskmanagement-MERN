@@ -46,7 +46,7 @@ const Home = () => {
                 to="/employees">
                 
               <div className="flex items-center">
-                <div className="inline-flex flex-shrink-0 justify-center items-center w-12 h-12 text-white bg-[#ff0080] to-voilet-500 rounded-lg">
+                <div className="inline-flex flex-shrink-0 justify-center items-center w-12 h-12 text-white bg-[#1E88E5] to-voilet-500 rounded-lg">
                   <svg
                     className="w-8 h-8"
                     fill="currentColor"
@@ -76,7 +76,7 @@ const Home = () => {
                <NavLink
                 to="/projects">
               <div className="flex items-center">
-                <div className="inline-flex flex-shrink-0 justify-center items-center w-12 h-12 text-white bg-[#ff0080] to-voilet-500 rounded-lg">
+                <div className="inline-flex flex-shrink-0 justify-center items-center w-12 h-12 text-white bg-[#1E88E5] to-voilet-500 rounded-lg">
                   <svg
                     className="w-8 h-8"
                     fill="currentColor"
@@ -106,7 +106,7 @@ const Home = () => {
             <NavLink
                 to="/tasks">
               <div className="flex items-center">
-                <div className="inline-flex flex-shrink-0 justify-center items-center w-12 h-12 text-white bg-[#ff0080] to-voilet-500 rounded-lg">
+                <div className="inline-flex flex-shrink-0 justify-center items-center w-12 h-12 text-white bg-[#1E88E5] to-voilet-500 rounded-lg">
                   <svg
                     className="w-8 h-8"
                     fill="currentColor"
@@ -138,7 +138,7 @@ const Home = () => {
             <NavLink
                 to="/tasks">
               <div className="flex items-center">
-                <div className="inline-flex flex-shrink-0 justify-center items-center w-12 h-12 text-white bg-[#ff0080] to-voilet-500 rounded-lg">
+                <div className="inline-flex flex-shrink-0 justify-center items-center w-12 h-12 text-white bg-[#1E88E5] to-voilet-500 rounded-lg">
                   <svg
                     className="w-8 h-8"
                     fill="currentColor"
@@ -168,7 +168,7 @@ const Home = () => {
             <NavLink
                 to="/tasks">
               <div className="flex items-center">
-                <div className="inline-flex flex-shrink-0 justify-center items-center w-12 h-12 text-white bg-[#ff0080] to-voilet-500 rounded-lg">
+                <div className="inline-flex flex-shrink-0 justify-center items-center w-12 h-12 text-white bg-[#1E88E5] to-voilet-500 rounded-lg">
                   <svg
                     className="w-8 h-8"
                     fill="currentColor"
