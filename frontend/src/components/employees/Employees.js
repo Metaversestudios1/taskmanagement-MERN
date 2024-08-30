@@ -103,7 +103,7 @@ const Employees = () => {
   const startIndex = (page - 1) * pageSize;
 
   return (
-    <div className="">
+    <div className="relative">
       <ToastContainer
           position="top-right"
           autoClose={2000}
