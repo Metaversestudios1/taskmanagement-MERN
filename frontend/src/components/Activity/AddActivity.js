@@ -21,6 +21,7 @@ const AddActivity = () => {
   };
   const [data, setData] = useState(initialState);
   const [error, setError] = useState("");
+  const [loader, setLoader] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -82,9 +83,9 @@ const AddActivity = () => {
       // setError("Please fill in all required fields.");
       return;
     }
-
+    setLoader(true);
     try {
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertevent`, {
+      const res = await fetch(`http://localhost:3000/api/insertevent`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -92,6 +93,7 @@ const AddActivity = () => {
       const response = await res.json();
       if (response.success) {
         setError("");
+        setLoader(false)
         toast.success("New Activity is added successfully!", {
           position: "top-right",
           autoClose: 1000,
@@ -122,7 +124,7 @@ const AddActivity = () => {
 
   return (
     <>
-      <div className="flex items-center">
+      <div className="flex items-center relative">
         <ToastContainer
           position="top-right"
           autoClose={2000}
@@ -147,6 +149,15 @@ const AddActivity = () => {
             Add Acitivity/Events
           </div>
         </div>
+        {loader && <div className="absolute h-full w-full top-64  flex justify-center items-center"><div
+        class=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+        role="status">
+        <span
+          class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+          >Loading...</span
+        >
+      </div></div>}
+
       </div>
 
       <div className="w-[70%] m-auto my-10">

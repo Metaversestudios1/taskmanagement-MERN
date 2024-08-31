@@ -3,6 +3,7 @@ import { IoIosArrowRoundBack } from "react-icons/io";
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 import $ from "jquery";
 import 'jquery-validation';
 const AddProject = () => {
@@ -13,6 +14,7 @@ const AddProject = () => {
   };
   const [data, setData] = useState(initialState);
   const [error, setError] = useState("");
+  const [loader, setLoader] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -54,14 +56,16 @@ const AddProject = () => {
      // setError("Please fill in all required fields.");
        return;
      }
+      setLoader(true)
  
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertproject`, {
+    const res = await fetch(`http://localhost:3000/api/insertproject`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
     const response = await res.json();
     if (response.success) {
+      setLoader(false)
       toast.success('New Project is added Successfully!', {
         position: "top-right",
         autoClose: 1000,
@@ -84,7 +88,7 @@ const AddProject = () => {
   }
   return (
     <>
-    <div className="flex items-center ">
+    <div className="flex items-center relative ">
     <ToastContainer
       position="top-right"
       autoClose={2000}
@@ -107,11 +111,19 @@ const AddProject = () => {
           {/* <div className="bg-[#032e4e] rounded-[5px] ml-5 h-[30px] w-[10px]"></div> */}
           <div className="text-xl font-bold mx-2 my-8">Add Project</div>
         </div>
+        {loader && <div className="absolute top-64 h-full w-full  flex justify-center items-center"><div
+        class=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+        role="status">
+        <span
+          class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+          >Loading...</span
+        >
+      </div></div>}
       </div>
 
-
+    
        
-        <div className="w-[70%] m-auto my-10">
+        <div className="relative w-[70%] m-auto my-10">
           <form id="projectform">
             <div className="grid gap-6 mb-6 md:grid-cols-2">
               <div>
@@ -144,7 +156,7 @@ const AddProject = () => {
             </button>
           </form>
         </div>
-     
+       
     </>
   );
 };

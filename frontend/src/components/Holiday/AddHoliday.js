@@ -17,6 +17,7 @@ const AddHoliday = () => {
   };
   const [data, setData] = useState(initialState);
   const [error, setError] = useState("");
+  const [loader, setLoader] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -78,15 +79,17 @@ const handleSubmit = async (e) => {
     //setError("Please fill in all required fields.");
     return;
   }
+  setLoader(true);
 
   try {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertholiday`, {
+    const res = await fetch(`http://localhost:3000/api/insertholiday`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
     const response = await res.json();
     if (response.success) {
+      setLoader(false);
       setError("");
       toast.success("New Holiday is added successfully!", {
         position: "top-right",
@@ -116,7 +119,7 @@ const handleSubmit = async (e) => {
 
   return (
     <>
-      <div className="flex items-center">
+      <div className="flex items-center relative">
         <ToastContainer
           position="top-right"
           autoClose={2000}
@@ -139,6 +142,14 @@ const handleSubmit = async (e) => {
           
           <div className="text-2xl font-bold mx-2 my-8 px-4">Add Holiday</div>
         </div>
+        {loader && <div className="absolute h-full w-full top-64  flex justify-center items-center"><div
+        class=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+        role="status">
+        <span
+          class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+          >Loading...</span
+        >
+      </div></div>}
       </div>
 
       <div className="w-[70%] m-auto my-10">

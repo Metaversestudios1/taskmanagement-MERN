@@ -10,6 +10,8 @@ const Projects = () => {
   const [loader, setLoader] = useState(true);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
+  const [noData, setNoData] = useState(false);
+  
   const [count, setCount] = useState(0);
   const [search, setSearch] = useState("");
   useEffect(() => {
@@ -18,10 +20,15 @@ const Projects = () => {
   const fetchProjects = async () => {
     setLoader(true)
     const res = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/getproject?page=${page}&limit=${pageSize}&search=${search}`
+      `http://localhost:3000/api/getproject?page=${page}&limit=${pageSize}&search=${search}`
     );
     const response = await res.json();
     if(response.success) {
+      setNoData(false)
+      if(response.result.length===0){
+        setNoData(true)
+      }
+      
       setLoader(false)
       setProjects(response.result);
       setCount(response.count);
@@ -36,7 +43,7 @@ const Projects = () => {
     if (count === 1) {
       projectOne = false;
     }
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/deleteproject`, {
+    const res = await fetch(`http://localhost:3000/api/deleteproject`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
@@ -74,7 +81,7 @@ const Projects = () => {
   const startIndex = (page - 1) * pageSize;
 
   return (
-    <div className="">
+    <div className="relative">
       <ToastContainer
           position="top-right"
           autoClose={2000}
@@ -108,9 +115,18 @@ const Projects = () => {
           />
         </div>
       </div>
+      {loader && <div className="absolute h-full w-full  flex justify-center items-center"><div
+        class=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+        role="status">
+        <span
+          class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+          >Loading...</span
+        >
+      </div></div>}
 
+      
       <div className="relative overflow-x-auto m-5 mb-0">
-      {projects.length > 0 ?<table className="w-full text-sm text-left rtl:text-right   border-2 border-gray-300 ">
+      {projects.length > 0 &&<table className="w-full text-sm text-left rtl:text-right   border-2 border-gray-300 ">
            <thead className="text-xs  uppercase bg-gray-200">
             <tr>
               <th scope="col" className="px-6 py-3 border-2 border-gray-300">
@@ -157,8 +173,11 @@ const Projects = () => {
               );
             })}
           </tbody>
-        </table>:<div className="text-center text-xl">Currently! There are no working Projects.</div>}
+        </table>}
       </div>
+      {noData && <div className="text-center text-xl">
+            Currently! There are no Project in the storage.
+          </div>}
 
       {projects.length > 0 && <div className="flex flex-col items-center my-10">
         <span className="text-sm text-black ">
@@ -180,86 +199,3 @@ const Projects = () => {
 };
 
 export default Projects;
-// <div
-//           aria-label="Loading..."
-//           role="status"
-//           class="flex items-center justify-center space-x-2 mx-5"
-//         >
-//           <svg
-//             class="h-12 w-12 animate-spin stroke-gray-500"
-//             viewBox="0 0 256 256"
-//           >
-//             <line
-//               x1="128"
-//               y1="32"
-//               x2="128"
-//               y2="64"
-//               stroke-linecap="round"
-//               stroke-linejoin="round"
-//               stroke-width="24"
-//             ></line>
-//             <line
-//               x1="195.9"
-//               y1="60.1"
-//               x2="173.3"
-//               y2="82.7"
-//               stroke-linecap="round"
-//               stroke-linejoin="round"
-//               stroke-width="24"
-//             ></line>
-//             <line
-//               x1="224"
-//               y1="128"
-//               x2="192"
-//               y2="128"
-//               stroke-linecap="round"
-//               stroke-linejoin="round"
-//               stroke-width="24"
-//             ></line>
-//             <line
-//               x1="195.9"
-//               y1="195.9"
-//               x2="173.3"
-//               y2="173.3"
-//               stroke-linecap="round"
-//               stroke-linejoin="round"
-//               stroke-width="24"
-//             ></line>
-//             <line
-//               x1="128"
-//               y1="224"
-//               x2="128"
-//               y2="192"
-//               stroke-linecap="round"
-//               stroke-linejoin="round"
-//               stroke-width="24"
-//             ></line>
-//             <line
-//               x1="60.1"
-//               y1="195.9"
-//               x2="82.7"
-//               y2="173.3"
-//               stroke-linecap="round"
-//               stroke-linejoin="round"
-//               stroke-width="24"
-//             ></line>
-//             <line
-//               x1="32"
-//               y1="128"
-//               x2="64"
-//               y2="128"
-//               stroke-linecap="round"
-//               stroke-linejoin="round"
-//               stroke-width="24"
-//             ></line>
-//             <line
-//               x1="60.1"
-//               y1="60.1"
-//               x2="82.7"
-//               y2="82.7"
-//               stroke-linecap="round"
-//               stroke-linejoin="round"
-//               stroke-width="24"
-//             ></line>
-//           </svg>
-//         </div>

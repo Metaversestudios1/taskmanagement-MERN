@@ -17,7 +17,7 @@ const EditRole = () => {
   const [oldData, setOldData] = useState(initialState);
   const [permissions, setPermissions] = useState([]);
   const [error, setError] = useState("");
-
+  const [loader, setLoader] = useState(false);
   useEffect(() => {
     fetchOldData();
     fetchAllPermissions();
@@ -30,7 +30,7 @@ const EditRole = () => {
   }, [oldData]);
 
   const fetchOldData = async () => {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getSingleRole`, {
+    const res = await fetch(`http://localhost:3000/api/getSingleRole`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
@@ -42,7 +42,7 @@ const EditRole = () => {
   };
 
   const fetchAllPermissions = async () => {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getpermission`);
+    const res = await fetch(`http://localhost:3000/api/getpermission`);
     const response = await res.json();
     if (response.success) {
       setPermissions(response.result);
@@ -108,16 +108,17 @@ const EditRole = () => {
     if (!$("#roleform").valid()) {
       return;
     }
-  
+    setLoader(true);
     try {
       const updateData = { id, oldData };
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updaterole`, {
+      const res = await fetch(`http://localhost:3000/api/updaterole`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updateData),
       });
       const response = await res.json();
       if (response.success) {
+        setLoader(false)
         toast.success('Role is updated Successfully!', {
           position: "top-right",
           autoClose: 1000,
@@ -145,7 +146,7 @@ const EditRole = () => {
 
   return (
     <>
-      <div className="flex items-center">
+      <div className="flex items-center relative">
         <ToastContainer
           position="top-right"
           autoClose={2000}
@@ -168,6 +169,14 @@ const EditRole = () => {
           
           <div className="text-2xl font-bold mx-2 my-8 px-4">Edit Role</div>
         </div>
+        {loader && <div className="absolute h-full w-full top-64  flex justify-center items-center"><div
+        class=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+        role="status">
+        <span
+          class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+          >Loading...</span
+        >
+      </div></div>}
       </div>
 
       <div className="w-[70%] m-auto my-10">

@@ -9,6 +9,7 @@ import "jquery-validation";
 const EditPermission = () => {
   const navigate = useNavigate();
   const params = useParams();
+  const [loader, setLoader] = useState(false);
   const { id } = params;
   const initialState = {
     role: "",
@@ -46,7 +47,7 @@ const EditPermission = () => {
 
 
   const fetchPermissions = async () => {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getesinglepermission`, {
+    const res = await fetch(`http://localhost:3000/api/getesinglepermission`, {
       method: "POST",
       headers: { "Content-type": "application/json" },
       body: JSON.stringify({ id }),
@@ -68,15 +69,17 @@ const EditPermission = () => {
       // setError("Please fill in all required fields.");
       return;
     }
+    setLoader(true);
     const updateData = { id, oldData };
     try {
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updatpermission`, {
+      const res = await fetch(`http://localhost:3000/api/updatpermission`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updateData),
       });
       const response = await res.json();
       if (response.success) {
+        setLoader(false);
         toast.success("Permission is updated Successfully!", {
           position: "top-right",
           autoClose: 1000,
@@ -107,7 +110,7 @@ const EditPermission = () => {
       <style>
       </style>
 
-      <div className="flex items-center">
+      <div className="flex items-center relative">
         <ToastContainer
           position="top-right"
           autoClose={2000}
@@ -130,6 +133,14 @@ const EditPermission = () => {
           
           <div className="text-2xl font-bold mx-2 my-8 px-4">Edit Permission</div>
         </div>
+        {loader && <div className="absolute h-full w-full top-64  flex justify-center items-center"><div
+        class=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+        role="status">
+        <span
+          class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+          >Loading...</span
+        >
+      </div></div>}
       </div>
 
       <div className="w-[70%] m-auto my-10">

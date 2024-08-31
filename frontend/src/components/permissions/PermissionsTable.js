@@ -12,16 +12,21 @@ const PermissionsTable = () => {
   const [pageSize, setPageSize] = useState(5);
   const [count, setCount] = useState(0);
   const [search, setSearch] = useState("");
+  const [noData, setNoData] = useState(false);
   useEffect(() => {
     fetchPermissions();
   }, [page, search]);
   const fetchPermissions = async () => {
     setLoader(true)
     const res = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/getpermission?page=${page}&limit=${pageSize}&search=${search}`
+      `http://localhost:3000/api/getpermission?page=${page}&limit=${pageSize}&search=${search}`
     );
     const response = await res.json();
     if(response.success) {
+      setNoData(false)
+      if(response.result.length===0){
+        setNoData(true)
+      }
       setLoader(false)
       setPermissions(response.result);
       setCount(response.count);
@@ -36,7 +41,7 @@ const PermissionsTable = () => {
     if (count === 1) {
       permOne = false;
     }
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/deletepermission`, {
+    const res = await fetch(`http://localhost:3000/api/deletepermission`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
@@ -46,6 +51,7 @@ const PermissionsTable = () => {
     }
     const response = await res.json();
     if (response.success) {
+     
       toast.success('Permission is deleted Successfully!', {
         position: "top-right",
         autoClose: 1000,
@@ -74,7 +80,7 @@ const PermissionsTable = () => {
   const startIndex = (page - 1) * pageSize;
 
   return (
-    <div className="">
+    <div className="relative">
       <ToastContainer
           position="top-right"
           autoClose={2000}
@@ -108,9 +114,16 @@ const PermissionsTable = () => {
         />
       </div>
     </div>
-
+    {loader && <div className="absolute h-full w-full  flex justify-center items-center"><div
+        class=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+        role="status">
+        <span
+          class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+          >Loading...</span
+        >
+      </div></div>}
     <div className="relative overflow-x-auto m-5 mb-0">
-    {permissions.length > 0 ?<table className="w-full text-sm text-left rtl:text-right border-2 border-gray-300">
+    {permissions.length > 0 &&<table className="w-full text-sm text-left rtl:text-right border-2 border-gray-300">
          <thead className="text-xs uppercase bg-gray-200">
           <tr>
             <th scope="col" className="px-6 py-3 border-2 border-gray-300">
@@ -157,8 +170,11 @@ const PermissionsTable = () => {
             );
           })}
         </tbody>
-      </table>:<div className="text-center text-xl">Currently! There are no available permissions.</div>}
+      </table>}
     </div>
+    {noData && <div className="text-center text-xl">
+            Currently! There are no Project in the storage.
+          </div>}
 
     {permissions.length > 0 && <div className="flex flex-col items-center my-10">
       <span className="text-sm text-black ">

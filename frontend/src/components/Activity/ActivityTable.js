@@ -15,6 +15,8 @@ const ActivityTable = () => {
   const [activity, setactivity] = useState([]);
   const [count, setCount] = useState(0);
   const [loader, setLoader] = useState(true);
+  const [noData, setNoData] = useState(false);
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "search") {
@@ -32,7 +34,7 @@ const ActivityTable = () => {
       if (count === 1) {
         activOne = false;
       }
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/deleteevent`, {
+      const res = await fetch(`http://localhost:3000/api/deleteevent`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
@@ -69,10 +71,14 @@ const ActivityTable = () => {
   const fetchActivity = async () => {
     setLoader(true);
     const res = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/getAllevent?page=${page}&limit=${pageSize}&search=${search}`
+      `http://localhost:3000/api/getAllevent?page=${page}&limit=${pageSize}&search=${search}`
     );
     const response = await res.json();
     if (response.success) {
+      setNoData(false)
+      if(response.result.length===0){
+        setNoData(true)
+      }
       setLoader(false);
       setactivity(response.result);
       setCount(response.count);
@@ -82,7 +88,7 @@ const ActivityTable = () => {
   const startIndex = (page - 1) * pageSize;
 
   return (
-    <div className="">
+    <div className="relative">
       <ToastContainer
         position="top-right"
         autoClose={2000}
@@ -118,9 +124,17 @@ const ActivityTable = () => {
           />
         </div>
       </div>
+      {loader && <div className="absolute h-full w-full  flex justify-center items-center"><div
+        class=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+        role="status">
+        <span
+          class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+          >Loading...</span
+        >
+      </div></div>}
 
       <div className="relative overflow-x-auto m-5 mb-0">
-        {activity.length > 0 ? (
+        {activity.length > 0 && (
           <table className="w-full text-sm text-left rtl:text-right border-2 border-gray-300">
             <thead className="text-xs uppercase bg-gray-200">
               <tr>
@@ -241,12 +255,11 @@ const ActivityTable = () => {
               })}
             </tbody>
           </table>
-        ) : (
-          <div className="text-center text-xl">
-            Currently! There are no available Events.
-          </div>
         )}
       </div>
+      {noData && <div className="text-center text-xl">
+            Currently! There are no Activity in the storage.
+          </div>}
 
       {activity.length > 0 && (
         <div className="flex flex-col items-center my-10">
