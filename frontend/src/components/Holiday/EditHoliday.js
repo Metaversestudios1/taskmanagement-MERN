@@ -76,7 +76,7 @@ const validateHolidayForm = () => {
   
   const fetchOldData = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/getSingleholiday`, {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getSingleholiday`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
@@ -102,7 +102,7 @@ const validateHolidayForm = () => {
 
   const fetchAllHoliday = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/getAllholiday`);
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getAllholiday`);
       const response = await res.json();
       if (response.success) {
         setHoliday(response.result);
@@ -126,7 +126,7 @@ const validateHolidayForm = () => {
       setLoader(true);
     try {
         const updateData = { id, oldData };
-      const res = await fetch(`http://localhost:3000/api/updateholiday`, {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateholiday`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updateData), // Spread oldData into the body
