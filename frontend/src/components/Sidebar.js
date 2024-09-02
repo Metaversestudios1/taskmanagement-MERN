@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaAngleDown, FaAngleRight } from "react-icons/fa6";
 import { NavLink } from "react-router-dom";
 import getUserFromToken from "./utils/getUserFromToken";
@@ -10,12 +10,16 @@ import { GoTasklist } from "react-icons/go";
 import { MdOutlineAttachMoney } from "react-icons/md";
 import accessPermission from "./utils/accessPermission";
 const Sidebar = ({ sidebar }) => {
-  const getroles =  (permission) => {
-    const roles =  accessPermission(permission);
-    console.log(roles)
-    return roles
-  };
   const userInfo = getUserFromToken();
+  
+  useEffect(()=>{
+    const getroles =  (permission) => {
+      const roles =  accessPermission(permission);
+      console.log(roles)
+      return roles
+    };
+    getroles()
+  },[])
   const [openSubMenu, setOpenSubMenu] = useState({
     attendance: false,
     admin: false,
