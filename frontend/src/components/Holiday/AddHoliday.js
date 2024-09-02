@@ -143,10 +143,10 @@ const handleSubmit = async (e) => {
           <div className="text-2xl font-bold mx-2 my-8 px-4">Add Holiday</div>
         </div>
         {loader && <div className="absolute h-full w-full top-64  flex justify-center items-center"><div
-        class=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+        className=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
         role="status">
         <span
-          class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+          className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
           >Loading...</span
         >
       </div></div>}
@@ -167,7 +167,7 @@ const handleSubmit = async (e) => {
                 id="date"
                 className="form-control bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5"
               />
-              <div class="invalid-feedback"></div>
+              <div className="invalid-feedback"></div>
             </div>
             <div>
               <label htmlFor="reason" className="block mb-2 text-sm">
