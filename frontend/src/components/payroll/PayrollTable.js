@@ -4,16 +4,10 @@ import { CiEdit } from "react-icons/ci";
 import { NavLink } from "react-router-dom";
 import getUserFromToken from "../utils/getUserFromToken";
 
-const  PayrollTable = () => {
+const PayrollTable = () => {
   const userInfo = getUserFromToken();
-  const [employee, setEmployee] = useState(
-    userInfo.role === "Employee" || userInfo.role === "employee"
-      ? userInfo.id
-      : ""
-  );
+  const [employee, setEmployee] = useState("");
   const [payroll, setPayroll] = useState([]);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
   const [loader, setLoader] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
@@ -28,11 +22,7 @@ const  PayrollTable = () => {
   }, []);
 
   useEffect(() => {
-    if (employee) {
       fetchPayroll();
-    } else {
-      setPayroll([]);
-    }
   }, [page, employee]);
 
   const fetchEmployees = async () => {
@@ -53,19 +43,21 @@ const  PayrollTable = () => {
       }
     );
     const employeeName = await nameRes.json();
+    console.log(employeeName)
     return employeeName.success ? employeeName.data[0].name : "Unknown";
   };
 
   const fetchPayroll = async () => {
-  setLoader(true);
+    setLoader(true);
     const res = await fetch(
       `${process.env.REACT_APP_BACKEND_URL}/api/getAllPayroll?page=${page}&limit=${pageSize}&id=${employee}`
     );
     const response = await res.json();
+    console.log(response)
     if (response.success) {
-      setNoData(false)
-      if(response.result.length===0){
-        setNoData(true)
+      setNoData(false);
+      if (response.result.length === 0) {
+        setNoData(true);
       }
       const payrollWithEmployeeNames = await Promise.all(
         response.result.map(async (payroll) => {
@@ -76,6 +68,7 @@ const  PayrollTable = () => {
           };
         })
       );
+      console.log(payrollWithEmployeeNames)
       setPayroll(payrollWithEmployeeNames);
       setCount(response.count);
       setLoader(false);
@@ -126,25 +119,27 @@ const  PayrollTable = () => {
   return (
     <div className="relative">
       <div className="flex items-center">
-        
         <div className="text-2xl font-bold mx-2 my-8 px-4">Payroll</div>
       </div>
       <div className="flex justify-between">
-      <NavLink to="/payroll/addpayroll">
+        <NavLink to="/payroll/addpayroll">
           <button className="bg-blue-800 text-white p-3 m-5 text-sm rounded-lg">
             Add New
           </button>
         </NavLink>
-        
       </div>
-      {loader && <div className="absolute h-full w-full top-64  flex justify-center items-center"><div
-        class=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
-        role="status">
-        <span
-          class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
-          >Loading...</span
-        >
-      </div></div>}
+      {loader && (
+        <div className="absolute h-full w-full top-64  flex justify-center items-center">
+          <div
+            class=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+            role="status"
+          >
+            <span class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+              Loading...
+            </span>
+          </div>
+        </div>
+      )}
 
       {(userInfo.role === "Admin" || userInfo.role === "admin") && (
         <div className="w-full ">
@@ -188,7 +183,7 @@ const  PayrollTable = () => {
                   designation
                 </th>
                 <th scope="col" className="px-6 py-3 border-2 border-gray-300">
-                 salary
+                  salary
                 </th>
                 <th scope="col" className="px-6 py-3 border-2 border-gray-300">
                   Action
@@ -236,9 +231,11 @@ const  PayrollTable = () => {
           </table>
         </div>
       )}
-      {noData && <div className="text-center text-xl">
-            Currently! There are no Payroll in the storage.
-          </div>}
+      {noData && (
+        <div className="text-center text-xl">
+          Currently! There are no Payroll in the storage.
+        </div>
+      )}
       {payroll.length > 0 && (
         <div className="flex flex-col items-center my-10">
           <span className="text-sm text-black">
@@ -248,8 +245,7 @@ const  PayrollTable = () => {
             <span className="font-semibold text-black">
               {Math.min(startIndex + pageSize, count)}
             </span>{" "}
-            of <span className="font-semibold text-black">{count}</span>{" "}
-            Entries
+            of <span className="font-semibold text-black">{count}</span> Entries
           </span>
           <div className="inline-flex mt-2 xs:mt-0">
             <button
@@ -271,9 +267,8 @@ const  PayrollTable = () => {
           </div>
         </div>
       )}
-
     </div>
   );
 };
 
-export default  PayrollTable;
+export default PayrollTable;

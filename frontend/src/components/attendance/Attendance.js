@@ -29,11 +29,7 @@ const Attendance = () => {
   }, []);
 
   useEffect(() => {
-    if (employee) { 
       fetchAttendance();
-    } else {
-      setAttendance([]);
-    }
   }, [page, employee, startDate, endDate]);
 
   const fetchEmployees = async () => {

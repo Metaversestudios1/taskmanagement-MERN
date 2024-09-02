@@ -7,11 +7,7 @@ import getUserFromToken from "../utils/getUserFromToken";
 
 const Tasks = () => {
   const userInfo = getUserFromToken();
-  const [employee, setEmployee] = useState(
-    userInfo.role === "Employee" || userInfo.role === "employee"
-      ? userInfo.id
-      : ""
-  );
+  const [employee, setEmployee] = useState((userInfo.role === "employee" || userInfo.role === "Employee")?userInfo.id:"");
   const [tasks, setTasks] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -30,11 +26,7 @@ const Tasks = () => {
   }, []);
 
   useEffect(() => {
-    if (employee) {
       fetchTasks();
-    } else {
-      setTasks([]);
-    }
   }, [page, search, employee, startDate, endDate]);
 
   const fetchEmployees = async () => {
@@ -66,16 +58,31 @@ const Tasks = () => {
     );
     const response = await res.json();
     if (response.success) {
-      setNoData(false)
-      if(response.result.length===0){
-        setNoData(true)
+      setNoData(false);
+      if (response.result.length === 0) {
+        setNoData(true);
       }
-      
+
+      const fetchEmployeeName = async (id) => {
+        const nameRes = await fetch(
+          `${process.env.REACT_APP_BACKEND_URL}/api/getesingleemployee`,
+          {
+            method: "POST",
+            headers: { "Content-type": "application/json" },
+            body: JSON.stringify({ id }),
+          }
+        );
+        const employeeName = await nameRes.json();
+        return employeeName.success ? employeeName.data[0].name : "Unknown";
+      };
+
       const tasksWithProjectNames = await Promise.all(
         response.result.map(async (task) => {
           const projectName = await fetchProjectName(task.project_name);
+          const employeeName = await fetchEmployeeName(task.emp_id)
           return {
             ...task,
+            emp_id:employeeName,
             project_name: projectName,
           };
         })
@@ -83,7 +90,6 @@ const Tasks = () => {
 
       // Group tasks by date
       const groupedTasks = tasksWithProjectNames.reduce((acc, task) => {
-  
         if (!acc[task.date]) {
           acc[task.date] = [];
         }
@@ -165,7 +171,7 @@ const Tasks = () => {
   const startIndex = (page - 1) * pageSize;
 
   return (
-    <div className="relative"> 
+    <div className="relative">
       <div className="flex items-center">
         <div className="text-2xl font-bold mx-2 my-8 px-4 ">Tasks</div>
       </div>
@@ -190,14 +196,18 @@ const Tasks = () => {
           </>
         )}
       </div>
-      {loader && <div className="absolute h-full w-full  flex justify-center items-center"><div
-        class=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
-        role="status">
-        <span
-          class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
-          >Loading...</span
-        >
-      </div></div>}
+      {loader && (
+        <div className="absolute h-full w-full  flex justify-center items-center">
+          <div
+            class=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+            role="status"
+          >
+            <span class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+              Loading...
+            </span>
+          </div>
+        </div>
+      )}
 
       <div className="flex justify-center items-center flex-wrap">
         {(userInfo.role === "Admin" || userInfo.role === "admin") && (
@@ -279,6 +289,9 @@ const Tasks = () => {
                   Date
                 </th>
                 <th scope="col" className="px-6 py-3 border-2 border-gray-300">
+                  Employee Name
+                </th>
+                <th scope="col" className="px-6 py-3 border-2 border-gray-300">
                   Task name
                 </th>
                 <th scope="col" className="px-6 py-3 border-2 border-gray-300">
@@ -308,33 +321,39 @@ const Tasks = () => {
                 const taskList = tasks[date];
                 let totalTaskTimeForDate = 0;
                 let totalMinutesForDate = 0;
-                
+
                 taskList.map((task) => {
                   // Check if task_time is defined and follows the expected format
                   if (task.task_time) {
                     // Split the task time into hours and minutes
-                    const [hours, minutes] = task.task_time.split('.').map(Number);
-                
+                    const [hours, minutes] = task.task_time
+                      .split(".")
+                      .map(Number);
+
                     // Ensure hours and minutes are valid numbers
                     if (!isNaN(hours) && !isNaN(minutes)) {
                       // Add hours to the total time for the date
                       totalTaskTimeForDate += hours;
-                
+
                       // Add minutes to the total minutes for the date
                       totalMinutesForDate += minutes;
-                
+
                       // If total minutes exceed or equal to 60, convert them to hours
                       if (totalMinutesForDate >= 60) {
-                        totalTaskTimeForDate += Math.floor(totalMinutesForDate / 60);
+                        totalTaskTimeForDate += Math.floor(
+                          totalMinutesForDate / 60
+                        );
                         totalMinutesForDate = totalMinutesForDate % 60;
                       }
                     }
                   }
                 });
-                
+
                 // Format the total time with proper formatting, ensuring no NaN values
-                const formattedTotalTime = `${totalTaskTimeForDate}.${totalMinutesForDate < 10 ? '0' : ''}${totalMinutesForDate}`;
-                 return (
+                const formattedTotalTime = `${totalTaskTimeForDate}.${
+                  totalMinutesForDate < 10 ? "0" : ""
+                }${totalMinutesForDate}`;
+                return (
                   <React.Fragment key={date}>
                     {taskList.map((task, index) => (
                       <tr
@@ -349,6 +368,9 @@ const Tasks = () => {
                         </th>
                         <td className="px-6 py-4 border-2 border-gray-300">
                           {task.date}
+                        </td>
+                        <td className="px-6 py-4 border-2 border-gray-300">
+                          {task.emp_id}
                         </td>
                         <td className="px-6 py-4 border-2 border-gray-300">
                           {task.task_name}
@@ -369,32 +391,34 @@ const Tasks = () => {
                           {task.task_time} hours
                         </td>
                         <td className=" py-5  gap-1 border-2 border-l-0 border-r-0 border-t-0 border-gray-300">
-                        <div className="flex items-center justify-center">
-                          {userInfo.role === "employee" ||
-                          userInfo.role === "Employee" ? (
-                            <>
-                              <NavLink to={`/tasks/edittask/${task._id}`}>
-                                <CiEdit className="text-2xl cursor-pointer text-green-900" />
-                              </NavLink>
-                              <MdDelete
-                                onClick={(e) => handleDelete(e, task._id)}
-                                className="text-2xl cursor-pointer text-red-900"
-                              />
+                          <div className="flex items-center justify-center">
+                            {userInfo.role === "employee" ||
+                            userInfo.role === "Employee" ? (
+                              <>
+                                <NavLink to={`/tasks/edittask/${task._id}`}>
+                                  <CiEdit className="text-2xl cursor-pointer text-green-900" />
+                                </NavLink>
+                                <MdDelete
+                                  onClick={(e) => handleDelete(e, task._id)}
+                                  className="text-2xl cursor-pointer text-red-900"
+                                />
+                                <IoMdDownload
+                                  onClick={() =>
+                                    handleDownload(task?.attachment?.url)
+                                  }
+                                  className="cursor-pointer text-lg"
+                                />
+                              </>
+                            ) : (
                               <IoMdDownload
                                 onClick={() =>
                                   handleDownload(task?.attachment?.url)
                                 }
                                 className="cursor-pointer text-lg"
                               />
-                            </>
-                          ) : (
-                            <IoMdDownload
-                              onClick={() => handleDownload(task?.attachment?.url)}
-                              className="cursor-pointer text-lg"
-                            />
-                          )}
-                        </div>
-                      </td>
+                            )}
+                          </div>
+                        </td>
                       </tr>
                     ))}
 
@@ -420,9 +444,11 @@ const Tasks = () => {
       )}
       <br></br>
 
-{noData && <div className="text-center text-xl">
-            Currently! There are no Task in the storage.
-          </div>}
+      {noData && (
+        <div className="text-center text-xl">
+          Currently! There are no Task in the storage.
+        </div>
+      )}
       {tasks.length > 0 && (
         <div className="flex flex-col items-center my-10">
           <span className="text-sm text-black">
@@ -432,8 +458,7 @@ const Tasks = () => {
             <span className="font-semibold text-black">
               {Math.min(startIndex + pageSize, count)}
             </span>{" "}
-            of <span className="font-semibold text-black">{count}</span>{" "}
-            Entries
+            of <span className="font-semibold text-black">{count}</span> Entries
           </span>
           <div className="inline-flex mt-2 xs:mt-0">
             <button

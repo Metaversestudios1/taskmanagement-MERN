@@ -8,17 +8,9 @@ import { MdEvent } from "react-icons/md";
 import { IoSettingsOutline } from "react-icons/io5";
 import { GoTasklist } from "react-icons/go";
 import { MdOutlineAttachMoney } from "react-icons/md";
-import accessPermission from "./utils/accessPermission";
 const Sidebar = ({ sidebar }) => {
   const userInfo = getUserFromToken();
-  
-  // useEffect(()=>{
-  //   getroles()
-  // },[])
-  // const getroles =  (permission) => {
-  //   const roles =  accessPermission(permission);
-  //   return roles
-  // };
+
   const [openSubMenu, setOpenSubMenu] = useState({
     attendance: false,
     admin: false,
@@ -30,7 +22,6 @@ const Sidebar = ({ sidebar }) => {
       [menu]: !prev[menu],
     }));
   };
-
   return (
     <>
     <div className={`h-full bg-[#032e4e] flex-col   ${sidebar ? "hidden" : "flex"
@@ -197,7 +188,7 @@ const Sidebar = ({ sidebar }) => {
                         </li>*/}
                 </ul>
               )}
-              {(
+              {((userInfo.permissions.includes("Admin-permission")) && (userInfo.role === "Admin" || userInfo.role === "admin")) && (
                 <>
                   <li className="hs-accordion" id="users-accordion">
                     <button
@@ -404,7 +395,7 @@ const Sidebar = ({ sidebar }) => {
                   Tasks
                 </NavLink>
               </li>
-              {(
+              {((userInfo.permissions.includes("Payroll_permission")) && (userInfo.role === "Admin" || userInfo.role === "admin")) && (
                 <li className="transition-all duration-200 hover:scale-105">
                   <NavLink
                     to="/payroll"

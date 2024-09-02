@@ -10,7 +10,7 @@ const nodemailer = require('nodemailer');
 const path = require('path'); // Include the path module to handle file extensions
 const dotenv = require("dotenv");
 const cloudinary = require("cloudinary").v2;
-
+const Permission = require("../models/Permission");
 dotenv.config();
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -235,44 +235,60 @@ const getSingleEmployee = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const { email, password, role } = req.body;
+  const { email, password } = req.body;
   try {
     // Find user by email
-    if (!email || !password || !role) {
+    if (!email || !password) {
       return res
         .status(404)
         .json({ success: false, message: "Please provide all fields" });
     }
-    const user = await Employee.findOne({ email, role });
+    const user = await Employee.findOne({ email });
     if (!user) {
       return res
-      .status(404)
-      .json({ success: false, message: "Employee not found" });
+        .status(404)
+        .json({ success: false, message: "Employee not found" });
     }
     // Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res
         .status(400)
-        .json({ success: false, message: "Please enter Correct Password" });
+        .json({ success: false, message: "Incorrect password" });
     }
-    const rolename = await Role.findOne({ _id: user.role, deleted: null });
 
+    // Get the role of the user
+    const role = await Role.findOne({ _id: user.role, deleted: null });
+    if (!role) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Role not found" });
+    }
+    // Fetch permissions for the role
+    const permissions = await Promise.all(
+      role.permission.map(async (permId) => {
+        const perm = await Permission.findById({_id:permId});
+        return perm ? perm.permission : null;
+      })
+    );
+    console.log(permissions)
+
+    // Create token with role and permissions
     const token = jwt.sign(
-      { id: user._id, name: user.name, email: user.email, role: rolename.role , role_id: user.role},
+      { id: user._id, name: user.name, email: user.email, role: role.role, permissions },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
     const options = {
-      expires: new Date(Date.now() + 2592000000),
+      expires: new Date(Date.now() + 2592000000), // 30 days
       httpOnly: true,
       sameSite: "None",
     };
     res.cookie("token", token, options).json({
       success: true,
       token,
-      user,
+      user
     });
   } catch (err) {
     res
@@ -280,6 +296,7 @@ const login = async (req, res) => {
       .json({ success: false, message: "Server error: " + err.message });
   }
 };
+
 const logout = (req, res) => {
   req.session.destroy((err) => {
     if (err) {
