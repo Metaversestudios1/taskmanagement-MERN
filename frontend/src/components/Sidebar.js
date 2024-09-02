@@ -13,12 +13,12 @@ const Sidebar = ({ sidebar }) => {
   const userInfo = getUserFromToken();
   
   useEffect(()=>{
-    const getroles =  (permission) => {
-      const roles =  accessPermission(permission);
-      return roles
-    };
     getroles()
   },[])
+  const getroles =  (permission) => {
+    const roles =  accessPermission(permission);
+    return roles
+  };
   const [openSubMenu, setOpenSubMenu] = useState({
     attendance: false,
     admin: false,
