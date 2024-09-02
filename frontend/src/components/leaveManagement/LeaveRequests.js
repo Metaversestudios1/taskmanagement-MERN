@@ -40,7 +40,7 @@ const LeaveRequests = () => {
   }, [page, search, employee, startDate, endDate]);
 
   const fetchEmployees = async () => {
-    const res = await fetch(`http://localhost:3000/api/getemployee`);
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getemployee`);
     const response = await res.json();
     if (response.success) {
       setEmployees(response.result);
@@ -49,7 +49,7 @@ const LeaveRequests = () => {
 
   const fetchEmployeeName = async (id) => {
     const nameRes = await fetch(
-      `http://localhost:3000/api/getesingleemployee`,
+      `${process.env.REACT_APP_BACKEND_URL}/api/getesingleemployee`,
       {
         method: "POST",
         headers: { "Content-type": "application/json" },
@@ -63,7 +63,7 @@ const LeaveRequests = () => {
   const fetchLeaves = async () => {
     setLoader(true);
     const res = await fetch(
-      `http://localhost:3000/api/getAllLeave?page=${page}&limit=${pageSize}&id=${employee}&startDate=${startDate}&endDate=${endDate}`
+      `${process.env.REACT_APP_BACKEND_URL}/api/getAllLeave?page=${page}&limit=${pageSize}&id=${employee}&startDate=${startDate}&endDate=${endDate}`
     );
     const response = await res.json();
     if (response.success) {
@@ -97,7 +97,7 @@ const LeaveRequests = () => {
       if (count === 1) {
         leaveOne = false;
       }
-      const res = await fetch(`http://localhost:3000/api/deleteleave`, {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/deleteleave`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
@@ -135,7 +135,7 @@ const LeaveRequests = () => {
 
   const handleLeaveStatus = async (e, status, id) => {
     e.preventDefault();
-    const res = await fetch(`http://localhost:3000/api/updateLeaveStatus`, {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateLeaveStatus`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status, id }),
