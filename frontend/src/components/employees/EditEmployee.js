@@ -193,17 +193,16 @@ const EditEmployee = () => {
     setOldData({ ...oldData, photo: file });
   };
 
-  const handleDownload = (url) => {
-    if (!url) {
-      return window.alert("There is no Photo with this employee.");
+  const handleDownload = (photo) => {
+    if (!photo || !photo.url) {
+      return window.alert("There is no photo available for this employee.");
     }
-   
-    const urlemp = url.url;
-    console.log(urlemp);
-    const isImage = urlemp.match(/\.(jpeg|jpg|gif|png)$/) != null;
-
+  
+    const url = photo.url; // Ensure we are working with the URL string
+    const isImage = url.match(/\.(jpeg|jpg|gif|png)$/i);
+  
     if (isImage) {
-      window.open(url, "_blank");
+      window.open(url, "_blank"); // Open image in a new tab
     } else {
       const link = document.createElement("a");
       link.href = url;
@@ -213,6 +212,7 @@ const EditEmployee = () => {
       document.body.removeChild(link);
     }
   };
+  
 
   return (
     <>
@@ -338,10 +338,11 @@ const EditEmployee = () => {
               </label>
               {oldData?.photo?.url && (
   <IoMdEye
-    onClick={() => handleDownload(oldData?.photo)}
+    onClick={() => handleDownload(oldData.photo)}
     className="cursor-pointer text-lg"
   />
 )}
+
               <input
                 name="photo"
                 onChange={handleFileChange}
