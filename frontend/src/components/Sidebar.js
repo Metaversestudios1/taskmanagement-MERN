@@ -8,8 +8,14 @@ import { MdEvent } from "react-icons/md";
 import { IoSettingsOutline } from "react-icons/io5";
 import { GoTasklist } from "react-icons/go";
 import { MdOutlineAttachMoney } from "react-icons/md";
+import accessPermission from "./utils/accessPermission";
 const Sidebar = ({ sidebar }) => {
-  const  userInfo = getUserFromToken();
+  const getroles =  (permission) => {
+    const roles =  accessPermission(permission);
+    console.log(roles)
+    return roles
+  };
+  const userInfo = getUserFromToken();
   const [openSubMenu, setOpenSubMenu] = useState({
     attendance: false,
     admin: false,
@@ -37,7 +43,10 @@ const Sidebar = ({ sidebar }) => {
               href="/"
               aria-label="Brand"
             >
-              {(userInfo?.role==="employee" || userInfo?.role==="Employee") ? (userInfo?.name)?.charAt(0).toUpperCase() + (userInfo?.name)?.slice(1) : "Admin"}
+              {userInfo?.role === "employee" || userInfo?.role === "Employee"
+                ? userInfo?.name?.charAt(0).toUpperCase() +
+                  userInfo?.name?.slice(1)
+                : "Admin"}
             </a>
           </div>
           <nav
@@ -73,7 +82,10 @@ const Sidebar = ({ sidebar }) => {
                 </NavLink>
               </li>
 
-              <li className="hs-accordion transition-all duration-200 hover:scale-105" id="users-accordion">
+              <li
+                className="hs-accordion transition-all duration-200 hover:scale-105"
+                id="users-accordion"
+              >
                 <button
                   onClick={() => toggleSubMenu("attendance")}
                   type="button"
@@ -182,7 +194,7 @@ const Sidebar = ({ sidebar }) => {
                         </li>*/}
                 </ul>
               )}
-              {(userInfo?.role === "Admin" || userInfo?.role === "admin") &&  (
+              {(getroles("Admin-permission")) && (
                 <>
                   <li className="hs-accordion" id="users-accordion">
                     <button
@@ -218,142 +230,165 @@ const Sidebar = ({ sidebar }) => {
                     </button>
                   </li>
 
-                  {openSubMenu.admin && <ul>
-                    <li
-                      id="users-accordion"
-                      className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
-                    >
-                      <div className="hs-accordion" id="users-accordion-sub-1">
-                        <NavLink
-                          to="/employees"
-                          className={({ isActive }) =>
-                            isActive
-                              ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg ml-10 "
-                              : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg ml-10  hover:text-black hover:bg-white"
-                          }
-                        >
-                          Employee List
-                        </NavLink>
-                      </div>
-                    </li>
-                    <li
-                      id="users-accordion"
-                      className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
-                    >
-                      <div className="hs-accordion" id="users-accordion-sub-1">
-                        <NavLink
-                          to="/employees/addemployee"
-                          className={({ isActive }) =>
-                            isActive
-                              ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg ml-10 "
-                              : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg ml-10  hover:text-black hover:bg-white"
-                          }
-                        >
-                          Add Employee
-                        </NavLink>
-                      </div>
-                    </li>
-                    <li
-                      id="users-accordion"
-                      className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
-                    >
-                      <div className="hs-accordion" id="users-accordion-sub-1">
-                        <NavLink
-                          to="/rolestable"
-                          className={({ isActive }) =>
-                            isActive
-                              ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg ml-10 "
-                              : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg ml-10  hover:text-black hover:bg-white"
-                          }
-                        >
-                          Role List
-                        </NavLink>
-                      </div>
-                    </li>
-                    <li
-                      id="users-accordion"
-                      className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
-                    >
-                      <div className="hs-accordion" id="users-accordion-sub-1">
-                        <NavLink
-                          to="/rolestable/addroles"
-                          className={({ isActive }) =>
-                            isActive
-                              ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg ml-10 "
-                              : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg ml-10  hover:text-black hover:bg-white"
-                          }
-                        >
-                          Add Role
-                        </NavLink>
-                      </div>
-                    </li>
-                    <li
-                      id="users-accordion"
-                      className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
-                    >
-                      <div className="hs-accordion" id="users-accordion-sub-1">
-                        <NavLink
-                          to="/permissionstable"
-                          className={({ isActive }) =>
-                            isActive
-                              ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg ml-10 "
-                              : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg ml-10  hover:text-black hover:bg-white"
-                          }
-                        >
-                          Permission List
-                        </NavLink>
-                      </div>
-                    </li>
-                    <li
-                      id="users-accordion"
-                      className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
-                    >
-                      <div className="hs-accordion" id="users-accordion-sub-1">
-                        <NavLink
-                          to="/permissionstable/addpermission"
-                          className={({ isActive }) =>
-                            isActive
-                              ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg ml-10 "
-                              : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg ml-10  hover:text-black hover:bg-white"
-                          }
-                        >
-                          Add Permission
-                        </NavLink>
-                      </div>
-                    </li>
-                    <li className="transition-all duration-200 hover:scale-110">
-                      <NavLink
-                        to="/projects"
-                        className={({ isActive }) =>
-                          isActive
-                            ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg ml-10 "
-                            : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg ml-10  hover:text-black hover:bg-white"
-                        }
+                  {openSubMenu.admin && (
+                    <ul>
+                      <li
+                        id="users-accordion"
+                        className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
                       >
-                        Projects
-                      </NavLink>
-                    </li>
-                    <li
-                      id="users-accordion"
-                      className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
-                    >
-                      <div className="hs-accordion" id="users-accordion-sub-1">
+                        <div
+                          className="hs-accordion"
+                          id="users-accordion-sub-1"
+                        >
+                          <NavLink
+                            to="/employees"
+                            className={({ isActive }) =>
+                              isActive
+                                ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg ml-10 "
+                                : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg ml-10  hover:text-black hover:bg-white"
+                            }
+                          >
+                            Employee List
+                          </NavLink>
+                        </div>
+                      </li>
+                      <li
+                        id="users-accordion"
+                        className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
+                      >
+                        <div
+                          className="hs-accordion"
+                          id="users-accordion-sub-1"
+                        >
+                          <NavLink
+                            to="/employees/addemployee"
+                            className={({ isActive }) =>
+                              isActive
+                                ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg ml-10 "
+                                : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg ml-10  hover:text-black hover:bg-white"
+                            }
+                          >
+                            Add Employee
+                          </NavLink>
+                        </div>
+                      </li>
+                      <li
+                        id="users-accordion"
+                        className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
+                      >
+                        <div
+                          className="hs-accordion"
+                          id="users-accordion-sub-1"
+                        >
+                          <NavLink
+                            to="/rolestable"
+                            className={({ isActive }) =>
+                              isActive
+                                ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg ml-10 "
+                                : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg ml-10  hover:text-black hover:bg-white"
+                            }
+                          >
+                            Role List
+                          </NavLink>
+                        </div>
+                      </li>
+                      <li
+                        id="users-accordion"
+                        className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
+                      >
+                        <div
+                          className="hs-accordion"
+                          id="users-accordion-sub-1"
+                        >
+                          <NavLink
+                            to="/rolestable/addroles"
+                            className={({ isActive }) =>
+                              isActive
+                                ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg ml-10 "
+                                : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg ml-10  hover:text-black hover:bg-white"
+                            }
+                          >
+                            Add Role
+                          </NavLink>
+                        </div>
+                      </li>
+                      <li
+                        id="users-accordion"
+                        className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
+                      >
+                        <div
+                          className="hs-accordion"
+                          id="users-accordion-sub-1"
+                        >
+                          <NavLink
+                            to="/permissionstable"
+                            className={({ isActive }) =>
+                              isActive
+                                ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg ml-10 "
+                                : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg ml-10  hover:text-black hover:bg-white"
+                            }
+                          >
+                            Permission List
+                          </NavLink>
+                        </div>
+                      </li>
+                      <li
+                        id="users-accordion"
+                        className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
+                      >
+                        <div
+                          className="hs-accordion"
+                          id="users-accordion-sub-1"
+                        >
+                          <NavLink
+                            to="/permissionstable/addpermission"
+                            className={({ isActive }) =>
+                              isActive
+                                ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg ml-10 "
+                                : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg ml-10  hover:text-black hover:bg-white"
+                            }
+                          >
+                            Add Permission
+                          </NavLink>
+                        </div>
+                      </li>
+                      <li className="transition-all duration-200 hover:scale-110">
                         <NavLink
-                          to="/projects/addproject"
+                          to="/projects"
                           className={({ isActive }) =>
                             isActive
                               ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg ml-10 "
                               : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg ml-10  hover:text-black hover:bg-white"
                           }
                         >
-                          Add Project
+                          Projects
                         </NavLink>
-                      </div>
-                    </li>
-                  </ul>}
+                      </li>
+                      <li
+                        id="users-accordion"
+                        className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
+                      >
+                        <div
+                          className="hs-accordion"
+                          id="users-accordion-sub-1"
+                        >
+                          <NavLink
+                            to="/projects/addproject"
+                            className={({ isActive }) =>
+                              isActive
+                                ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg ml-10 "
+                                : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg ml-10  hover:text-black hover:bg-white"
+                            }
+                          >
+                            Add Project
+                          </NavLink>
+                        </div>
+                      </li>
+                    </ul>
+                  )}
                 </>
               )}
-              <li className = "transition-all duration-200 hover:scale-105">
+              <li className="transition-all duration-200 hover:scale-105">
                 <NavLink
                   to="/tasks"
                   className={({ isActive }) =>
@@ -366,20 +401,22 @@ const Sidebar = ({ sidebar }) => {
                   Tasks
                 </NavLink>
               </li>
-              {(userInfo?.role==="Admin" || userInfo?.role==="admin") &&  <li className = "transition-all duration-200 hover:scale-105">
-                <NavLink
-                  to="/payroll"
-                  className={({ isActive }) =>
-                    isActive
-                      ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg"
-                      : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg hover:text-black hover:bg-white"
-                  }
-                >
-                  <MdOutlineAttachMoney className="text-lg" />
-                  Payroll Management
-                </NavLink>
-              </li>}
-              <li className = "transition-all duration-200 hover:scale-105">
+              {(getroles("Payroll_permission")) && (
+                <li className="transition-all duration-200 hover:scale-105">
+                  <NavLink
+                    to="/payroll"
+                    className={({ isActive }) =>
+                      isActive
+                        ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg"
+                        : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg hover:text-black hover:bg-white"
+                    }
+                  >
+                    <MdOutlineAttachMoney className="text-lg" />
+                    Payroll Management
+                  </NavLink>
+                </li>
+              )}
+              <li className="transition-all duration-200 hover:scale-105">
                 <NavLink
                   to="/holiday"
                   className={({ isActive }) =>
@@ -392,20 +429,20 @@ const Sidebar = ({ sidebar }) => {
                   Holiday
                 </NavLink>
               </li>
-              <li className = "transition-all duration-200 hover:scale-105">
-              <NavLink
-                to="/activity"
-                className={({ isActive }) =>
-                  isActive
-                    ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg"
-                    : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg hover:text-black hover:bg-white"
-                }
-              >
-                <MdEvent className="text-lg" />
-                Activity
-              </NavLink>
-            </li>
-              <li className = "transition-all duration-200 hover:scale-105">
+              <li className="transition-all duration-200 hover:scale-105">
+                <NavLink
+                  to="/activity"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg"
+                      : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg hover:text-black hover:bg-white"
+                  }
+                >
+                  <MdEvent className="text-lg" />
+                  Activity
+                </NavLink>
+              </li>
+              <li className="transition-all duration-200 hover:scale-105">
                 <NavLink
                   to="/setting"
                   className={({ isActive }) =>

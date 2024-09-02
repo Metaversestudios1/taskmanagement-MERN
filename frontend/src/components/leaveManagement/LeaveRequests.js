@@ -15,7 +15,10 @@ const LeaveRequests = () => {
   const [leaves, setLeaves] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [loader, setLoader] = useState(true);
+  const [loader, setLoader] = useState(userInfo.role === "Employee" || userInfo.role === "employee"
+    ? true
+    : false);
+    const [noData, setNoData] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [count, setCount] = useState(0);
@@ -37,7 +40,7 @@ const LeaveRequests = () => {
   }, [page, search, employee, startDate, endDate]);
 
   const fetchEmployees = async () => {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getemployee`);
+    const res = await fetch(`http://localhost:3000/api/getemployee`);
     const response = await res.json();
     if (response.success) {
       setEmployees(response.result);
@@ -46,7 +49,7 @@ const LeaveRequests = () => {
 
   const fetchEmployeeName = async (id) => {
     const nameRes = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/getesingleemployee`,
+      `http://localhost:3000/api/getesingleemployee`,
       {
         method: "POST",
         headers: { "Content-type": "application/json" },
@@ -60,10 +63,15 @@ const LeaveRequests = () => {
   const fetchLeaves = async () => {
     setLoader(true);
     const res = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/getAllLeave?page=${page}&limit=${pageSize}&id=${employee}&startDate=${startDate}&endDate=${endDate}`
+      `http://localhost:3000/api/getAllLeave?page=${page}&limit=${pageSize}&id=${employee}&startDate=${startDate}&endDate=${endDate}`
     );
     const response = await res.json();
     if (response.success) {
+      setNoData(false)
+      if(response.result.length===0){
+
+        setNoData(true)
+      }
       const leavesWithEmployeeNames = await Promise.all(
         response.result.map(async (leave) => {
           const employee_name = await fetchEmployeeName(leave.emp_id);
@@ -89,7 +97,7 @@ const LeaveRequests = () => {
       if (count === 1) {
         leaveOne = false;
       }
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/deleteleave`, {
+      const res = await fetch(`http://localhost:3000/api/deleteleave`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
@@ -127,7 +135,7 @@ const LeaveRequests = () => {
 
   const handleLeaveStatus = async (e, status, id) => {
     e.preventDefault();
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateLeaveStatus`, {
+    const res = await fetch(`http://localhost:3000/api/updateLeaveStatus`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status, id }),
@@ -141,7 +149,7 @@ const LeaveRequests = () => {
   const startIndex = (page - 1) * pageSize;
 
   return (
-    <div className="">
+    <div className="relative">
       <div className="flex items-center">
         <div className="text-2xl font-bold mx-2 my-8 px-4">Leave Requests</div>
       </div>
@@ -223,7 +231,15 @@ const LeaveRequests = () => {
           </button>
         </div>
       </div>
-      {leaves.length > 0 ? (
+      {loader && <div className="absolute h-full w-full top-64 flex justify-center items-center"><div
+        className=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+        role="status">
+        <span
+          className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+          >Loading...</span
+        >
+      </div></div>}
+      {leaves.length > 0 && (
         <div className="relative overflow-x-auto m-5 mb-0">
           <table className="w-full text-sm text-left rtl:text-right border-2 border-gray-300">
             <thead className="text-xs text uppercase bg-gray-200">
@@ -335,11 +351,10 @@ const LeaveRequests = () => {
             </tbody>
           </table>
         </div>
-      ) : (
-        !loader && (
-          <div className="m-8 flex justify-center">No leaves Found</div>
-        )
       )}
+      {noData && <div className="text-center text-xl my-10">
+        Currently! There are no Attendance for the user.
+      </div>}
       {leaves.length > 0 && (
         <div className="flex flex-col items-center my-10">
           <span className="text-sm text-black">
