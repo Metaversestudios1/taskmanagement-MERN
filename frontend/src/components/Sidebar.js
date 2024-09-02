@@ -194,7 +194,7 @@ const Sidebar = ({ sidebar }) => {
                         </li>*/}
                 </ul>
               )}
-              {(getroles("Admin-permission")) && (
+              {(getroles("Admin_permission")) && (
                 <>
                   <li className="hs-accordion" id="users-accordion">
                     <button
