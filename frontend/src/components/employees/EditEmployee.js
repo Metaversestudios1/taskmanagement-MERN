@@ -5,7 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import $ from "jquery";
 import "jquery-validation"; // Import the validation plugin
-
+import { IoMdEye } from "react-icons/io";
 const EditEmployee = () => {
   const [loader, setLoader] = useState(false);
   const [roles, setRoles] = useState([]);
@@ -41,6 +41,7 @@ const EditEmployee = () => {
             email: result.data[0]?.email,
             contact_number: result.data[0]?.contact_number,
             role: result.data[0]?.role,
+            photo: result.data[0]?.photo.url,
           });
         } else {
           console.error("No data found for the given parameter.");
@@ -192,6 +193,24 @@ const EditEmployee = () => {
     setOldData({ ...oldData, photo: file });
   };
 
+  const handleDownload = (url) => {
+    if (!url) {
+      return window.alert("There is no Photo with this employee.");
+    }
+    const isImage = url.match(/\.(jpeg|jpg|gif|png)$/) != null;
+
+    if (isImage) {
+      window.open(url, "_blank");
+    } else {
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = url.substring(url.lastIndexOf("/") + 1);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   return (
     <>
       <div className="flex items-center relative">
@@ -314,6 +333,12 @@ const EditEmployee = () => {
               >
                 Profile Picture
               </label>
+              {oldData?.photo && (
+  <IoMdEye
+    onClick={() => handleDownload(oldData?.photo)}
+    className="cursor-pointer text-lg"
+  />
+)}
               <input
                 name="photo"
                 onChange={handleFileChange}
