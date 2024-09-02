@@ -41,7 +41,7 @@ const EditEmployee = () => {
             email: result.data[0]?.email,
             contact_number: result.data[0]?.contact_number,
             role: result.data[0]?.role,
-            photo: result.data[0]?.photo.url,
+            photo: result.data[0]?.photo,
           });
         } else {
           console.error("No data found for the given parameter.");
@@ -333,7 +333,7 @@ const EditEmployee = () => {
               >
                 Profile Picture
               </label>
-              {oldData?.photo && (
+              {oldData?.photo?.url && (
   <IoMdEye
     onClick={() => handleDownload(oldData?.photo)}
     className="cursor-pointer text-lg"
