@@ -197,8 +197,9 @@ const EditEmployee = () => {
     if (!url) {
       return window.alert("There is no Photo with this employee.");
     }
-    console.log(url);
-    const urlemp = url.url
+   
+    const urlemp = url.url;
+    console.log(urlemp);
     const isImage = urlemp.match(/\.(jpeg|jpg|gif|png)$/) != null;
 
     if (isImage) {
