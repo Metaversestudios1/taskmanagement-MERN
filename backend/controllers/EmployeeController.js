@@ -259,7 +259,7 @@ const login = async (req, res) => {
     const rolename = await Role.findOne({ _id: user.role, deleted: null });
 
     const token = jwt.sign(
-      { id: user._id, name: user.name, email: user.email, role: rolename.role },
+      { id: user._id, name: user.name, email: user.email, role: rolename.role , role_id: user.role},
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
