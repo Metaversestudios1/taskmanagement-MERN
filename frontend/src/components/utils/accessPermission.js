@@ -66,6 +66,7 @@ const accessPermission = (requiredPermission) => {
   if (permissions && Array.isArray(permissions) && permissions.includes(requiredPermission)) {
     return true;  // Return true if permission is found
   } else {
+    
     return false;  // Return false if permission is not found
   }
 };
