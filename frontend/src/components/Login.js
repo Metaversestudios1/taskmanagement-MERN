@@ -16,6 +16,7 @@ const Login = () => {
   const [role, setRole] = useState("");
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loader, setLoader] = useState(false);
   const [roles, setRoles] = useState([]);
   const [passEye, setPassEye] = useState("");
   const { setAuth } = useContext(AuthContext);
@@ -103,6 +104,7 @@ const Login = () => {
       if (!validateLoginForm()) {
         return;
       }
+      setLoader(true);
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/login`, {
         method: "POST",
         headers: {
@@ -113,6 +115,7 @@ const Login = () => {
       });
       const response = await res.json();
       if (response.success) {
+        setLoader(false);
         setError("")
         toast.success("You are logged in Successfully!", {
           position: "top-right",
@@ -151,7 +154,7 @@ const Login = () => {
         theme="light"
       />
       {!loading && (
-        <div className="font-[sans-serif]">
+        <div className="font-[sans-serif] relative">
           <div className="min-h-screen flex flex-col items-center justify-center">
             <div className="grid md:grid-cols-2 items-center gap-4 max-md:gap-8 max-w-6xl max-md:max-w-lg w-full p-4 m-4 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] rounded-md">
               <div className="md:max-w-md w-full px-4 py-4">
@@ -161,7 +164,14 @@ const Login = () => {
                       Log In
                     </h3>
                   </div>
-
+                  {loader && <div className="absolute h-full w-full top-64  flex justify-center items-center"><div
+        className=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+        role="status">
+        <span
+          className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+          >Loading...</span
+        >
+      </div></div>}
                   {/* Email Field */}
                   <div className="mb-6">
                     <label className="text-gray-800 text-xs block mb-2">
