@@ -208,7 +208,7 @@ const Tasks = () => {
               onChange={handleChange}
               className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block  p-2.5 m-auto"
             >
-              <option value="">Select an employee for attendance.</option>
+              <option value="">Select an employee for tasks.</option>
               {employees.map((item) => (
                 <option
                   key={item._id}
