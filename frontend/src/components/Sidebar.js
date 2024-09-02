@@ -12,13 +12,13 @@ import accessPermission from "./utils/accessPermission";
 const Sidebar = ({ sidebar }) => {
   const userInfo = getUserFromToken();
   
-  useEffect(()=>{
-    getroles()
-  },[])
-  const getroles =  (permission) => {
-    const roles =  accessPermission(permission);
-    return roles
-  };
+  // useEffect(()=>{
+  //   getroles()
+  // },[])
+  // const getroles =  (permission) => {
+  //   const roles =  accessPermission(permission);
+  //   return roles
+  // };
   const [openSubMenu, setOpenSubMenu] = useState({
     attendance: false,
     admin: false,
@@ -197,7 +197,7 @@ const Sidebar = ({ sidebar }) => {
                         </li>*/}
                 </ul>
               )}
-              {(getroles("Admin_permission")) && (
+              {(
                 <>
                   <li className="hs-accordion" id="users-accordion">
                     <button
@@ -404,7 +404,7 @@ const Sidebar = ({ sidebar }) => {
                   Tasks
                 </NavLink>
               </li>
-              {(getroles("Payroll_permission")) && (
+              {(
                 <li className="transition-all duration-200 hover:scale-105">
                   <NavLink
                     to="/payroll"
