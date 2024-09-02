@@ -33,11 +33,11 @@ const Sidebar = ({ sidebar }) => {
 
   return (
     <>
-      <div className="h-full bg-[#032e4e] flex flex-col">
+    <div className={`h-full bg-[#032e4e] flex-col   ${sidebar ? "hidden" : "flex"
+      } md:block`}>
         <div
           id="docs-sidebar"
-          className={`hs-overlay [--auto-close:lg] start-0 z-[60] w-64 border-gray-200 pt-7 pb-10 overflow-y-auto sidebar ${
-            sidebar ? "open1" : "hidden1"
+          className={`hs-overlay [--auto-close:lg] start-0 z-[60] w-64 border-gray-200 pt-7 pb-10 overflow-y-auto sidebar
           }`}
         >
           <div className="px-6">
