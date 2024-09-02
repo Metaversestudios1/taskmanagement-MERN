@@ -15,7 +15,6 @@ const Sidebar = ({ sidebar }) => {
   useEffect(()=>{
     const getroles =  (permission) => {
       const roles =  accessPermission(permission);
-      console.log(roles)
       return roles
     };
     getroles()

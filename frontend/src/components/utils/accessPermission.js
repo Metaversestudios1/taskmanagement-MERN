@@ -56,7 +56,6 @@ const accessPermission = (requiredPermission) => {
   const { role_id } = getUserFromToken();
 
   if (!role_id) {
-    console.error("Invalid role ID."); // If no valid role ID, exit
     return false;
   }
 
@@ -67,7 +66,6 @@ const accessPermission = (requiredPermission) => {
   if (permissions && Array.isArray(permissions) && permissions.includes(requiredPermission)) {
     return true;  // Return true if permission is found
   } else {
-    console.warn(`Permission "${requiredPermission}" not found.`);
     return false;  // Return false if permission is not found
   }
 };
