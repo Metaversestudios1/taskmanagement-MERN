@@ -174,6 +174,9 @@ const Employees = () => {
                   Sr no.
                 </th>
                 <th scope="col" className="px-6 py-3 border-2 border-gray-300">
+                  Profile Photo
+                </th>
+                <th scope="col" className="px-6 py-3 border-2 border-gray-300">
                   Full name
                 </th>
                 <th scope="col" className="px-6 py-3 border-2 border-gray-300">
@@ -185,9 +188,7 @@ const Employees = () => {
                 <th scope="col" className="px-6 py-3 border-2 border-gray-300">
                   Email
                 </th>
-                <th scope="col" className="px-6 py-3 border-2 border-gray-300">
-                  Profile Photo
-                </th>
+                
                 <th scope="col" className="px-6 py-3 border-2 border-gray-300">
                   Created At
                 </th>
@@ -200,6 +201,25 @@ const Employees = () => {
             <tbody>
               {users.map((item, index) => (
                 <tr key={item?._id} className="bg-white">
+                   <td className="px-6 py-4 border-2 border-gray-300">
+                  {item?.photo?.url ? (
+                    <img
+                      src={item.photo.url}
+                      alt="Profile"
+                      className="w-12 h-12 rounded-full object-cover aspect-square"
+                    />
+                  ) : (
+                    <span className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-200 text-gray-600 aspect-square">
+                      {item?.email ? (
+                        <span className="text-xl">
+                          {item.email.charAt(0).toUpperCase()}
+                        </span>
+                      ) : (
+                        <span className="text-xl">📷</span>
+                      )}
+                    </span>
+                  )}
+                  </td>
                   <th
                     scope="row"
                     className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap border-2 border-gray-300"
