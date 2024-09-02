@@ -15,7 +15,7 @@ const Tasks = () => {
   const [tasks, setTasks] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [loader, setLoader] = useState(true);
+  const [loader, setLoader] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [count, setCount] = useState(0);
