@@ -101,7 +101,23 @@ const Employees = () => {
       setPage(1);
     }
   };
+  const handleDownload = (url) => {
+    if (!url) {
+      return window.alert("There is no Photo with this employee.");
+    }
+    const isImage = url.match(/\.(jpeg|jpg|gif|png)$/) != null;
 
+    if (isImage) {
+      window.open(url, "_blank");
+    } else {
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = url.substring(url.lastIndexOf("/") + 1);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
   const startIndex = (page - 1) * pageSize;
 
   return (
