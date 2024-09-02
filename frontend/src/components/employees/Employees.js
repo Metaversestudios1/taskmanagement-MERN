@@ -201,7 +201,14 @@ const Employees = () => {
             <tbody>
               {users.map((item, index) => (
                 <tr key={item?._id} className="bg-white">
-                   <td className="px-6 py-4 border-2 border-gray-300">
+                 
+                  <th
+                    scope="row"
+                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap border-2 border-gray-300"
+                  >
+                    {startIndex + index + 1}
+                  </th>
+                  <td className="px-6 py-4 border-2 border-gray-300">
                   {item?.photo?.url ? (
                     <img
                       src={item.photo.url}
@@ -224,25 +231,12 @@ const Employees = () => {
                     scope="row"
                     className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap border-2 border-gray-300"
                   >
-                    {startIndex + index + 1}
-                  </th>
-                  <th
-                    scope="row"
-                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap border-2 border-gray-300"
-                  >
                     {item?.name}
                   </th>
                   <td className="px-6 py-4 border-2 border-gray-300">{item?.role}</td>
                   <td className="px-6 py-4 border-2 border-gray-300">{item?.contact_number}</td>
                   <td className="px-6 py-4 border-2 border-gray-300">{item?.email}</td>
-                  <td className="px-6 py-4 border-2 border-gray-300">
-                  <IoMdEye
-                                onClick={() =>
-                                  handleDownload(item?.photo?.url)
-                                }
-                                className="cursor-pointer text-lg"
-                              />
-                              </td>
+                 
                   <td className="px-6 py-4 border-2 border-gray-300">
                     {item?.createdAt?.split("T")[0]}
                   </td>
