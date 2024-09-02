@@ -7,8 +7,9 @@ const Home = () => {
   const [todayTasks, setTodayTasks] = useState(0);
   const [totalProjects, setTotalProjects] = useState(0);
   const [totalTasks, setTotalTasks] = useState(0);
-
+  const [loader, setLoader] = useState(false);
   useEffect(() => {
+    setLoader(true);
     fetchProjectCount();
     fetchUsersCount();
     fetchTodayTasksCount();
@@ -19,21 +20,26 @@ const Home = () => {
     const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getprojectcount`);
     const response = await res.json();
     setTotalProjects(response.count);
+    setLoader(false);
+   
   };
   const fetchUsersCount = async () => {
     const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getemployeecount`);
     const response = await res.json();
     setTotalUsers(response.count);
+    setLoader(false);
   };
   const fetchTodayTasksCount = async () => {
     const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/gettodaystask`);
     const response = await res.json();
     setTodayTasks(response.count);
+    setLoader(false);
   };
   const fetchTotalTasks = async () => {
     const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/gettotaltasks?id=${userInfo?.id}`);
     const response = await res.json();
     setTotalTasks(response)
+    setLoader(false);
   };
   return (
     <div>

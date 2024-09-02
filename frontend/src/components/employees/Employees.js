@@ -4,6 +4,7 @@ import { CiEdit } from "react-icons/ci";
 import { NavLink } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { IoMdDownload } from "react-icons/io";
 const Employees = () => {
   const [users, setUsers] = useState([]);
   const [noData, setNoData] = useState(false);
@@ -169,6 +170,9 @@ const Employees = () => {
                   Email
                 </th>
                 <th scope="col" className="px-6 py-3 border-2 border-gray-300">
+                  Profile Photo
+                </th>
+                <th scope="col" className="px-6 py-3 border-2 border-gray-300">
                   Created At
                 </th>
                 <th scope="col" className="px-6 py-3 border-2 border-gray-300">
@@ -195,6 +199,14 @@ const Employees = () => {
                   <td className="px-6 py-4 border-2 border-gray-300">{item?.role}</td>
                   <td className="px-6 py-4 border-2 border-gray-300">{item?.contact_number}</td>
                   <td className="px-6 py-4 border-2 border-gray-300">{item?.email}</td>
+                  <td className="px-6 py-4 border-2 border-gray-300">
+                  <IoMdDownload
+                                onClick={() =>
+                                  handleDownload(item?.photo?.url)
+                                }
+                                className="cursor-pointer text-lg"
+                              />
+                              </td>
                   <td className="px-6 py-4 border-2 border-gray-300">
                     {item?.createdAt?.split("T")[0]}
                   </td>

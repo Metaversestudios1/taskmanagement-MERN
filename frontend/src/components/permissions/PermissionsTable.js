@@ -133,7 +133,7 @@ const PermissionsTable = () => {
             <th scope="col" className="px-6 py-3 border-2 border-gray-300">
               Permission
             </th>
-            <th scope="col" className="px-6 py-3 border-2 border-gray-300">
+            <th scope="col" className="px-6 py-3 border-2 border-gray-300 hidden">
               Action
             </th>
           </tr>
@@ -155,7 +155,7 @@ const PermissionsTable = () => {
                 >
                   {item?.permission}
                 </th>
-                <td className="py-5  pl-5 gap-1 border-2  border-gray-300">
+                <td className="py-5  pl-5 gap-1 border-2  border-gray-300 hidden">
                   <div className="flex items-center">
                   <NavLink to={`/permissionstable/editpermission/${item._id}`}>
                     <CiEdit className="text-2xl cursor-pointer text-green-900" />

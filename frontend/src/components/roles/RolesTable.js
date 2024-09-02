@@ -162,7 +162,7 @@ const RolesTable = () => {
                 <th scope="col" className="px-6 py-3 border-2 border-gray-300">
                   Permission
                 </th>
-                <th scope="col" className="px-6 py-3 border-2 border-gray-300">
+                <th scope="col" className="px-6 py-3 border-2 border-gray-300 hidden">
                   Action
                 </th>
               </tr>
@@ -186,7 +186,7 @@ const RolesTable = () => {
                     </th>
                     <td className="px-6 py-4 border-2 border-gray-300">{(item?.permission).join(", ")} </td>
 
-                    <td className="py-5 pl-5 gap-1 border-2  border-gray-300">
+                    <td className="py-5 pl-5 gap-1 border-2  border-gray-300 hidden">
                     <div className="flex items-center">
                      { /*<a href="/">
                         <GrFormView className="text-3xl cursor-pointer text-yellow-700" />
