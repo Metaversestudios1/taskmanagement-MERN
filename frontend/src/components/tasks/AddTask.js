@@ -33,6 +33,7 @@ const AddTask = () => {
 
   const [projects, setProjects] = useState([]);
   const [data, setData] = useState(initialState);
+  const [loader, setLoader] = useState(false);
 
   useEffect(() => {
     fetchProjects();
@@ -133,7 +134,7 @@ const AddTask = () => {
       // setError("Please fill in all required fields.");
         return;
       }
-  
+  setLoader(true);
     // if (!validTime(data.task_time)) {
     //   toast.error(
     //     "Task time should be between 1 and 3, and rounded figures like 1.3 or 1.30 are acceptable.",
@@ -161,6 +162,7 @@ const AddTask = () => {
 
     const response = await res.json();
     if (response.success) {
+      setLoader(false);
       toast.success("New Task is added Successfully!", {
         position: "top-right",
         autoClose: 1000,
@@ -183,7 +185,7 @@ const AddTask = () => {
 
   return (
     <>
-      <div className="flex items-center ">
+      <div className="flex items-center relative ">
         <ToastContainer
           position="top-right"
           autoClose={2000}
@@ -206,6 +208,14 @@ const AddTask = () => {
           
           <div className="text-2xl font-bold mx-2 my-8 px-4">Add Task</div>
         </div>
+        {loader && <div className="absolute h-full w-full top-64  flex justify-center items-center"><div
+        class=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+        role="status">
+        <span
+          class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+          >Loading...</span
+        >
+      </div></div>}
       </div>
 
       <div className="w-[70%] m-auto my-10">

@@ -14,11 +14,12 @@ const  PayrollTable = () => {
   const [payroll, setPayroll] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [loader, setLoader] = useState(true);
+  const [loader, setLoader] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [count, setCount] = useState(0);
   const [employees, setEmployees] = useState([]);
+  const [noData, setNoData] = useState(false);
 
   useEffect(() => {
     if (userInfo.role === "Admin" || userInfo.role === "admin") {
@@ -56,12 +57,16 @@ const  PayrollTable = () => {
   };
 
   const fetchPayroll = async () => {
-    setLoader(true);
+  setLoader(true);
     const res = await fetch(
       `${process.env.REACT_APP_BACKEND_URL}/api/getAllPayroll?page=${page}&limit=${pageSize}&id=${employee}`
     );
     const response = await res.json();
     if (response.success) {
+      setNoData(false)
+      if(response.result.length===0){
+        setNoData(true)
+      }
       const payrollWithEmployeeNames = await Promise.all(
         response.result.map(async (payroll) => {
           const employee_name = await fetchEmployeeName(payroll.emp_id);
@@ -119,7 +124,7 @@ const  PayrollTable = () => {
   const startIndex = (page - 1) * pageSize;
 
   return (
-    <div className="">
+    <div className="relative">
       <div className="flex items-center">
         
         <div className="text-2xl font-bold mx-2 my-8 px-4">Payroll</div>
@@ -132,6 +137,14 @@ const  PayrollTable = () => {
         </NavLink>
         
       </div>
+      {loader && <div className="absolute h-full w-full top-64  flex justify-center items-center"><div
+        class=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+        role="status">
+        <span
+          class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+          >Loading...</span
+        >
+      </div></div>}
 
       {(userInfo.role === "Admin" || userInfo.role === "admin") && (
         <div className="w-full ">
@@ -160,7 +173,7 @@ const  PayrollTable = () => {
           </select>
         </div>
       )}
-      {payroll.length > 0 ? (
+      {payroll.length > 0 && (
         <div className="relative overflow-x-auto m-5 mb-0">
           <table className="w-full text-sm text-left rtl:text-right border-2 border-gray-300">
             <thead className="text-xs text uppercase bg-gray-200">
@@ -222,11 +235,10 @@ const  PayrollTable = () => {
             </tbody>
           </table>
         </div>
-      ) : (
-        !loader && (
-          <div className="m-8 flex justify-center">No Payroll Found</div>
-        )
       )}
+      {noData && <div className="text-center text-xl">
+            Currently! There are no Payroll in the storage.
+          </div>}
       {payroll.length > 0 && (
         <div className="flex flex-col items-center my-10">
           <span className="text-sm text-black">
