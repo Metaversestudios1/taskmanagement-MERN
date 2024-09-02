@@ -21,6 +21,7 @@ const Tasks = () => {
   const [count, setCount] = useState(0);
   const [search, setSearch] = useState("");
   const [employees, setEmployees] = useState([]);
+  const [noData, setNoData] = useState(false);
 
   useEffect(() => {
     if (userInfo.role === "Admin" || userInfo.role === "admin") {
@@ -65,6 +66,11 @@ const Tasks = () => {
     );
     const response = await res.json();
     if (response.success) {
+      setNoData(false)
+      if(response.result.length===0){
+        setNoData(true)
+      }
+      
       const tasksWithProjectNames = await Promise.all(
         response.result.map(async (task) => {
           const projectName = await fetchProjectName(task.project_name);
@@ -159,7 +165,7 @@ const Tasks = () => {
   const startIndex = (page - 1) * pageSize;
 
   return (
-    <div className=""> 
+    <div className="relative"> 
       <div className="flex items-center">
         <div className="text-2xl font-bold mx-2 my-8 px-4 ">Tasks</div>
       </div>
@@ -184,6 +190,14 @@ const Tasks = () => {
           </>
         )}
       </div>
+      {loader && <div className="absolute h-full w-full  flex justify-center items-center"><div
+        class=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+        role="status">
+        <span
+          class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+          >Loading...</span
+        >
+      </div></div>}
 
       <div className="flex justify-center items-center flex-wrap">
         {(userInfo.role === "Admin" || userInfo.role === "admin") && (
@@ -211,7 +225,7 @@ const Tasks = () => {
           <div className="flex items-center mx-4">
             <label
               htmlFor="startDate"
-              className="block text-lg font-medium text-gray-900 w-36  "
+              className="block font-medium text-gray-900 w-36  "
             >
               Start Date:
             </label>
@@ -228,7 +242,7 @@ const Tasks = () => {
           <div className="flex items-center mx-4">
             <label
               htmlFor="endDate"
-              className="block  text-lg font-medium text-gray-900 w-36"
+              className="block  font-medium text-gray-900 w-36"
             >
               End Date:
             </label>
@@ -253,7 +267,7 @@ const Tasks = () => {
           </button>
         </div>
       </div>
-      {Object.keys(tasks).length > 0 ? (
+      {Object.keys(tasks).length > 0 && (
         <div className="relative overflow-x-auto m-5 mb-0">
           <table className="w-full text-sm text-left rtl:text-right border-2 border-gray-300">
             <thead className="text-xs text uppercase bg-gray-200">
@@ -403,10 +417,12 @@ const Tasks = () => {
             </tbody>
           </table>
         </div>
-      ) : (
-        <div className="m-8 flex justify-center">No Tasks Found</div>
       )}
+      <br></br>
 
+{noData && <div className="text-center text-xl">
+            Currently! There are no Task in the storage.
+          </div>}
       {tasks.length > 0 && (
         <div className="flex flex-col items-center my-10">
           <span className="text-sm text-black">

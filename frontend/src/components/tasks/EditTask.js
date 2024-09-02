@@ -11,7 +11,7 @@ const EditTask = () => {
   const userInfo = getUserFromToken();
   const { id } = useParams();
   const navigate = useNavigate();
-
+  const [loader, setLoader] = useState(false);
   const initialState = {
     date: "",
     task_name: "",
@@ -163,6 +163,7 @@ const EditTask = () => {
     //   );
     //   return;
     // }
+    setLoader(true);
 
     const formData = new FormData();
     Object.keys(oldData).forEach((key) => {
@@ -176,6 +177,7 @@ const EditTask = () => {
 
     const response = await res.json();
     if (response.success) {
+      setLoader(false);
       toast.success("Task is updated Successfully!", {
         position: "top-right",
         autoClose: 1000,
@@ -199,7 +201,7 @@ const EditTask = () => {
 
   return (
     <>
-      <div className="flex items-center ">
+      <div className="flex items-center relative ">
         <ToastContainer
           position="top-right"
           autoClose={2000}
@@ -222,6 +224,14 @@ const EditTask = () => {
           
           <div className="text-2xl font-bold mx-2 my-8 px-4">Edit Task</div>
         </div>
+        {loader && <div className="absolute h-full w-full top-64  flex justify-center items-center"><div
+        class=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+        role="status">
+        <span
+          class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+          >Loading...</span
+        >
+      </div></div>}
       </div>
 
       <div className="w-[70%] m-auto my-10">

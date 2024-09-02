@@ -16,7 +16,7 @@ const AddPayroll = () => {
     salary: "",
     designation: "",
   };
-
+  const [loader, setLoader] = useState(false);
   const [data, setData] = useState(initialState);
 
   const handleChange = (e) => {
@@ -82,6 +82,7 @@ const AddPayroll = () => {
     if(!validatePayrollForm()) {
       return ;
     }
+    setLoader(true);
     const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertpayroll`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -90,6 +91,7 @@ const AddPayroll = () => {
 
     const response = await res.json();
     if (response.success) {
+      setLoader(false);
       toast.success("New Payroll is added Successfully!", {
         position: "top-right",
         autoClose: 1000,
@@ -112,7 +114,7 @@ const AddPayroll = () => {
 
   return (
     <>
-      <div className="flex items-center ">
+      <div className="flex items-center relative">
         <ToastContainer
           position="top-right"
           autoClose={2000}
@@ -134,6 +136,14 @@ const AddPayroll = () => {
         <div className="flex items-center">
           <div className="text-2xl font-bold mx-2 my-8 px-4">Add Payroll</div>
         </div>
+        {loader && <div className="absolute h-full w-full top-64  flex justify-center items-center"><div
+        class=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+        role="status">
+        <span
+          class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+          >Loading...</span
+        >
+      </div></div>}
       </div>
 
       <div className="w-[70%] m-auto my-10">
