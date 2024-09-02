@@ -188,7 +188,7 @@ const Sidebar = ({ sidebar }) => {
                         </li>*/}
                 </ul>
               )}
-              {((userInfo.permissions.includes("Admin-permission")) && (userInfo.role === "Admin" || userInfo.role === "admin")) && (
+              {((userInfo?.permissions?.includes("Admin_permission")) && (userInfo?.role === "Admin" || userInfo?.role === "admin")) && (
                 <>
                   <li className="hs-accordion" id="users-accordion">
                     <button
@@ -395,7 +395,7 @@ const Sidebar = ({ sidebar }) => {
                   Tasks
                 </NavLink>
               </li>
-              {((userInfo.permissions.includes("Payroll_permission")) && (userInfo.role === "Admin" || userInfo.role === "admin")) && (
+              {((userInfo?.permissions?.includes("Payroll_permission")) && (userInfo?.role === "Admin" || userInfo?.role === "admin")) && (
                 <li className="transition-all duration-200 hover:scale-105">
                   <NavLink
                     to="/payroll"

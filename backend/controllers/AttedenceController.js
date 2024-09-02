@@ -175,8 +175,12 @@ const calculateWorkingHours = (checkInTime, checkOutTime) => {
   const checkOutDate = parseTimeString(checkOutTime);
 
   const diffMs = checkOutDate - checkInDate; // Difference in milliseconds
-  const diffHours = diffMs / (1000 * 60 * 60); // Convert to hours
-  return Math.round(diffHours * 100) / 100; // Round to 2 decimal places
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60)); // Get the hours part
+  const diffMinutes = Math.round(((diffMs % (1000 * 60 * 60)) / (1000 * 60)) * 100) / 100; // Get the minutes part and format to 1/100
+
+  const formattedHours = diffHours + (diffMinutes / 60).toFixed(2); // Combine hours and formatted minutes
+
+  return Math.round(formattedHours * 100) / 100; // Round to 2 decimal places
 };
 
 const updateattendence = async (req, res) => {
