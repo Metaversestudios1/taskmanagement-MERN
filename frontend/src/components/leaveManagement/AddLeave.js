@@ -25,10 +25,10 @@ const AddLeave = () => {
   };
 
   const [data, setData] = useState(initialState);
+  const [loader, setLoader] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(name, value)
     setData({ ...data, [name]: value });
   };
 
@@ -97,16 +97,16 @@ const AddLeave = () => {
         return;
       }
   
-   
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertleave`, {
-      method: "POST",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify(data),
-    });
-
-    const response = await res.json();
-    console.log(response)
-    if (response.success) {
+      setLoader(true)
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertleave`, {
+        method: "POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify(data),
+      });
+      
+      const response = await res.json();
+      if (response.success) {
+      setLoader(false)
       toast.success("New Leave is added Successfully!", {
         position: "top-right",
         autoClose: 1000,
@@ -121,6 +121,9 @@ const AddLeave = () => {
         navigate("/leaverequests");
       }, 1500);
     }
+    else {
+      setLoader(false)
+    }
   };
 
   const handleGoBack = () => {
@@ -129,7 +132,7 @@ const AddLeave = () => {
 console.log(data)
   return (
     <>
-      <div className="flex items-center ">
+      <div className="flex items-center relative">
         <ToastContainer
           position="top-right"
           autoClose={2000}
@@ -142,6 +145,14 @@ console.log(data)
           pauseOnHover
           theme="light"
         />
+        {loader && <div className="absolute h-full w-full top-64 flex justify-center items-center"><div
+          className=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+          role="status">
+          <span
+            className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+            >Loading...</span
+          >
+        </div></div>}
         <div className="flex items-center">
           <IoIosArrowRoundBack
             onClick={handleGoBack}
