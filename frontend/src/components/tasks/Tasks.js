@@ -124,7 +124,7 @@ const Tasks = () => {
       }
       const response = await res.json();
       if (response.success) {
-        toast.success('Leave is deleted Successfully!', {
+        toast.success('Task is deleted Successfully!', {
           position: "top-right",
           autoClose: 1000,
           hideProgressBar: false,
