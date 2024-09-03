@@ -235,7 +235,7 @@ const getSingleEmployee = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, role } = req.body;
   try {
     // Find user by email
     if (!email || !password) {
@@ -243,7 +243,7 @@ const login = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Please provide all fields" });
     }
-    const user = await Employee.findOne({ email });
+    const user = await Employee.findOne({ email, role });
     if (!user) {
       return res
         .status(404)
