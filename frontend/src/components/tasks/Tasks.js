@@ -4,6 +4,8 @@ import { CiEdit } from "react-icons/ci";
 import { NavLink } from "react-router-dom";
 import { IoMdDownload } from "react-icons/io";
 import getUserFromToken from "../utils/getUserFromToken";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Tasks = () => {
   const userInfo = getUserFromToken();
@@ -122,6 +124,16 @@ const Tasks = () => {
       }
       const response = await res.json();
       if (response.success) {
+        toast.success('Leave is deleted Successfully!', {
+          position: "top-right",
+          autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          });
         if (taskOne) {
           setPage(page - 1);
         } else {
@@ -172,6 +184,19 @@ const Tasks = () => {
 
   return (
     <div className="relative">
+       <ToastContainer
+          position="top-right"
+          autoClose={2000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
+
       <div className="flex items-center">
         <div className="text-2xl font-bold mx-2 my-8 px-4 ">Tasks</div>
       </div>

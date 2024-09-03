@@ -4,6 +4,8 @@ import { NavLink, useNavigate } from "react-router-dom";
 import getUserFromToken from "../utils/getUserFromToken";
 import { ImCross } from "react-icons/im";
 import { FcApproval } from "react-icons/fc";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const LeaveRequests = () => {
   const navigate = useNavigate();
   const userInfo = getUserFromToken();
@@ -107,6 +109,16 @@ const LeaveRequests = () => {
       }
       const response = await res.json();
       if (response.success) {
+        toast.success('Leave is deleted Successfully!', {
+          position: "top-right",
+          autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          });
         if (leaveOne) {
           setPage(page - 1);
         } else {
@@ -150,6 +162,19 @@ const LeaveRequests = () => {
 
   return (
     <div className="relative">
+       <ToastContainer
+          position="top-right"
+          autoClose={2000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
+
       <div className="flex items-center">
         <div className="text-2xl font-bold mx-2 my-8 px-4">Leave Requests</div>
       </div>
@@ -271,9 +296,12 @@ const LeaveRequests = () => {
                 <th scope="col" className="px-6 py-3 border-2 border-gray-300">
                   status
                 </th>
+                {(userInfo.role === "admin" || userInfo.role === "Admin") && (
+              
                 <th scope="col" className="px-6 py-3 border-2 border-gray-300">
                   Action
                 </th>
+                 )}
               </tr>
             </thead>
 
@@ -337,6 +365,8 @@ const LeaveRequests = () => {
                         </div>
                       </div>
                     </td>
+                    {(userInfo.role === "admin" || userInfo.role === "Admin") && (
+              
                     <td className=" py-5  gap-1 border-2 border-l-0 border-r-0 border-t-0 border-gray-300">
                       <div className="flex items-center justify-center">
                         <MdDelete
@@ -345,6 +375,7 @@ const LeaveRequests = () => {
                         />
                       </div>
                     </td>
+                    )}
                   </tr>
                 );
               })}
