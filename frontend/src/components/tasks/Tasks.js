@@ -315,44 +315,44 @@ const Tasks = () => {
               </tr>
             </thead>
             <tbody>
-              {Object.keys(tasks).map((date, dateIndex) => {
-                // const taskList = tasks[date];
-                // let totalTaskTimeForDate = 0;
-                const taskList = tasks[date];
-                let totalTaskTimeForDate = 0;
-                let totalMinutesForDate = 0;
-
-                taskList.map((task) => {
-                  // Check if task_time is defined and follows the expected format
-                  if (task.task_time) {
+            {Object.keys(tasks).map((date, dateIndex) => {
+              // const taskList = tasks[date];
+              // let totalTaskTimeForDate = 0;
+              const taskList = tasks[date];
+              let totalTaskTimeForDate = 0;
+              let totalMinutesForDate = 0;
+             
+              taskList.map((task) => {
+                if (task.task_time) {
+                  let hours = 0;
+                  let minutes = 0;
+             
+                  // Check if the task_time includes a decimal point
+                  if (task.task_time.includes('.')) {
                     // Split the task time into hours and minutes
-                    const [hours, minutes] = task.task_time
-                      .split(".")
-                      .map(Number);
-
-                    // Ensure hours and minutes are valid numbers
-                    if (!isNaN(hours) && !isNaN(minutes)) {
-                      // Add hours to the total time for the date
-                      totalTaskTimeForDate += hours;
-
-                      // Add minutes to the total minutes for the date
-                      totalMinutesForDate += minutes;
-
-                      // If total minutes exceed or equal to 60, convert them to hours
-                      if (totalMinutesForDate >= 60) {
-                        totalTaskTimeForDate += Math.floor(
-                          totalMinutesForDate / 60
-                        );
-                        totalMinutesForDate = totalMinutesForDate % 60;
-                      }
+                    [hours, minutes] = task.task_time.split('.').map(Number);
+                  } else {
+                    // If no decimal point, assume task_time is in whole hours
+                    hours = Number(task.task_time);
+                  }
+             
+                  if (!isNaN(hours)) {
+                    totalTaskTimeForDate += hours;
+                  }
+             
+                  if (!isNaN(minutes)) {
+                    totalMinutesForDate += minutes;
+             
+                    if (totalMinutesForDate >= 60) {
+                      totalTaskTimeForDate += Math.floor(totalMinutesForDate / 60);
+                      totalMinutesForDate = totalMinutesForDate % 60;
                     }
                   }
-                });
-
-                // Format the total time with proper formatting, ensuring no NaN values
-                const formattedTotalTime = `${totalTaskTimeForDate}.${
-                  totalMinutesForDate < 10 ? "0" : ""
-                }${totalMinutesForDate}`;
+                }
+              });
+             
+              // Format the total time with proper formatting
+              const formattedTotalTime = `${totalTaskTimeForDate}.${totalMinutesForDate < 10 ? '0' : ''}${totalMinutesForDate}`;
                 return (
                   <React.Fragment key={date}>
                     {taskList.map((task, index) => (
