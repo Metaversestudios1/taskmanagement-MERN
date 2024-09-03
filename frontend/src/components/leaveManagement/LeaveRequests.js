@@ -15,9 +15,8 @@ const LeaveRequests = () => {
   const [leaves, setLeaves] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [loader, setLoader] = useState(userInfo.role === "Employee" || userInfo.role === "employee"
-    ? true
-    : false);
+  const [loader, setLoader] = useState(true
+);
     const [noData, setNoData] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
@@ -32,11 +31,7 @@ const LeaveRequests = () => {
   }, []);
 
   useEffect(() => {
-    if (employee) {
       fetchLeaves();
-    } else {
-      setLeaves([]);
-    }
   }, [page, search, employee, startDate, endDate]);
 
   const fetchEmployees = async () => {
