@@ -23,23 +23,23 @@ const Home = () => {
   }, []);
 
   const fetchProjectCount = async () => {
-    const res = await fetch(`http://localhost:3000/api/getprojectcount`);
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getprojectcount`);
     const response = await res.json();
     setTotalProjects(response.count);
   };
   const fetchUsersCount = async () => {
-    const res = await fetch(`http://localhost:3000/api/getemployeecount`);
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getemployeecount`);
     const response = await res.json();
     setTotalUsers(response.count);
   };
   const fetchTodayTasksCount = async () => {
-    const res = await fetch(`http://localhost:3000/api/gettodaystask`);
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/gettodaystask`);
     const response = await res.json();
     setTodayTasks(response.count);
   };
   const fetchTotalTasks = async () => {
     const res = await fetch(
-      `http://localhost:3000/api/gettotaltasks?id=${userInfo?.id}`
+      `${process.env.REACT_APP_BACKEND_URL}/api/gettotaltasks?id=${userInfo?.id}`
     );
     const response = await res.json();
     setTotalTasks(response);
