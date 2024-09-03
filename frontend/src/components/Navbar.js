@@ -153,7 +153,7 @@ const Navbar = ({ toggleSideBar }) => {
     const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateattendence`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ emp_id: userInfo?.id, date: date,  checkOut_location_url, check_out_time:getCurrentTime()  }),
+      body: JSON.stringify({ emp_id: userInfo?.id, date: date,  checkOut_location_url, check_out:getCurrentTime()  }),
     });
     const response = await res.json();
     console.log(response)
