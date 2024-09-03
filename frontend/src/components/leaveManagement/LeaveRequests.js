@@ -167,7 +167,7 @@ const LeaveRequests = () => {
               onChange={handleChange}
               className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block  p-2.5 m-auto"
             >
-              <option value="">Select an employee for attendance.</option>
+              <option value="">Select an employee for leaves.</option>
               {employees.map((item) => (
                 <option
                   key={item._id}
@@ -348,7 +348,7 @@ const LeaveRequests = () => {
         </div>
       )}
       {noData && <div className="text-center text-xl my-10">
-        Currently! There are no Attendance for the user.
+        Currently! There are no leaves for the user.
       </div>}
       {leaves.length > 0 && (
         <div className="flex flex-col items-center my-10">
