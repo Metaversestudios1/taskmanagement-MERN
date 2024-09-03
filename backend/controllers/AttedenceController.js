@@ -217,16 +217,16 @@ const updateattendence = async (req, res) => {
     }
 
     const check_in = result["check_in"];
-    const check_out_time = check_out; // This should be in string format like "2:29 PM"
+ // This should be in string format like "2:29 PM"
 
-    const roundedDurationHours = calculateWorkingHours(check_in, check_out_time);
+    const roundedDurationHours = calculateWorkingHours(check_in, check_out);
     let attendance_status = roundedDurationHours >= 8 ? "present" : "absent";
     console.log(typeof(roundedDurationHours))
     await Attendence.updateOne(
       { emp_id, date: result.date },
       {
         $set: {
-          check_out: check_out_time, // Save as a string
+          check_out: check_out, // Save as a string
           working_hours: roundedDurationHours,
           attendance_status: attendance_status,
           checkOut_location_url,
