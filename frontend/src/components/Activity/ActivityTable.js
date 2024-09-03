@@ -206,7 +206,7 @@ const ActivityTable = () => {
 
                     <th
                       scope="row"
-                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap border-2 border-gray-300"
+                      className="px-6 py-4 font-medium text-gray-900  border-2 border-gray-300"
                     >
                       {item?.location}
                     </th>

@@ -4,13 +4,15 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import getUserFromToken from "../utils/getUserFromToken";
-import $ from 'jquery';
-import 'jquery-validation';
+import $ from "jquery";
+import "jquery-validation";
+
 const AddPayroll = () => {
   const userInfo = getUserFromToken();
-
   const navigate = useNavigate();
   const [employees, setEmployees] = useState([]);
+  const [payrolls, setPayrolls] = useState([]);
+
   const initialState = {
     emp_id: "",
     salary: "",
@@ -23,16 +25,34 @@ const AddPayroll = () => {
     const { name, value } = e.target;
     setData({ ...data, [name]: value });
   };
+
   useEffect(() => {
     if (userInfo.role === "Admin" || userInfo.role === "admin") {
-      fetchEmployees();
+      fetchPayrolls();
     }
   }, []);
+
+  useEffect(() => {
+      fetchEmployees();
+  }, [payrolls]);
+
   const fetchEmployees = async () => {
     const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getemployee`);
     const response = await res.json();
     if (response.success) {
-      setEmployees(response.result);
+      // Filter employees that do not have a payroll entry
+      const employeesWithoutPayroll = response.result.filter(
+        (employee) => !payrolls.some((payroll) => payroll.emp_id === employee._id)
+      );
+      setEmployees(employeesWithoutPayroll);
+    }
+  };
+
+  const fetchPayrolls = async () => {
+    const res = await fetch("${process.env.REACT_APP_BACKEND_URL}/api/getAllPayroll");
+    const response = await res.json();
+    if (response.success) {
+      setPayrolls(response.result);
     }
   };
 
@@ -40,47 +60,47 @@ const AddPayroll = () => {
     $("#payrollform").validate({
       rules: {
         emp_id: {
-          required: true
+          required: true,
         },
         salary: {
           required: true,
         },
         designation: {
-          required: true
+          required: true,
         },
       },
       messages: {
         emp_id: {
-          required: "Please Select employee name"
+          required: "Please Select employee name",
         },
         salary: {
-          required: "Please enter salary"
+          required: "Please enter salary",
         },
         designation: {
-          required: "Please enter designation"
+          required: "Please enter designation",
         },
       },
-      errorElement: 'div',
-      errorPlacement: function(error, element) {
-        error.addClass('invalid-feedback');
-        error.insertAfter(element.parent());  // Insert error after the parent container
+      errorElement: "div",
+      errorPlacement: function (error, element) {
+        error.addClass("invalid-feedback");
+        error.insertAfter(element.parent());
       },
-      highlight: function(element, errorClass, validClass) {
-        $(element).addClass('is-invalid').removeClass('is-valid');
+      highlight: function (element, errorClass, validClass) {
+        $(element).addClass("is-invalid").removeClass("is-valid");
       },
-      unhighlight: function(element, errorClass, validClass) {
-        $(element).removeClass('is-invalid').addClass('is-valid');
-      }
+      unhighlight: function (element, errorClass, validClass) {
+        $(element).removeClass("is-invalid").addClass("is-valid");
+      },
     });
 
     // Return validation status
     return $("#payrollform").valid();
   };
 
-  const handleSubmit = async (e) =>  {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if(!validatePayrollForm()) {
-      return ;
+    if (!validatePayrollForm()) {
+      return;
     }
     setLoader(true);
     const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertpayroll`, {
@@ -136,24 +156,33 @@ const AddPayroll = () => {
         <div className="flex items-center">
           <div className="text-2xl font-bold mx-2 my-8 px-4">Add Payroll</div>
         </div>
-        {loader && <div className="absolute h-full w-full top-64  flex justify-center items-center"><div
-        className=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
-        role="status">
-        <span
-          className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
-          >Loading...</span
-        >
-      </div></div>}
+        {loader && (
+          <div className="absolute h-full w-full top-64  flex justify-center items-center">
+            <div
+              className=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+              role="status"
+            >
+              <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+                Loading...
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="w-[70%] m-auto my-10">
-        <form onSubmit={handleSubmit} encType="multipart/form-data" id="payrollform">
+        <form
+          onSubmit={handleSubmit}
+          encType="multipart/form-data"
+          id="payrollform"
+        >
           <div className="mb-1">
             <label
               htmlFor="employees"
               className="block mb-2 text-lg font-medium text-gray-900 dark:text-black  m-auto"
             >
-              Select an Employee<span className="text-red-900 text-lg ">&#x2a;</span>
+              Select an Employee
+              <span className="text-red-900 text-lg ">&#x2a;</span>
             </label>
             <select
               name="emp_id"
@@ -204,7 +233,7 @@ const AddPayroll = () => {
               type="text"
               id="designation"
               className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
-              placeholder="Enter the Number of days"
+              placeholder="Enter the designation"
             />
           </div>
 

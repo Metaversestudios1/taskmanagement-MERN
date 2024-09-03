@@ -99,6 +99,7 @@ const getAllattendence = async (req, res) => {
     const id = req.query.id;
     const startDate = req.query.startDate;
     const endDate = req.query.endDate;
+
     const query = {
       deleted_at: null,
     };
@@ -117,7 +118,6 @@ const getAllattendence = async (req, res) => {
     } else if (endDate) {
       query.date = { $lte: endDate };
     }
-
     const result = await Attendence.find(query)
       .sort({ createdAt: -1 })
       .skip((page - 1) * pageSize)
@@ -176,12 +176,17 @@ const calculateWorkingHours = (checkInTime, checkOutTime) => {
 
   const diffMs = checkOutDate - checkInDate; // Difference in milliseconds
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60)); // Get the hours part
-  const diffMinutes = Math.round(((diffMs % (1000 * 60 * 60)) / (1000 * 60)) * 100) / 100; // Get the minutes part and format to 1/100
+  const diffMinutes = Math.round((diffMs % (1000 * 60 * 60)) / (1000 * 60)); // Get the minutes part
 
-  const formattedHours = diffHours + (diffMinutes / 60).toFixed(2); // Combine hours and formatted minutes
+  // Format minutes as "XX" format where 5 minutes = "05" and 25 minutes = "25"
+  const minutesFormatted = diffMinutes.toString().padStart(2, '0');
 
-  return Math.round(formattedHours * 100) / 100; // Round to 2 decimal places
+  // Combine hours and formatted minutes
+  const formattedHours = parseFloat(`${diffHours}.${minutesFormatted}`);
+
+  return formattedHours; // Return in hours format like 1.12 for 1 hour 12 minutes
 };
+
 
 const updateattendence = async (req, res) => {
   const { emp_id, date, checkOut_location_url } = req.body;
@@ -189,7 +194,6 @@ const updateattendence = async (req, res) => {
   const employee = await Employee.findOne({ _id: emp_id });
 
   if (req.file) {
-   
     if (!employee) {
       return res.status(404).json({
         success: false,
@@ -207,11 +211,13 @@ const updateattendence = async (req, res) => {
     } else {
       return res.status(400).json({
         success: false,
-        message: "upload Profile pic first.",
+        message: "Upload Profile pic first.",
       });
     }
   }
+
   const check_out = getCurrentTime();
+
   try {
     const result = await Attendence.findOne({
       emp_id,
@@ -227,16 +233,9 @@ const updateattendence = async (req, res) => {
     const check_in = result["check_in"];
     const check_out_time = check_out; // This should be in string format like "2:29 PM"
 
-    const roundedDurationHours = calculateWorkingHours(
-      check_in,
-      check_out_time
-    );
-    let attendance_status;
-    if (roundedDurationHours >= 8) {
-      attendance_status = "present";
-    } else {
-      attendance_status = "absent";
-    }
+    const roundedDurationHours = calculateWorkingHours(check_in, check_out_time);
+    let attendance_status = roundedDurationHours >= 8 ? "present" : "absent";
+    console.log(typeof(roundedDurationHours))
     await Attendence.updateOne(
       { emp_id, date: result.date },
       {
@@ -244,10 +243,11 @@ const updateattendence = async (req, res) => {
           check_out: check_out_time, // Save as a string
           working_hours: roundedDurationHours,
           attendance_status: attendance_status,
-          checkOut_location_url
+          checkOut_location_url,
         },
       }
     );
+
     res.status(200).json({ success: true });
   } catch (error) {
     return res.status(500).json({
@@ -257,6 +257,7 @@ const updateattendence = async (req, res) => {
     });
   }
 };
+
 
 const deleteattendence = async (req, res) => {
   const { id } = req.body;
