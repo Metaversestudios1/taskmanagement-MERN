@@ -235,7 +235,7 @@ const getSingleEmployee = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const { email, password, role } = req.body;
+  const { email, password , role} = req.body;
   try {
     // Find user by email
     if (!email || !password) {
@@ -258,24 +258,23 @@ const login = async (req, res) => {
     }
 
     // Get the role of the user
-    const role = await Role.findOne({ _id: user.role, deleted: null });
-    if (!role) {
+    const roleObject = await Role.findOne({ _id: user.role, deleted: null });
+    if (!roleObject) {
       return res
         .status(404)
         .json({ success: false, message: "Role not found" });
     }
     // Fetch permissions for the role
     const permissions = await Promise.all(
-      role.permission.map(async (permId) => {
+      roleObject.permission.map(async (permId) => {
         const perm = await Permission.findById({_id:permId});
         return perm ? perm.permission : null;
       })
     );
-    console.log(permissions)
 
     // Create token with role and permissions
     const token = jwt.sign(
-      { id: user._id, name: user.name, email: user.email, role: role.role, permissions },
+      { id: user._id, name: user.name, email: user.email, role: roleObject.role, permissions },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
