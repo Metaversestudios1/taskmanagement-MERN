@@ -33,7 +33,10 @@ const AddPayroll = () => {
   }, []);
 
   useEffect(() => {
+    if(payrolls){
+
       fetchEmployees();
+    }
   }, [payrolls]);
 
   const fetchEmployees = async () => {
