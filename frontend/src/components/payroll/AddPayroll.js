@@ -11,7 +11,7 @@ const AddPayroll = () => {
   const userInfo = getUserFromToken();
   const navigate = useNavigate();
   const [employees, setEmployees] = useState([]);
-  const [payrolls, setPayrolls] = useState([]);
+  const [payrolls, setPayrolls] = useState(null);
 
   const initialState = {
     emp_id: "",
@@ -42,23 +42,28 @@ const AddPayroll = () => {
   const fetchEmployees = async () => {
     const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getemployee`);
     const response = await res.json();
+    console.log(response)
     if (response.success) {
       // Filter employees that do not have a payroll entry
       const employeesWithoutPayroll = response.result.filter(
-        (employee) => !payrolls.some((payroll) => payroll.emp_id === employee._id)
+        (employee) =>
+          !payrolls.some((payroll) => payroll.emp_id.toString() === employee._id.toString())
       );
+      
+      console.log(employeesWithoutPayroll)
       setEmployees(employeesWithoutPayroll);
     }
   };
-
+  
   const fetchPayrolls = async () => {
     const res = await fetch("${process.env.REACT_APP_BACKEND_URL}/api/getAllPayroll");
     const response = await res.json();
+    console.log(response)
     if (response.success) {
       setPayrolls(response.result);
     }
   };
-
+  
   const validatePayrollForm = () => {
     $("#payrollform").validate({
       rules: {

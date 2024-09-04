@@ -3,7 +3,8 @@ import { MdDelete } from "react-icons/md";
 import { CiEdit } from "react-icons/ci";
 import { NavLink } from "react-router-dom";
 import getUserFromToken from "../utils/getUserFromToken";
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const PayrollTable = () => {
   const userInfo = getUserFromToken();
   const [employee, setEmployee] = useState("");
@@ -43,7 +44,6 @@ const PayrollTable = () => {
       }
     );
     const employeeName = await nameRes.json();
-    console.log(employeeName)
     return employeeName.success ? employeeName.data[0].name : "Unknown";
   };
 
@@ -53,7 +53,6 @@ const PayrollTable = () => {
       `${process.env.REACT_APP_BACKEND_URL}/api/getAllPayroll?page=${page}&limit=${pageSize}&id=${employee}`
     );
     const response = await res.json();
-    console.log(response)
     if (response.success) {
       setNoData(false);
       if (response.result.length === 0) {
@@ -68,7 +67,6 @@ const PayrollTable = () => {
           };
         })
       );
-      console.log(payrollWithEmployeeNames)
       setPayroll(payrollWithEmployeeNames);
       setCount(response.count);
       setLoader(false);
@@ -95,6 +93,16 @@ const PayrollTable = () => {
       }
       const response = await res.json();
       if (response.success) {
+        toast.success("Payroll data deleted Successfully!", {
+          position: "top-right",
+          autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
         if (payrollOne) {
           setPage(page - 1);
         } else {
@@ -118,6 +126,18 @@ const PayrollTable = () => {
 
   return (
     <div className="relative">
+    <ToastContainer
+    position="top-right"
+    autoClose={2000}
+    hideProgressBar={false}
+    newestOnTop={false}
+    closeOnClick
+    rtl={false}
+    pauseOnFocusLoss
+    draggable
+    pauseOnHover
+    theme="light"
+  />
       <div className="flex items-center">
         <div className="text-2xl font-bold mx-2 my-8 px-4">Payroll</div>
       </div>
@@ -232,7 +252,7 @@ const PayrollTable = () => {
         </div>
       )}
       {noData && (
-        <div className="text-center text-xl">
+        <div className="text-center text-xl my-10">
           Currently! There are no Payroll in the storage.
         </div>
       )}
