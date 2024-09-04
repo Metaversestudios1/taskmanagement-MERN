@@ -48,6 +48,17 @@ const uploadImage = (buffer, originalname, mimetype) => {
   });
 };
 
+const deleteImage = async (publicId) => {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.destroy(publicId, (error, result) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(result);
+      }
+    });
+  });
+};
 
 
 const insertEmployee = async (req, res) => {
@@ -434,6 +445,16 @@ const resetPassword = async(req, res)=>{
 const deleteEmployeePhoto = async(req, res) => {
   const {id} = req.body;
   try{
+    const employee = await Employee.findById(id);
+    
+    if (!employee) {
+      return res.status(404).json({ success: false, message: "Employee not found" });
+    }
+
+    // Check if there's an existing photo to delete from Cloudinary
+    if (employee.photo && employee.photo.publicId) {      
+        await deleteImage(employee.photo.publicId); // Delete the photo from Cloudinary
+    }
     const result = await Employee.updateOne(
       {_id:id},
       { $unset: { photo: "" } } // Use $unset to remove the photo field
