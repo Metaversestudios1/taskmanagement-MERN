@@ -10,7 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import getUserFromToken from "./utils/getUserFromToken";
 import { AuthContext } from "../context/AuthContext";
 const Navbar = ({ toggleSideBar }) => {
-  const {setAuth} = useContext(AuthContext)
+  const { setAuth } = useContext(AuthContext);
   const now = new Date();
   const offset = now.getTimezoneOffset() * 60000; // Offset in milliseconds
   const localDate = new Date(now.getTime() - offset);
@@ -20,7 +20,24 @@ const Navbar = ({ toggleSideBar }) => {
   const [date, setDate] = useState(localDate);
   const [checkInTime, setCheckInTime] = useState("");
   const [checkInStatus, setCheckInStatus] = useState("");
+  const [loader, setLoader] = useState(false);
+
   const [emp_id, setEmpId] = useState(userInfo?.id);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications] = useState([
+    "New Activity Added",
+    "Your meeting confirmed",
+    "Meeting at 3 PM",
+  ]);
+
+  const handleButtonClick = () => {
+    setCount(0)
+    //alert('ok')
+    setShowNotifications(!showNotifications);
+  };
+  const handleClose = () => {
+    setShowNotifications(false);
+  };
   const token = Cookies.get("jwt");
   function getCurrentTime() {
     const date = new Date();
@@ -37,9 +54,7 @@ const Navbar = ({ toggleSideBar }) => {
     return timeString;
   }
   useEffect(() => {
-   
-      fetchCheckInRecord();
-
+    fetchCheckInRecord();
   }, []);
   const currentDate = () => {
     const currentDate = new Date();
@@ -50,9 +65,10 @@ const Navbar = ({ toggleSideBar }) => {
     const day = String(currentDate.getDate()).padStart(2, "0");
 
     // Format the date as YYYY-MM-DD
-    return `${year}-${month}-${day}`; 
+    return `${year}-${month}-${day}`;
   };
   const fetchCheckInRecord = async () => {
+    setLoader(true);
     const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getSingleattendence`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -60,24 +76,29 @@ const Navbar = ({ toggleSideBar }) => {
     });
     const response = await res.json();
     if (response.success && !response?.result?.check_out) {
+      setLoader(true);
       setCheckInValue(false);
       setCheckInTime(response.result?.check_in); // Store the check-in date
       setDate(response.result?.date);
-    }else if(response.success && response?.result?.check_out){
+    } else if (response.success && response?.result?.check_out) {
+      setLoader(true);
       setCheckInValue(false);
-      setCheckInStatus("Your status is recorded. Thank You!")
+      setCheckInStatus("Your status is recorded. Thank You!");
     } else {
+      setLoader(true);
       setCheckInValue(true);
     }
   };
-
   const handleLogout = async () => {
-    try { 
+    try {
       // Perform logout logic (e.g., API call to logout)
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/logout`, {
-        method: "POST",
-        credentials: "include", // Send cookies with the request
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/logout`,
+        {
+          method: "POST",
+          credentials: "include", // Send cookies with the request
+        }
+      );
       const response = await res.json();
       if (response.status) {
         Cookies.remove("jwt");
@@ -92,7 +113,7 @@ const Navbar = ({ toggleSideBar }) => {
           progress: undefined,
           theme: "light",
         });
-        setAuth({ isAuthenticated: false, user:null })
+        setAuth({ isAuthenticated: false, user: null });
         setTimeout(() => {
           navigate("/login");
         }, 1500);
@@ -121,17 +142,23 @@ const Navbar = ({ toggleSideBar }) => {
       }
     });
   };
-  
-  
 
   const handleCheckIn = async () => {
     // const isoCheckIn = date.toISOString();
-    const checkIn_location_url = await getLocationURL()
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertattendence`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ date: date, emp_id, check_in: getCurrentTime(),  checkIn_location_url }),
-    });
+    const checkIn_location_url = await getLocationURL();
+    const res = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/api/insertattendence`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          date: date,
+          emp_id,
+          check_in: getCurrentTime(),
+          checkIn_location_url,
+        }),
+      }
+    );
     const response = await res.json();
     if (response.success) {
       setCheckInValue(false);
@@ -149,14 +176,22 @@ const Navbar = ({ toggleSideBar }) => {
   };
 
   const handleCheckOut = async () => {
-    const checkOut_location_url = await getLocationURL()
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateattendence`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ emp_id: userInfo?.id, date: date,  checkOut_location_url, check_out:getCurrentTime()  }),
-    });
+    const checkOut_location_url = await getLocationURL();
+    const res = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/api/updateattendence`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          emp_id: userInfo?.id,
+          date: date,
+          checkOut_location_url,
+          check_out: getCurrentTime(),
+        }),
+      }
+    );
     const response = await res.json();
-    console.log(response)
+    console.log(response);
     if (response.success) {
       toast.success("You are Check Out!", {
         position: "top-right",
@@ -239,9 +274,10 @@ const Navbar = ({ toggleSideBar }) => {
           className="hs-collapse  overflow-hidden transition-all duration-300 "
         >
           <div className="flex flex-row items-center justify-end ">
-            {(userInfo?.role === "Employee" || userInfo?.role === "employee") && (
+          {(userInfo?.role === "Employee" || userInfo?.role === "employee") &&
+            loader ? (
               <div className="mx-3">
-                {checkInValue  ? (
+                {checkInValue ? (
                   <button
                     type="button"
                     onClick={handleCheckIn}
@@ -260,12 +296,45 @@ const Navbar = ({ toggleSideBar }) => {
                     CheckOut
                   </button>
                 )}
-                <div className="text-lg ">
-                  {checkInStatus &&
-                    checkInStatus}
+                <div className="text-lg ">{checkInStatus && checkInStatus}</div>
+              </div>
+            ) : (userInfo.role==="Employee" || userInfo.role==="employee") && (
+              <div className="flex justify-center items-center">
+                <div
+                  className=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+                  role="status"
+                >
+                  <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+                    Loading...
+                  </span>
                 </div>
               </div>
             )}
+            <div className="relative inline-block mx-2">
+              <button
+                id="notificationButton"
+                className="text-2xl"
+                onClick={handleButtonClick}
+                style={{ color: "rgb(21, 101, 192)" }}
+              >
+                <svg
+                  stroke="currentColor"
+                  fill="currentColor"
+                  strokeWidth="0.7"
+                  viewBox="0 0 24 24"
+                  className="text-xl"
+                  height="2em"
+                  width="1.5em"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M12 22c1.104.005 1.999-.892 2-1.997h-4c.002 1.106.896 2.002 2 1.997zM21.7 17.29l-1.4-1.4V11c0-4.28-2.99-7.99-7-8.72V2c0-.552-.449-1-1-1s-1 .448-1 1v.28C6.99 3.01 4 6.72 4 11v4.89l-1.4 1.4c-.391.391-.601.902-.601 1.41v.3c0 .552.449 1 1 1h18c.552 0 1-.448 1-1v-.3c0-.508-.21-1.019-.6-1.41z"></path>
+                </svg>
+              </button>
+
+              <span className={`absolute top-[10px] right-1 inline-flex  items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-red transform translate-x-1/2 -translate-y-1/2 ${count && "bg-red-600"} rounded-full`}>
+                3
+              </span>
+            </div>
             {!token ? (
               <NavLink
                 className="flex items-center  font-medium text-black hover:text-blue-600 md:border-s md:border-gray-300 "
@@ -302,6 +371,26 @@ const Navbar = ({ toggleSideBar }) => {
             )}
           </div>
         </div>
+        {showNotifications && (
+          <div
+            className="absolute top-[50px] right-40 w-64 p-4 bg-white border border-gray-300 rounded-lg shadow-lg"
+            // style={{ background: "red", zIndex: 1111 }}
+          >
+            <button
+              onClick={handleClose}
+              className="absolute top-0 right-0 mt-2 mr-2 text-black p-1 hover:bg-gray-800"
+            >
+              &times;
+            </button>
+            <ul>
+              {notifications.map((notification, index) => (
+                <li key={index} className="mb-2">
+                  {notification}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </nav>
     </header>
   );
