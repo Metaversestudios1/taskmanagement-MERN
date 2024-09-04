@@ -56,7 +56,7 @@ const AddPayroll = () => {
   };
   
   const fetchPayrolls = async () => {
-    const res = await fetch("${process.env.REACT_APP_BACKEND_URL}/api/getAllPayroll");
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getAllPayroll`);
     const response = await res.json();
     console.log(response)
     if (response.success) {
