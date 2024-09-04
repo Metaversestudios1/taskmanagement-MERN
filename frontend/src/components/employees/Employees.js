@@ -4,6 +4,7 @@ import { CiEdit } from "react-icons/ci";
 import { NavLink } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { ImCross } from "react-icons/im";
 import { IoMdEye } from "react-icons/io";
 const Employees = () => {
   const [users, setUsers] = useState([]);
@@ -101,6 +102,40 @@ const Employees = () => {
       setPage(1);
     }
   };
+
+  const handledeletephoto = async (e, id) => {
+    e.preventDefault();
+    const permissionOfDelete = window.confirm("Are you sure, you want to delete the employee photo")
+    if(permissionOfDelete) {
+      let userOne = users.length === 1;
+      if (count === 1) {
+      userOne = false;
+    }
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/deleteEmployeePhoto`, {
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    const response = await res.json();
+    if (response.success) {
+      toast.success('Employee photo is deleted Successfully!', {
+        position: "top-right",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        });
+        if (userOne) {
+          setPage(page - 1);
+        } else {
+          fetchData();
+        }
+    }
+  };
+  }
   const handleDownload = (url) => {
     if (!url) {
       return window.alert("There is no Photo with this employee.");
@@ -208,25 +243,33 @@ const Employees = () => {
                   >
                     {startIndex + index + 1}
                   </th>
-                  <td className="px-6 py-4 border-2 border-gray-300">
-                  {item?.photo?.url ? (
-                    <img
-                      src={item.photo.url}
-                      alt="Profile"
-                      className="w-12 h-12 rounded-full object-cover aspect-square"
-                    />
-                  ) : (
-                    <span className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-200 text-gray-600 aspect-square">
-                      {item?.email ? (
-                        <span className="text-xl">
-                          {item.email.charAt(0).toUpperCase()}
-                        </span>
-                      ) : (
-                        <span className="text-xl">📷</span>
-                      )}
-                    </span>
-                  )}
-                  </td>
+
+<td className="px-6 py-4 border-2 border-gray-300 relative">
+  {item?.photo?.url ? (
+    <>
+      <img
+        src={item.photo.url}
+        alt="Profile"
+        className="w-12 h-12 rounded-full object-cover aspect-square"
+      />
+      <ImCross
+        className="absolute top-10 bottom-10 left-20 text-red-600 cursor-pointer"
+        onClick={(e) => {handledeletephoto(e, item._id)}}
+      />
+    </>
+  ) : (
+    <span className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-200 text-gray-600 aspect-square">
+      {item?.email ? (
+        <span className="text-xl">
+          {item.email.charAt(0).toUpperCase()}
+        </span>
+      ) : (
+        <span className="text-xl">📷</span>
+      )}
+    </span>
+  )}
+</td>
+
                   <th
                     scope="row"
                     className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap border-2 border-gray-300"

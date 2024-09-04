@@ -51,7 +51,7 @@ const uploadImage = (buffer, originalname, mimetype) => {
 
 
 const insertEmployee = async (req, res) => {
-  console.log(req.body, req.file)
+  // console.log(req.body, req.file)
   try {
     const { password, ...employeeData } = req.body; // Extract password from req.body
     if (
@@ -164,7 +164,7 @@ const deleteEmployee = async (req, res) => {
 
 const updateEmployee = async (req, res) => {
   //const id = req.body.id; // Extract the ID from the request parameters
-  console.log(req.body)
+  // console.log(req.body)
   const updateData = req.body; // Extract the update data from the request body
   const id = updateData.id;
   try {
@@ -431,6 +431,18 @@ const resetPassword = async(req, res)=>{
   await user.save();
   res.status(200).json({success: true})
 }
+const deleteEmployeePhoto = async(req, res) => {
+  const {id} = req.body;
+  try{
+    const result = await Employee.updateOne(
+      {_id:id},
+      { $unset: { photo: "" } } // Use $unset to remove the photo field
+    )
+ res.status(200).json({success: true})
+  }catch(err){
+    res.status(500).json({success:false,message:"error updating leave",error:error.message})
+  }
+}
 module.exports = {
   insertEmployee,
   getAllEmployees,
@@ -442,5 +454,6 @@ module.exports = {
   changePassword,
   sendotp,
   verifyOtp,
-  resetPassword
+  resetPassword,
+  deleteEmployeePhoto,
 };

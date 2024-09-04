@@ -19,6 +19,9 @@ const EditHoliday = () => {
   const [error, setError] = useState("");
   const [holiday, setHoliday] = useState([]);
   const [loader, setLoader] = useState(false);
+  const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const monthsOfYear = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
 
   useEffect(() => {
     fetchOldData();
@@ -227,27 +230,40 @@ const validateHolidayForm = () => {
               <label htmlFor="day" className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">
                 Day<span className="text-red-900 text-lg">*</span>
               </label>
-              <input
+              <select
                 name="day"
-                value={oldData.day} // Added value
+                value={oldData.day}
                 onChange={handleChange}
-                type="text"
                 id="day"
                 className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5"
-              />
+              >
+                <option value="">Select a day</option>
+                {daysOfWeek.map((day) => (
+                  <option key={day} value={day}>
+                    {day}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label htmlFor="month" className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">
                 Month<span className="text-red-900 text-lg">*</span>
               </label>
-              <input
+              <select
                 name="month"
-                value={oldData.month} // Added value
+                value={oldData.month}
                 onChange={handleChange}
-                type="text"
                 id="month"
                 className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5"
-              />
+              >
+                <option value="">Select a month</option>
+                {monthsOfYear.map((month) => (
+                  <option key={month} value={month}>
+                    {month}
+                  </option>
+                ))}
+              </select>
+              
             </div>
           </div>
 
