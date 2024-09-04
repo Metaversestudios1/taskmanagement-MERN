@@ -31,7 +31,6 @@ const Navbar = ({ toggleSideBar }) => {
   ]);
 
   const handleButtonClick = () => {
-    setCount(0)
     //alert('ok')
     setShowNotifications(!showNotifications);
   };
