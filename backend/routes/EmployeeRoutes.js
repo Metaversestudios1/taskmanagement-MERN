@@ -1,5 +1,5 @@
 const express = require('express');
-const { insertEmployee, getAllEmployees,updateEmployee,deleteEmployee,resetPassword ,getSingleEmployee,login,logout,changePassword,sendotp,verifyOtp,deleteEmployeePhoto} = require('../controllers/EmployeeController');
+const { insertEmployee, getAllEmployees,updateEmployee,deleteEmployee,resetPassword ,getSingleEmployee,login,logout,changePassword,sendotp,verifyOtp,deleteEmployeePhoto,loginmobile} = require('../controllers/EmployeeController');
 const multer = require('multer');
 const router = express.Router();
 
@@ -31,4 +31,6 @@ router.post('/logout', logout);
 router.post('/verifyOtp', verifyOtp);
 router.post('/deleteEmployeePhoto',deleteEmployeePhoto);
 router.post('/sendotp', sendotp);
+router.post('/loginmobile', loginmobile);
+
 module.exports = router;

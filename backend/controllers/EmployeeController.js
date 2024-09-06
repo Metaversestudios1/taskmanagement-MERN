@@ -307,6 +307,52 @@ const login = async (req, res) => {
   }
 };
 
+const loginmobile = async (req, res) => {
+  const { email, password} = req.body;
+  try {
+    // Find user by email
+    if (!email || !password) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Please provide all fields" });
+    }
+    const user = await Employee.findOne({ email });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Employee not found" });
+    }
+    // Check password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Incorrect password" });
+    }
+    // Create token with role and permissions
+    const token = jwt.sign(
+      { id: user._id, name: user.name, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+    const options = {
+      expires: new Date(Date.now() + 2592000000), // 30 days
+      httpOnly: true,
+      sameSite: "None",
+    };
+    res.cookie("token", token, options).json({
+      success: true,
+      token,
+      user
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server error: " + err.message });
+  }
+};
+
+
 const logout = (req, res) => {
   req.session.destroy((err) => {
     if (err) {
@@ -477,4 +523,5 @@ module.exports = {
   verifyOtp,
   resetPassword,
   deleteEmployeePhoto,
+  loginmobile
 };
