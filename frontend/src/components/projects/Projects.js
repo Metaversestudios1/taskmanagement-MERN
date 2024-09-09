@@ -195,7 +195,7 @@ const Projects = () => {
 
 
       <div className="relative overflow-x-auto m-5 mb-0">
-        {projects.length > 0 && <table className="w-full text-sm text-left rtl:text-right   border-2 border-gray-300 " style={{ tableLayout: 'fixed' }}>
+        {projects.length > 0 && <table className="w-full text-sm text-left rtl:text-right   border-2 border-gray-300 ">
           <thead className="text-xs  uppercase bg-gray-200">
             <tr>
               <th scope="col" className="px-6 py-3 border-2 border-gray-300">
@@ -226,7 +226,7 @@ const Projects = () => {
                   </th>
                   <th
                     scope="row"
-                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap  border-2 border-gray-300"
+                    className="px-6 py-4 font-medium text-gray-900   border-2 border-gray-300"
                   >
                     {item?.name}
                   </th>
@@ -245,7 +245,7 @@ const Projects = () => {
                   </th>
                   <th
                     scope="row"
-                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap border-2 border-gray-300 text-ellipsis overflow-hidden"
+                    className="px-6 py-4 font-medium text-gray-900  border-2 border-gray-300 text-ellipsis overflow-hidden"
                     style={{ width: '200px' }}
                   >
                     {item?.description?.length > 100 ? item.description.slice(0, 100) + '...' : item.description}

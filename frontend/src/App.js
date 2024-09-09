@@ -26,7 +26,6 @@ import Setting from "./components/Setting";
 import AdminRoute from "./components/utils/AdminRoute";
 import EmployeeRoute from "./components/utils/EmployeeRoute";
 import Attendance from "./components/attendance/Attendance";
-import LeaveHistory from "./components/leaveManagement/LeaveHistory";
 import LeaveRequests from "./components/leaveManagement/LeaveRequests";
 import AddLeave from "./components/leaveManagement/AddLeave";
 import EditLeave from "./components/leaveManagement/EditLeave";
@@ -382,24 +381,6 @@ function App() {
               </div>
             </div>
           </div>
-        </PrivateRoute>
-      ),
-    },
-    {
-      path: "/leavehistory",
-      element: (
-        <PrivateRoute>
-          <EmployeeRoute>
-            <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} />
-              <div className="flex flex-col flex-grow overflow-y-auto">
-                <Navbar toggleSideBar={toggleSideBar} />
-                <div className="flex-grow ">
-                  <LeaveHistory />
-                </div>
-              </div>
-            </div>
-          </EmployeeRoute>
         </PrivateRoute>
       ),
     },
