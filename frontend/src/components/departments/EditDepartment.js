@@ -61,7 +61,7 @@ const EditDepartment = () => {
   
   const fetchOldData = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/getSingleDepartment`, {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getSingleDepartment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
@@ -98,7 +98,7 @@ const EditDepartment = () => {
       setLoader(true);
     try {
         const updateData = { id, oldData };
-      const res = await fetch(`http://localhost:3000/api/updatedepartment`, {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updatedepartment`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updateData), // Spread oldData into the body

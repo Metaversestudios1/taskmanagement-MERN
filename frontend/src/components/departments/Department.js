@@ -21,7 +21,7 @@ const Department = () => {
   const fetchDepartments = async () => {
     setLoader(true)
     const res = await fetch(
-      `http://localhost:3000/api/getalldepartment?page=${page}&limit=${pageSize}&search=${search}`
+      `${process.env.REACT_APP_BACKEND_URL}/api/getalldepartment?page=${page}&limit=${pageSize}&search=${search}`
     );
     const response = await res.json();
     console.log(response)
@@ -46,7 +46,7 @@ const Department = () => {
       if (count === 1) {
         departmentOne = false;
     }
-    const res = await fetch(`http://localhost:3000/api/deletedepartment`, {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/deletedepartment`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
