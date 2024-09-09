@@ -67,7 +67,6 @@ const EditDepartment = () => {
         body: JSON.stringify({ id }),
       });
       const response = await res.json();
-      console.log(response)
       if (response.success) {
         setOldData({
           department_name: response?.data[0]?.department_name,

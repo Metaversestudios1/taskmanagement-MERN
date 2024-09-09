@@ -24,7 +24,6 @@ const Department = () => {
       `${process.env.REACT_APP_BACKEND_URL}/api/getalldepartment?page=${page}&limit=${pageSize}&search=${search}`
     );
     const response = await res.json();
-    console.log(response)
     if (response.success) {
       setNoData(false)
       if(response.result.length===0){
