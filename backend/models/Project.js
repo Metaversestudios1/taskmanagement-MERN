@@ -4,7 +4,7 @@ const projectSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        unique: true // If you want project names to be unique
+        // unique: true // If you want project names to be unique
     },
     scope_finalization_date: {
         type: Date
