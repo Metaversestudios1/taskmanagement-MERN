@@ -205,7 +205,7 @@ const Projects = () => {
                 Project Name
               </th>
               <th scope="col" className="px-6 py-3 border-2 border-gray-300">Start Date</th>
-              <th scope="col" className="px-6 py-3 border-2 border-gray-300">No of Assigned Manager</th>
+              <th scope="col" className="px-6 py-3 border-2 border-gray-300">Assigned Manager</th>
               <th scope="col" className="px-6 py-3 border-2 border-gray-300" style={{ width: '200px' }}>Project Description</th>
               <th scope="col" className="px-6 py-3 border-2 border-gray-300">Status</th>
               <th scope="col" className="px-6 py-3 border-2 border-gray-300">
