@@ -4,8 +4,8 @@ import { NavLink, useNavigate } from "react-router-dom";
 import getUserFromToken from "../utils/getUserFromToken";
 import { ImCross } from "react-icons/im";
 import { FcApproval } from "react-icons/fc";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const LeaveRequests = () => {
   const navigate = useNavigate();
   const userInfo = getUserFromToken();
@@ -17,13 +17,15 @@ const LeaveRequests = () => {
   const [leaves, setLeaves] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [loader, setLoader] = useState(true
-);
-    const [noData, setNoData] = useState(false);
+  const [loader, setLoader] = useState(true);
+  const [noData, setNoData] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [count, setCount] = useState(0);
   const [search, setSearch] = useState("");
+  const [pendingLeaves, setPendingLeaves] = useState([]);
+  const [approvedLeaves, setApprovedLeaves] = useState([]);
+  const [rejectedLeaves, setrejectedLeaves] = useState([]);
   const [employees, setEmployees] = useState([]);
 
   useEffect(() => {
@@ -33,7 +35,7 @@ const LeaveRequests = () => {
   }, []);
 
   useEffect(() => {
-      fetchLeaves();
+    fetchLeaves();
   }, [page, search, employee, startDate, endDate]);
 
   const fetchEmployees = async () => {
@@ -64,10 +66,10 @@ const LeaveRequests = () => {
     );
     const response = await res.json();
     if (response.success) {
-      setNoData(false)
-      if(response.result.length===0){
-
-        setNoData(true)
+      console.log(response)
+      setNoData(false);
+      if (response.result.length === 0) {
+        setNoData(true);
       }
       const leavesWithEmployeeNames = await Promise.all(
         response.result.map(async (leave) => {
@@ -80,6 +82,15 @@ const LeaveRequests = () => {
       );
       setLeaves(leavesWithEmployeeNames);
       setCount(response.count);
+      setApprovedLeaves(
+        response.approved
+      );
+      setPendingLeaves(
+        response.pending
+      );
+      setrejectedLeaves(
+        response.rejected
+      );
       setLoader(false);
     }
   };
@@ -104,7 +115,7 @@ const LeaveRequests = () => {
       }
       const response = await res.json();
       if (response.success) {
-        toast.success('Leave is deleted Successfully!', {
+        toast.success("Leave is deleted Successfully!", {
           position: "top-right",
           autoClose: 1000,
           hideProgressBar: false,
@@ -113,7 +124,7 @@ const LeaveRequests = () => {
           draggable: true,
           progress: undefined,
           theme: "light",
-          });
+        });
         if (leaveOne) {
           setPage(page - 1);
         } else {
@@ -157,18 +168,18 @@ const LeaveRequests = () => {
 
   return (
     <div className="relative">
-       <ToastContainer
-          position="top-right"
-          autoClose={2000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
+      <ToastContainer
+        position="top-right"
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
 
       <div className="flex items-center">
         <div className="text-2xl font-bold mx-2 my-8 px-4">Leave Requests</div>
@@ -251,14 +262,27 @@ const LeaveRequests = () => {
           </button>
         </div>
       </div>
-      {loader && <div className="absolute h-full w-full top-64 flex justify-center items-center"><div
-        className=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
-        role="status">
-        <span
-          className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
-          >Loading...</span
-        >
-      </div></div>}
+      {loader && (
+        <div className="absolute h-full w-full top-64 flex justify-center items-center">
+          <div
+            className=" flex justify-center h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+            role="status"
+          >
+            <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+              Loading...
+            </span>
+          </div>
+        </div>
+      )}
+      {
+        leaves.length>0 && 
+        <div className="flex mx-4 my-5">
+          <div className="mx-2 font-bold">Total: {count}</div>
+          <div className="mx-2 font-bold">Pending: {pendingLeaves}</div>
+          <div className="mx-2 font-bold">Approved: {approvedLeaves}</div>
+          <div className="mx-2 font-bold">Rejected: {rejectedLeaves}</div>
+        </div>
+      }
       {leaves.length > 0 && (
         <div className="relative overflow-x-auto m-5 mb-0">
           <table className="w-full text-sm text-left rtl:text-right border-2 border-gray-300">
@@ -292,11 +316,13 @@ const LeaveRequests = () => {
                   status
                 </th>
                 {(userInfo.role === "admin" || userInfo.role === "Admin") && (
-              
-                <th scope="col" className="px-6 py-3 border-2 border-gray-300">
-                  Action
-                </th>
-                 )}
+                  <th
+                    scope="col"
+                    className="px-6 py-3 border-2 border-gray-300"
+                  >
+                    Action
+                  </th>
+                )}
               </tr>
             </thead>
 
@@ -360,16 +386,16 @@ const LeaveRequests = () => {
                         </div>
                       </div>
                     </td>
-                    {(userInfo.role === "admin" || userInfo.role === "Admin") && (
-              
-                    <td className=" py-5  gap-1 border-2 border-l-0 border-r-0 border-t-0 border-gray-300">
-                      <div className="flex items-center justify-center">
-                        <MdDelete
-                          onClick={(e) => handleDelete(e, item._id)}
-                          className="text-2xl cursor-pointer text-red-900"
-                        />
-                      </div>
-                    </td>
+                    {(userInfo.role === "admin" ||
+                      userInfo.role === "Admin") && (
+                      <td className=" py-5  gap-1 border-2 border-l-0 border-r-0 border-t-0 border-gray-300">
+                        <div className="flex items-center justify-center">
+                          <MdDelete
+                            onClick={(e) => handleDelete(e, item._id)}
+                            className="text-2xl cursor-pointer text-red-900"
+                          />
+                        </div>
+                      </td>
                     )}
                   </tr>
                 );
@@ -378,9 +404,11 @@ const LeaveRequests = () => {
           </table>
         </div>
       )}
-      {noData && <div className="text-center text-xl my-10">
-        Currently! There are no leaves for the user.
-      </div>}
+      {noData && (
+        <div className="text-center text-xl my-10">
+          Currently! There are no leaves for the user.
+        </div>
+      )}
       {leaves.length > 0 && (
         <div className="flex flex-col items-center my-10">
           <span className="text-sm text-black">

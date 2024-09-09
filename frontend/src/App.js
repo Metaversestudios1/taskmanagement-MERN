@@ -41,6 +41,7 @@ import AddPayroll from "./components/payroll/AddPayroll";
 import EditPayroll from "./components/payroll/EditPayroll";
 import ForgotPassword from "./components/forgotPassword/ForgotPassword";
 import ShowProject from "./components/projects/ShowProject";
+import LeaveSetting from "./components/leaveManagement/LeaveSetting";
 
 function App() {
   const [sideBar, setSideBar] = useState(true);
@@ -415,6 +416,24 @@ function App() {
               </div>
             </div>
           </div>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/leavesetting",
+      element: (
+        <PrivateRoute>
+          <AdminRoute>
+            <div className="flex h-screen">
+              <Sidebar sidebar={sideBar} />
+              <div className="flex flex-col flex-grow overflow-y-auto">
+                <Navbar toggleSideBar={toggleSideBar} />
+                <div className="flex-grow ">
+                  <LeaveSetting />
+                </div>
+              </div>
+            </div>
+          </AdminRoute>
         </PrivateRoute>
       ),
     },
