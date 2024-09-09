@@ -51,6 +51,7 @@ const HolidayRoutes = require('./routes/HolidayRoutes');
 const EventRoutes = require('./routes/EventRoutes');
 const CommonRoutes = require('./routes/CommonRoutes');
 const DepartmentRoutes = require('./routes/DepartmentRoutes');
+const AppraisalRoutes = require('./routes/AppraisalRoutes');
 
 app.use('/api', dashboardRoutes);
 app.use('/api',employeeRoutes);
@@ -65,6 +66,7 @@ app.use('/api',HolidayRoutes);
 app.use('/api',EventRoutes);
 app.use('/api',CommonRoutes);
 app.use('/api',DepartmentRoutes);
+app.use('/api',AppraisalRoutes);
 
 
 app.get('/protected', auth, (req, res) => {
