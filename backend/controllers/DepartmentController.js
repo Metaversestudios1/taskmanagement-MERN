@@ -2,7 +2,6 @@ const Department = require("../models/Department");
 
 const insertdepartment = async (req, res) => {
      try{
-      console.log(req.body)
         const newdept = new Department(req.body);
         await newdept.save();
         res.status(201).json({ success: true });
