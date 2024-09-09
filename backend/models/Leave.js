@@ -31,7 +31,7 @@ const LeaveSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        default: "Pending"
+        default: "pending"
     },
   
     deleted_at: {

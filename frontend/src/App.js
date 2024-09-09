@@ -26,7 +26,6 @@ import Setting from "./components/Setting";
 import AdminRoute from "./components/utils/AdminRoute";
 import EmployeeRoute from "./components/utils/EmployeeRoute";
 import Attendance from "./components/attendance/Attendance";
-import LeaveHistory from "./components/leaveManagement/LeaveHistory";
 import LeaveRequests from "./components/leaveManagement/LeaveRequests";
 import AddLeave from "./components/leaveManagement/AddLeave";
 import EditLeave from "./components/leaveManagement/EditLeave";
@@ -41,6 +40,7 @@ import AddPayroll from "./components/payroll/AddPayroll";
 import EditPayroll from "./components/payroll/EditPayroll";
 import ForgotPassword from "./components/forgotPassword/ForgotPassword";
 import ShowProject from "./components/projects/ShowProject";
+import LeaveSetting from "./components/leaveManagement/LeaveSetting";
 
 function App() {
   const [sideBar, setSideBar] = useState(true);
@@ -385,24 +385,6 @@ function App() {
       ),
     },
     {
-      path: "/leavehistory",
-      element: (
-        <PrivateRoute>
-          <EmployeeRoute>
-            <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} />
-              <div className="flex flex-col flex-grow overflow-y-auto">
-                <Navbar toggleSideBar={toggleSideBar} />
-                <div className="flex-grow ">
-                  <LeaveHistory />
-                </div>
-              </div>
-            </div>
-          </EmployeeRoute>
-        </PrivateRoute>
-      ),
-    },
-    {
       path: "/leaverequests",
       element: (
         <PrivateRoute>
@@ -415,6 +397,24 @@ function App() {
               </div>
             </div>
           </div>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/leavesetting",
+      element: (
+        <PrivateRoute>
+          <AdminRoute>
+            <div className="flex h-screen">
+              <Sidebar sidebar={sideBar} />
+              <div className="flex flex-col flex-grow overflow-y-auto">
+                <Navbar toggleSideBar={toggleSideBar} />
+                <div className="flex-grow ">
+                  <LeaveSetting />
+                </div>
+              </div>
+            </div>
+          </AdminRoute>
         </PrivateRoute>
       ),
     },

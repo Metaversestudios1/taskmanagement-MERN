@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import getUserFromToken from "../components/utils/getUserFromToken";
 import { NavLink } from "react-router-dom";
+import { IoIosArrowRoundForward } from "react-icons/io";
 const Home = () => {
   const userInfo = getUserFromToken();
   const [loader, setLoader] = useState(true);
@@ -58,7 +59,7 @@ const Home = () => {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 p-3 mb-6 w-full xl:grid-cols-2 2xl:grid-cols-4">
+        <div className="flex flex-col md:flex-row p-3 mb-6 w-full ">
           {userInfo?.role === "admin" || userInfo?.role === "Admin" ? (
             <>
               {" "}
@@ -149,61 +150,194 @@ const Home = () => {
             </>
           ) : (
             <>
-              <div className="bg-white shadow-lg shadow-gray-200 rounded-2xl p-4">
-                <NavLink to="/tasks">
-                  <div className="flex items-center">
-                    <div className="inline-flex flex-shrink-0 justify-center items-center w-12 h-12 text-white bg-[#1E88E5] to-voilet-500 rounded-lg">
-                      <svg
-                        className="w-8 h-8"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
-                          clipRule="evenodd"
-                        ></path>
-                      </svg>
+              <div className="flex flex-col flex-1 my-1">
+                <div className="bg-white shadow-lg shadow-gray-200 rounded-2xl p-4  ">
+                  <NavLink to="/tasks">
+                    <div className="flex items-center">
+                      <div className="inline-flex flex-shrink-0 justify-center items-center w-12 h-12 text-white bg-[#1E88E5] to-voilet-500 rounded-lg">
+                        <svg
+                          className="w-8 h-8"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
+                            clipRule="evenodd"
+                          ></path>
+                        </svg>
+                      </div>
+                      <div className="flex-shrink-0 ml-3">
+                        <span className="text-2xl font-bold leading-none text-gray-900 sm:text-3xl">
+                          {todayTasks}
+                        </span>
+                        <h3 className="text-base font-normal text-gray-500">
+                          Today's Tasks
+                        </h3>
+                      </div>
                     </div>
-                    <div className="flex-shrink-0 ml-3">
-                      <span className="text-2xl font-bold leading-none text-gray-900 sm:text-3xl">
-                        {todayTasks}
-                      </span>
-                      <h3 className="text-base font-normal text-gray-500">
-                        Today's Tasks
-                      </h3>
+                  </NavLink>
+                </div>
+                <div className="bg-white shadow-lg shadow-gray-200 rounded-2xl p-4  my-2">
+                  <NavLink to="/tasks">
+                    <div className="flex items-center">
+                      <div className="inline-flex flex-shrink-0 justify-center items-center w-12 h-12 text-white bg-[#1E88E5] to-voilet-500 rounded-lg">
+                        <svg
+                          className="w-8 h-8"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
+                            clipRule="evenodd"
+                          ></path>
+                        </svg>
+                      </div>
+                      <div className="flex-shrink-0 ml-3">
+                        <span className="text-2xl font-bold leading-none text-gray-900 sm:text-3xl">
+                          2
+                        </span>
+                        <h3 className="text-base font-normal text-gray-500">
+                          Assigned Leaves
+                        </h3>
+                      </div>
                     </div>
-                  </div>
-                </NavLink>
+                  </NavLink>
+                </div>
+                <div className="bg-white shadow-lg shadow-gray-200 rounded-2xl p-4  my-2">
+                  <NavLink to="/tasks">
+                    <div className="flex items-center">
+                      <div className="inline-flex flex-shrink-0 justify-center items-center w-12 h-12 text-white bg-[#1E88E5] to-voilet-500 rounded-lg">
+                        <svg
+                          className="w-8 h-8"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
+                            clipRule="evenodd"
+                          ></path>
+                        </svg>
+                      </div>
+                      <div className="flex-shrink-0 ml-3">
+                        <span className="text-2xl font-bold leading-none text-gray-900 sm:text-3xl">
+                          1
+                        </span>
+                        <h3 className="text-base font-normal text-gray-500">
+                          Completed Leaves
+                        </h3>
+                      </div>
+                    </div>
+                  </NavLink>
+                </div>
               </div>
-              <div className="bg-white shadow-lg shadow-gray-200 rounded-2xl p-4">
-                <NavLink to="/tasks">
-                  <div className="flex items-center">
-                    <div className="inline-flex flex-shrink-0 justify-center items-center w-12 h-12 text-white bg-[#1E88E5] to-voilet-500 rounded-lg">
-                      <svg
-                        className="w-8 h-8"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
-                          clipRule="evenodd"
-                        ></path>
-                      </svg>
+              <div className="flex flex-col flex-1 my-1">
+                <div className="bg-white shadow-lg shadow-gray-200 rounded-2xl p-4 ">
+                  <NavLink to="/tasks">
+                    <div className="flex items-center">
+                      <div className="inline-flex flex-shrink-0 justify-center items-center w-12 h-12 text-white bg-[#1E88E5] to-voilet-500 rounded-lg">
+                        <svg
+                          className="w-8 h-8"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
+                            clipRule="evenodd"
+                          ></path>
+                        </svg>
+                      </div>
+                      <div className="flex-shrink-0 ml-3">
+                        <span className="text-2xl font-bold leading-none text-gray-900 sm:text-3xl">
+                          {totalTasks}
+                        </span>
+                        <h3 className="text-base font-normal text-gray-500">
+                          Total Tasks
+                        </h3>
+                      </div>
                     </div>
-                    <div className="flex-shrink-0 ml-3">
-                      <span className="text-2xl font-bold leading-none text-gray-900 sm:text-3xl">
-                        {totalTasks}
-                      </span>
-                      <h3 className="text-base font-normal text-gray-500">
-                        Total Tasks
-                      </h3>
+                  </NavLink>
+                </div>
+                <div className="rounded-2xl shadow-lg shadow-gray-200 p-3 mx-1 py-5">
+                  <div className="flex justify-between items-center">
+                    <div className="font-bold flex items-center"><span className="inline-block mr-2 h-5 w-5 rounded-full bg-[#1E88E5] "></span>Upcoming Activites/Events</div>
+                    <div>
+                      <IoIosArrowRoundForward className="text-2xl" />
                     </div>
                   </div>
-                </NavLink>
+                  <div>
+                    <div className="flex flex-col my-3">
+                      <div className="flex items-center ">
+                        <div className="mr-2 text-lg">10 Sep</div>
+                        <div className="text-sm font-thin">Tuesday</div>
+                      </div>
+                      <div className="text-sm  font-thin">Meeting</div>
+                    </div>
+
+                    <div className="flex flex-col my-3">
+                      <div className="flex items-center ">
+                        <div className="mr-2 text-lg">28 Sep</div>
+                        <div className="text-sm font-thin">Friday</div>
+                      </div>
+                      <div className="text-sm  font-thin">Fun Activity</div>
+                    </div>
+                    <div className="flex flex-col my-3">
+                      <div className="flex items-center ">
+                        <div className="mr-2 text-lg">5 Oct </div>
+                        <div className="text-sm font-thin">Wednesday</div>
+                      </div>
+                      <div className="text-sm  font-thin">New member meet</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col flex-1 my-1">
+                <div className="rounded-2xl shadow-lg shadow-gray-200 p-3 mx-1">
+                  <div className="flex justify-between items-center">
+                    <div className="font-bold flex items-center"><span className="inline-block mr-2 h-5 w-5 rounded-full bg-[#1E88E5] "></span>Upcoming Holidays</div>
+                    <div>
+                      <IoIosArrowRoundForward className="text-2xl" />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex flex-col my-3">
+                      <div className="flex items-center ">
+                        <div className="mr-2 text-lg">16 Sep</div>
+                        <div className="text-sm font-thin">Monday</div>
+                      </div>
+                      <div className="text-sm  font-thin">Eid-E-Milad</div>
+                    </div>
+
+                    <div className="flex flex-col my-3">
+                      <div className="flex items-center ">
+                        <div className="mr-2 text-lg">02 Oct</div>
+                        <div className="text-sm font-thin">Wednesday</div>
+                      </div>
+                      <div className="text-sm  font-thin">Gandhu jayanti</div>
+                    </div>
+                    <div className="flex flex-col my-3">
+                      <div className="flex items-center ">
+                        <div className="mr-2 text-lg">11 Oct </div>
+                        <div className="text-sm font-thin">Friday</div>
+                      </div>
+                      <div className="text-sm  font-thin">Maha Ashtami</div>
+                    </div>
+                    <div className="flex flex-col my-3">
+                      <div className="flex items-center ">
+                        <div className="mr-2 text-lg">16 Sep</div>
+                        <div className="text-sm font-thin">Monday</div>
+                      </div>
+                      <div className="text-sm  font-thin">Eid-E-Milad</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </>
           )}
