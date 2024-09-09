@@ -6,7 +6,52 @@ const axios = require('axios');
 const sharp = require('sharp'); // Import sharp
 const fs = require('fs');
 
-const { PNG } = require('pngjs');
+// const { PNG } = require('pngjs');
+// const resizeImage = async (buffer, width, height) => {
+//   return sharp(buffer)
+//     .resize(width, height)
+//     .toBuffer();
+// };
+
+// const comparePhotos = async (url1, buffer2) => {
+//   try {
+//     const { default: pixelmatch } = await import('pixelmatch');
+//     // Fetch the Cloudinary image as a buffer
+//     const response1 = await axios.get(url1, { responseType: 'arraybuffer' });
+//     const buffer1 = Buffer.from(response1.data);
+
+//     // Get dimensions of the first image
+//     const metadata1 = await sharp(buffer1).metadata();
+//     const { width, height } = metadata1;
+
+//     // Resize the second image to match the dimensions of the first
+//     const resizedBuffer2 = await resizeImage(buffer2, width, height);
+
+//     // Convert buffers to PNG images
+//     const img1 = PNG.sync.read(buffer1);
+//     const img2 = PNG.sync.read(resizedBuffer2);
+
+//     const diff = new PNG({ width, height });
+
+//     // Compare the images
+//     const numDiffPixels = pixelmatch(
+//       img1.data,
+//       img2.data,
+//       diff.data,
+//       width,
+//       height,
+//       { threshold: 0.1 } // Adjust the threshold for sensitivity
+//     );
+
+//     // Calculate similarity
+//     const similarity = 1 - numDiffPixels / (width * height);
+//     return similarity >= 0.8; // similarity is in the range [0, 1]
+//   } catch (error) {
+//     console.error('Error comparing photos:', error);
+//     return false;
+//   }
+// };
+
 const resizeImage = async (buffer, width, height) => {
   return sharp(buffer)
     .resize(width, height)
@@ -16,10 +61,11 @@ const resizeImage = async (buffer, width, height) => {
 const comparePhotos = async (url1, buffer2) => {
   try {
     const { default: pixelmatch } = await import('pixelmatch');
+    const sharp = require('sharp');
+    
     // Fetch the Cloudinary image as a buffer
     const response1 = await axios.get(url1, { responseType: 'arraybuffer' });
     const buffer1 = Buffer.from(response1.data);
-
     // Get dimensions of the first image
     const metadata1 = await sharp(buffer1).metadata();
     const { width, height } = metadata1;
@@ -27,17 +73,17 @@ const comparePhotos = async (url1, buffer2) => {
     // Resize the second image to match the dimensions of the first
     const resizedBuffer2 = await resizeImage(buffer2, width, height);
 
-    // Convert buffers to PNG images
-    const img1 = PNG.sync.read(buffer1);
-    const img2 = PNG.sync.read(resizedBuffer2);
+    // Get raw pixel data for both images (convert them to raw RGBA buffers)
+    const img1 = await sharp(buffer1).raw().ensureAlpha().toBuffer();
+    const img2 = await sharp(resizedBuffer2).raw().ensureAlpha().toBuffer();
 
-    const diff = new PNG({ width, height });
+    const diff = Buffer.alloc(width * height * 4); // Buffer to store the difference image
 
     // Compare the images
     const numDiffPixels = pixelmatch(
-      img1.data,
-      img2.data,
-      diff.data,
+      img1,
+      img2,
+      diff,
       width,
       height,
       { threshold: 0.1 } // Adjust the threshold for sensitivity
@@ -177,45 +223,39 @@ const calculateWorkingHours = (checkInTime, checkOutTime) => {
 
 const updateattendence = async (req, res) => {
   const { emp_id, date, checkOut_location_url, check_out} = req.body;
-
-  const employee = await Employee.findOne({ _id: emp_id });
-
-  if (req.file) {
-    if (!employee) {
-      return res.status(404).json({
-        success: false,
-        message: "Employee not found",
-      });
-    }
-    if (employee.photo.url) {
-      const isMatch = await comparePhotos(employee.photo.url, req.file.buffer);
-      if (!isMatch) {
-        return res.status(400).json({
-          success: false,
-          message: "Photo does not match",
-        });
-      }
-    } else {
-      return res.status(400).json({
-        success: false,
-        message: "Upload Profile pic first.",
-      });
-    }
-  }
-
-
   try {
     const result = await Attendence.findOne({
       emp_id,
       date: new Date(date),
     });
-
     if (!result) {
       return res
         .status(404)
         .json({ success: false, message: "Employee not found" });
     }
-
+    if (req.file) {
+      const employee = await Employee.findOne({ _id: emp_id });
+      if (!employee) {
+        return res.status(404).json({
+          success: false,
+          message: "Employee not found",
+        });
+      }
+      if (employee.photo.url) {
+        const isMatch = await comparePhotos(employee.photo.url, req.file.buffer);
+        if (!isMatch) {
+          return res.status(400).json({
+            success: false,
+            message: "Photo does not match",
+          });
+        }
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: "Upload Profile pic first.",
+        });
+      }
+    }
     const check_in = result["check_in"];
  // This should be in string format like "2:29 PM"
 
