@@ -49,6 +49,7 @@ const LeaveRoutes = require('./routes/LeaveRoutes');
 const PayrollRoutes = require('./routes/PayrollRoutes');
 const HolidayRoutes = require('./routes/HolidayRoutes');
 const EventRoutes = require('./routes/EventRoutes');
+const CommonRoutes = require('./routes/CommonRoutes');
 
 app.use('/api', dashboardRoutes);
 app.use('/api',employeeRoutes);
@@ -61,6 +62,7 @@ app.use('/api', LeaveRoutes);
 app.use('/api',PayrollRoutes);
 app.use('/api',HolidayRoutes);
 app.use('/api',EventRoutes);
+app.use('/api',CommonRoutes);
 
 app.get('/protected', auth, (req, res) => {
     res.json({success: true, message: "you are authorize", user: req.user});

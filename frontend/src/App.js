@@ -40,6 +40,7 @@ import PayrollTable from "./components/payroll/PayrollTable";
 import AddPayroll from "./components/payroll/AddPayroll";
 import EditPayroll from "./components/payroll/EditPayroll";
 import ForgotPassword from "./components/forgotPassword/ForgotPassword";
+import ShowProject from "./components/projects/ShowProject";
 
 function App() {
   const [sideBar, setSideBar] = useState(true);
@@ -181,6 +182,24 @@ function App() {
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
                   <EditProject />
+                </div>
+              </div>
+            </div>
+          </AdminRoute>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/projects/showproject/:id",
+      element: (
+        <PrivateRoute>
+          <AdminRoute>
+            <div className="flex h-screen">
+              <Sidebar sidebar={sideBar} />
+              <div className="flex flex-col flex-grow overflow-y-auto">
+                <Navbar toggleSideBar={toggleSideBar} />
+                <div className="flex-grow ">
+                  <ShowProject />
                 </div>
               </div>
             </div>
