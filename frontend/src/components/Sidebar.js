@@ -24,11 +24,11 @@ const Sidebar = ({ sidebar }) => {
   };
   return (
     <>
-    <div className={`h-full bg-[#032e4e] flex-col   ${sidebar ? "hidden" : "flex"
+    <div className={`h-full bg-[#032e4e] flex-col  overflow-y-auto overflow-x-hidden ${sidebar ? "hidden" : "flex"
       } md:block`}>
         <div
           id="docs-sidebar"
-          className={`hs-overlay [--auto-close:lg] start-0 z-[60] w-64 border-gray-200 pt-7 pb-10 overflow-y-auto sidebar
+          className={`bg-[#032e4e] hs-overlay [--auto-close:lg] start-0 z-[60] w-72 border-gray-200 pt-7 pb-10 overflow-y-auto sidebar
           }`}
         >
           <div className="px-6">
@@ -172,7 +172,7 @@ const Sidebar = ({ sidebar }) => {
                    <li
                       id="users-accordion"
                       className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
-                    >
+                    > 
                       <div className="hs-accordion" id="users-accordion-sub-1">
                         <NavLink
                           to="/leavesetting"
@@ -263,6 +263,46 @@ const Sidebar = ({ sidebar }) => {
                             }
                           >
                             Add Employee
+                          </NavLink>
+                        </div>
+                      </li>
+                      <li
+                        id="users-accordion"
+                        className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
+                      >
+                        <div
+                          className="hs-accordion"
+                          id="users-accordion-sub-1"
+                        >
+                          <NavLink
+                            to="/departments"
+                            className={({ isActive }) =>
+                              isActive
+                                ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg ml-10 "
+                                : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg ml-10  hover:text-black hover:bg-white"
+                            }
+                          >
+                            Department List
+                          </NavLink>
+                        </div>
+                      </li>
+                      <li
+                        id="users-accordion"
+                        className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
+                      >
+                        <div
+                          className="hs-accordion"
+                          id="users-accordion-sub-1"
+                        >
+                          <NavLink
+                            to="/departments/adddepartment"
+                            className={({ isActive }) =>
+                              isActive
+                                ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg ml-10 "
+                                : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg ml-10  hover:text-black hover:bg-white"
+                            }
+                          >
+                            Add Department
                           </NavLink>
                         </div>
                       </li>

@@ -41,6 +41,9 @@ import EditPayroll from "./components/payroll/EditPayroll";
 import ForgotPassword from "./components/forgotPassword/ForgotPassword";
 import ShowProject from "./components/projects/ShowProject";
 import LeaveSetting from "./components/leaveManagement/LeaveSetting";
+import Department from "./components/departments/Department";
+import AddDepartment from "./components/departments/AddDepartment";
+import EditDepartment from "./components/departments/EditDepartment";
 
 function App() {
   const [sideBar, setSideBar] = useState(true);
@@ -110,6 +113,60 @@ function App() {
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
                   <AddEmployee />
+                </div>
+              </div>
+            </div>
+          </AdminRoute>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/departments/adddepartment",
+      element: (
+        <PrivateRoute>
+          <AdminRoute>
+            <div className="flex h-screen">
+              <Sidebar sidebar={sideBar} />
+              <div className="flex flex-col flex-grow overflow-y-auto">
+                <Navbar toggleSideBar={toggleSideBar} />
+                <div className="flex-grow ">
+                  <AddDepartment />
+                </div>
+              </div>
+            </div>
+          </AdminRoute>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/departments",
+      element: (
+        <PrivateRoute>
+          <AdminRoute>
+            <div className="flex h-screen">
+              <Sidebar sidebar={sideBar} />
+              <div className="flex flex-col flex-grow overflow-y-auto">
+                <Navbar toggleSideBar={toggleSideBar} />
+                <div className="flex-grow ">
+                  <Department />
+                </div>
+              </div>
+            </div>
+          </AdminRoute>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/departments/editdepartment/:id",
+      element: (
+        <PrivateRoute>
+          <AdminRoute>
+            <div className="flex h-screen">
+              <Sidebar sidebar={sideBar} />
+              <div className="flex flex-col flex-grow overflow-y-auto">
+                <Navbar toggleSideBar={toggleSideBar} />
+                <div className="flex-grow ">
+                  <EditDepartment />
                 </div>
               </div>
             </div>
@@ -384,6 +441,7 @@ function App() {
         </PrivateRoute>
       ),
     },
+  
     {
       path: "/leaverequests",
       element: (
