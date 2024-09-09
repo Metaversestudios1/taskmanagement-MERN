@@ -303,14 +303,22 @@ const Projects = () => {
           <span className="font-semibold text-black ">{count}</span> Entries
         </span>
         <div className="inline-flex mt-2 xs:mt-0">
-          <button className="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 rounded-s hover:bg-gray-900 ">
-            Prev
-          </button>
-          <button className="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 border-0 border-s border-gray-700 rounded-e hover:bg-gray-900 ">
-            Next
-          </button>
-        </div>
-      </div>}
+        <button
+        onClick={() => setPage(page - 1)}
+        disabled={page === 1}
+        className="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 rounded-s hover:bg-gray-900"
+      >
+        Prev
+      </button>
+      <button
+        onClick={() => setPage(page + 1)}
+        disabled={
+          projects.length < pageSize || startIndex + pageSize >= count
+        }
+        className="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 border-0 border-s border-gray-700 rounded-e hover:bg-gray-900"
+      >
+        Next
+      </button>
     </div>
   );
 };
