@@ -80,7 +80,7 @@ const Addappraisal = () => {
 
 
   const fetchEmployees = async () => {
-    const res = await fetch(`http://localhost:3000/api/getemployee`);
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getemployee`);
     const response = await res.json();
    
     if (response.success) {
@@ -98,7 +98,7 @@ const Addappraisal = () => {
     setLoader(true);
     
     try {
-      const res = await fetch(`http://localhost:3000/api/insertappraisal`, {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertappraisal`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

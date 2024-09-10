@@ -34,7 +34,7 @@ const AppraisalTable = () => {
       if (count === 1) {
         activOne = false;
       }
-      const res = await fetch(`http://localhost:3000/api/deleteappraisal`, {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/deleteappraisal`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
@@ -70,7 +70,7 @@ const AppraisalTable = () => {
 
   const fetchEmployeeName = async (id) => {
     const nameRes = await fetch(
-      `http://localhost:3000/api/getesingleemployee`,
+      `${process.env.REACT_APP_BACKEND_URL}/api/getesingleemployee`,
       {
         method: "POST",
         headers: { "Content-type": "application/json" },
@@ -83,7 +83,7 @@ const AppraisalTable = () => {
   const fetchappraisal = async () => {
     setLoader(true);
     const res = await fetch(
-      `http://localhost:3000/api/getAllappraisal?page=${page}&limit=${pageSize}&search=${search}`
+      `${process.env.REACT_APP_BACKEND_URL}/api/getAllappraisal?page=${page}&limit=${pageSize}&search=${search}`
     );
     const response = await res.json();
     if (response.success) {

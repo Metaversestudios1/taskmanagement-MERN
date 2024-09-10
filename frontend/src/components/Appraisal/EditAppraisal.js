@@ -76,7 +76,7 @@ const Editappraisal = () => {
 
 
   const fetchEmployees = async () => {
-    const res = await fetch(`http://localhost:3000/api/getemployee`);
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getemployee`);
     const response = await res.json();
    
     if (response.success) {
@@ -86,7 +86,7 @@ const Editappraisal = () => {
   };
   const fetchOldData = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/getSingleAppraisal`, {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getSingleAppraisal`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
@@ -126,7 +126,7 @@ const Editappraisal = () => {
 
   const fetchAllAppraisal = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/getAllappraisal`);
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getAllappraisal`);
       const response = await res.json();
       if (response.success) {
         setAppraisal(response.result);
@@ -150,7 +150,7 @@ const Editappraisal = () => {
       setLoader(true);
     try {
         const updateData = { id, oldData };
-      const res = await fetch(`http://localhost:3000/api/updateappraisal`, {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateappraisal`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updateData), // Spread oldData into the body
