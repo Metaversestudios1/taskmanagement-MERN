@@ -4,8 +4,8 @@ const appraisal_schema = new mongoose.Schema({
     employee_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee' },
     period_start: Date,
     period_end: Date,
-    overall_rating: Number,
-    feedback: String,
+    overall_rating: Number,    
+    criteria : String,
     goals_for_next_period: String,
     appraisal_date: Date,
     status: {

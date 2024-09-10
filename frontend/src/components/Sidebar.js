@@ -315,6 +315,46 @@ const Sidebar = ({ sidebar }) => {
                           id="users-accordion-sub-1"
                         >
                           <NavLink
+                            to="/appraisal"
+                            className={({ isActive }) =>
+                              isActive
+                                ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg ml-10 "
+                                : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg ml-10  hover:text-black hover:bg-white"
+                            }
+                          >
+                            Appraisal List
+                          </NavLink>
+                        </div>
+                      </li>
+                      <li
+                        id="users-accordion"
+                        className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
+                      >
+                        <div
+                          className="hs-accordion"
+                          id="users-accordion-sub-1"
+                        >
+                          <NavLink
+                            to="/appraisal/addappraisal"
+                            className={({ isActive }) =>
+                              isActive
+                                ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg ml-10 "
+                                : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg ml-10  hover:text-black hover:bg-white"
+                            }
+                          >
+                            Assign Appraisal
+                          </NavLink>
+                        </div>
+                      </li>
+                      <li
+                        id="users-accordion"
+                        className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
+                      >
+                        <div
+                          className="hs-accordion"
+                          id="users-accordion-sub-1"
+                        >
+                          <NavLink
                             to="/rolestable"
                             className={({ isActive }) =>
                               isActive

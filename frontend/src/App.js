@@ -44,6 +44,9 @@ import LeaveSetting from "./components/leaveManagement/LeaveSetting";
 import Department from "./components/departments/Department";
 import AddDepartment from "./components/departments/AddDepartment";
 import EditDepartment from "./components/departments/EditDepartment";
+import Appraisal from "./components/Appraisal/AppraisalTable";
+import AddAppraisal from "./components/Appraisal/AddAppraisal";
+import Editappraisal from "./components/Appraisal/EditAppraisal";
 
 function App() {
   const [sideBar, setSideBar] = useState(true);
@@ -677,6 +680,60 @@ function App() {
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
                   <AddPayroll />
+                </div>
+              </div>
+            </div>
+          </AdminRoute>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/appraisal",
+      element: (
+        <PrivateRoute>
+          <AdminRoute>
+            <div className="flex h-screen">
+              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
+                <Navbar toggleSideBar={toggleSideBar} />
+                <div className="flex-grow ">
+                  <Appraisal />
+                </div>
+              </div>
+            </div>
+          </AdminRoute>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/appraisal/addappraisal",
+      element: (
+        <PrivateRoute>
+          <AdminRoute>
+            <div className="flex h-screen">
+              <Sidebar sidebar={sideBar} />
+              <div className="flex flex-col flex-grow overflow-y-auto">
+                <Navbar toggleSideBar={toggleSideBar} />
+                <div className="flex-grow ">
+                  <AddAppraisal />
+                </div>
+              </div>
+            </div>
+          </AdminRoute>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/appraisal/editappraisal/:id",
+      element: (
+        <PrivateRoute>
+          <AdminRoute>
+            <div className="flex h-screen">
+              <Sidebar sidebar={sideBar} />
+              <div className="flex flex-col flex-grow overflow-y-auto">
+                <Navbar toggleSideBar={toggleSideBar} />
+                <div className="flex-grow ">
+                  <Editappraisal />
                 </div>
               </div>
             </div>
