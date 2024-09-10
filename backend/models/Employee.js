@@ -21,20 +21,14 @@ const employeeSchema = new mongoose.Schema(
         message: (props) => `${props.value} is not a valid phone number!`,
       },
     },
-    emergency_contact_number: {
-      type: String,
-      validate: {
-        validator: function (v) {
-          return /\d{10}/.test(v); // Example validation for a 10-digit phone number
-        },
-        message: (props) => `${props.value} is not a valid phone number!`,
-      },
-    },
+
     password: {
       type: String,
+      required: true
     },
     role: {
       type: String,
+      required: true
     },
     department: { type: String },
     designation: { type: String },
@@ -46,10 +40,8 @@ const employeeSchema = new mongoose.Schema(
     },
     employee_type: {
       type: String,
-      enum: ["Full-time", "Part-time", "Freelancer"],
     },
     shift_timing: { type: String },
-    address: { type: String },
     permanent_address: { type: String },
     work_location: { type: String },
     joining_date: { type: Date },
@@ -64,12 +56,17 @@ const employeeSchema = new mongoose.Schema(
     }, // Assuming the document is stored as a file URL or path
     nationality: { type: String },
     gender: { type: String },
-    experience: { type: String }, // You may want to define a more detailed structure if required
-    bank_account_details: { type: String },
-    hobbies_interests: { type: String },
-    previous_job_history: { type: String },
-    educational_qualification: { type: String },
+    experience: { type: String },
+    hobbies: { type: String },
+    education: { type: String },
     skills: { type: String },
+    bank_details: {
+      acc_no: { type: String },
+      ifsc_code: { type: String },
+      acc_holder_name: { type: String },
+      bank_name: { type: String },
+      branch: { type: String },
+    },
     resetOtp: {
       type: String,
     },
