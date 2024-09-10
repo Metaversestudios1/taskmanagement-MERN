@@ -28,7 +28,7 @@ const Sidebar = ({ sidebar }) => {
       } md:block`}>
         <div
           id="docs-sidebar"
-          className={`bg-[#032e4e] hs-overlay [--auto-close:lg] start-0 z-[60] w-72 border-gray-200 pt-7 pb-10 overflow-y-auto sidebar
+          className={`bg-[#032e4e] hs-overlay [--auto-close:lg] start-0 z-[60]  border-gray-200 pt-7 pb-10 overflow-y-auto sidebar
           }`}
         >
           <div className="px-6">
