@@ -26,7 +26,7 @@ const Projects = () => {
   const fetchProjects = async () => {
     setLoader(true)
     const res = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/getproject?page=${page}&limit=${pageSize}&search=${search}&filter=${filter}`
+      `http://localhost:3000/api/getproject?page=${page}&limit=${pageSize}&search=${search}&filter=${filter}`
     );
     const response = await res.json();
     if (response.success) {
@@ -49,7 +49,7 @@ const Projects = () => {
       if (count === 1) {
         projectOne = false;
       }
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/deleteproject`, {
+      const res = await fetch(`http://localhost:3000/api/deleteproject`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
@@ -100,7 +100,7 @@ const Projects = () => {
         projectOne = false;
       }
       try {
-        const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updatestatus/Project/${id}`, {
+        const res = await fetch(`http://localhost:3000/api/updatestatus/Project/${id}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -127,9 +127,6 @@ const Projects = () => {
     }
   };
 
-  const handleshow = (e, id) => {
-    navigate(`showproject/${id}`);
-  };
 
   const startIndex = (page - 1) * pageSize;
 
@@ -273,16 +270,17 @@ const Projects = () => {
 
                   <td className="py-5  pl-5 gap-1 border-2  border-gray-300">
                     <div className="flex items-center">
+                    <NavLink to={`/projects/showproject/${item?._id}`}>
+                    <IoMdEye
+                    className="text-2xl cursor-pointer text-blue-900"
+                    />
+                    </NavLink>
                       <NavLink to={`/projectjs/editproject/${item._id}`}>
                         <CiEdit className="text-2xl cursor-pointer text-green-900" />
                       </NavLink>
                       <MdDelete
                         onClick={(e) => handleDelete(e, item._id)}
                         className="text-2xl cursor-pointer text-red-900"
-                      />
-                       <IoMdEye
-                        onClick={(e) => handleshow(e, item._id)}
-                        className="text-2xl cursor-pointer text-blue-900"
                       />
                     </div>
                   </td>

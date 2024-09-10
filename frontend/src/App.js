@@ -44,10 +44,10 @@ import LeaveSetting from "./components/leaveManagement/LeaveSetting";
 import Department from "./components/departments/Department";
 import AddDepartment from "./components/departments/AddDepartment";
 import EditDepartment from "./components/departments/EditDepartment";
+import ShowEmployee from "./components/employees/ShowEmployee";
 import Appraisal from "./components/Appraisal/AppraisalTable";
 import AddAppraisal from "./components/Appraisal/AddAppraisal";
 import Editappraisal from "./components/Appraisal/EditAppraisal";
-
 function App() {
   const [sideBar, setSideBar] = useState(true);
   const toggleSideBar = () => {
@@ -75,7 +75,7 @@ function App() {
       element: (
         <PrivateRoute>
           <div className="flex h-screen">
-            <Sidebar sidebar={sideBar} className="flex-1"/>
+            <Sidebar sidebar={sideBar} className="flex-1" />
             <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
               <Navbar toggleSideBar={toggleSideBar} />
               <div className="flex-grow ">
@@ -92,7 +92,7 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -111,11 +111,29 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
                   <AddEmployee />
+                </div>
+              </div>
+            </div>
+          </AdminRoute>
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/employees/showemployee/:id",
+      element: (
+        <PrivateRoute>
+          <AdminRoute>
+            <div className="flex h-screen">
+              <Sidebar sidebar={sideBar} className="flex-1" />
+              <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
+                <Navbar toggleSideBar={toggleSideBar} />
+                <div className="flex-grow ">
+                  <ShowEmployee />
                 </div>
               </div>
             </div>
@@ -129,7 +147,7 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -147,7 +165,7 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -165,7 +183,7 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -183,7 +201,7 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -201,7 +219,7 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -219,7 +237,7 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -237,7 +255,7 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -255,7 +273,7 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -273,7 +291,7 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -291,7 +309,7 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -309,7 +327,7 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -327,7 +345,7 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -345,7 +363,7 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -363,7 +381,7 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -380,7 +398,7 @@ function App() {
       element: (
         <PrivateRoute>
           <div className="flex h-screen">
-            <Sidebar sidebar={sideBar} className="flex-1"/>
+            <Sidebar sidebar={sideBar} className="flex-1" />
             <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
               <Navbar toggleSideBar={toggleSideBar} />
               <div className="flex-grow ">
@@ -397,7 +415,7 @@ function App() {
         <PrivateRoute>
           <EmployeeRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -415,7 +433,7 @@ function App() {
         <PrivateRoute>
           <EmployeeRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -433,7 +451,7 @@ function App() {
       element: (
         <PrivateRoute>
           <div className="flex h-screen">
-            <Sidebar sidebar={sideBar} className="flex-1"/>
+            <Sidebar sidebar={sideBar} className="flex-1" />
             <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
               <Navbar toggleSideBar={toggleSideBar} />
               <div className="flex-grow ">
@@ -444,13 +462,13 @@ function App() {
         </PrivateRoute>
       ),
     },
-  
+
     {
       path: "/leaverequests",
       element: (
         <PrivateRoute>
           <div className="flex h-screen">
-            <Sidebar sidebar={sideBar} className="flex-1"/>
+            <Sidebar sidebar={sideBar} className="flex-1" />
             <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
               <Navbar toggleSideBar={toggleSideBar} />
               <div className="flex-grow ">
@@ -467,7 +485,7 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -484,7 +502,7 @@ function App() {
       element: (
         <PrivateRoute>
           <div className="flex h-screen">
-            <Sidebar sidebar={sideBar} className="flex-1"/>
+            <Sidebar sidebar={sideBar} className="flex-1" />
             <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
               <Navbar toggleSideBar={toggleSideBar} />
               <div className="flex-grow ">
@@ -501,7 +519,7 @@ function App() {
         <PrivateRoute>
           <EmployeeRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -518,7 +536,7 @@ function App() {
       element: (
         <PrivateRoute>
           <div className="flex h-screen">
-            <Sidebar sidebar={sideBar} className="flex-1"/>
+            <Sidebar sidebar={sideBar} className="flex-1" />
             <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
               <Navbar toggleSideBar={toggleSideBar} />
               <div className="flex-grow ">
@@ -534,7 +552,7 @@ function App() {
       element: (
         <PrivateRoute>
           <div className="flex h-screen">
-            <Sidebar sidebar={sideBar} className="flex-1"/>
+            <Sidebar sidebar={sideBar} className="flex-1" />
             <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
               <Navbar toggleSideBar={toggleSideBar} />
               <div className="flex-grow ">
@@ -551,7 +569,7 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -569,7 +587,7 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -587,7 +605,7 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -604,7 +622,7 @@ function App() {
       element: (
         <PrivateRoute>
           <div className="flex h-screen">
-            <Sidebar sidebar={sideBar} className="flex-1"/>
+            <Sidebar sidebar={sideBar} className="flex-1" />
             <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
               <Navbar toggleSideBar={toggleSideBar} />
               <div className="flex-grow ">
@@ -621,7 +639,7 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -639,7 +657,7 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -657,7 +675,7 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
@@ -675,7 +693,7 @@ function App() {
         <PrivateRoute>
           <AdminRoute>
             <div className="flex h-screen">
-              <Sidebar sidebar={sideBar} className="flex-1"/>
+              <Sidebar sidebar={sideBar} className="flex-1" />
               <div className="flex flex-col flex-grow overflow-y-auto flex-[3]">
                 <Navbar toggleSideBar={toggleSideBar} />
                 <div className="flex-grow ">
