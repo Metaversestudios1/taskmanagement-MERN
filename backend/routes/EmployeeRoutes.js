@@ -18,9 +18,15 @@ const upload = multer({
 });
 
 router.get('/getemployee', getAllEmployees);
-router.post('/insertemployee', upload.single('photo'),insertEmployee);
+router.post('/insertemployee',upload.fields([
+  { name: 'photo', maxCount: 1 },
+  { name: 'document', maxCount: 1 }
+]),insertEmployee);
 router.post('/login',  login);
-router.put('/updatemployee',upload.single('photo'), updateEmployee);
+router.put('/updatemployee',upload.fields([
+  { name: 'photo', maxCount: 1 },
+  { name: 'document', maxCount: 1 }
+]), updateEmployee);
 
 // Route to delete an employee by ID
 router.delete('/deleteemployee', deleteEmployee);

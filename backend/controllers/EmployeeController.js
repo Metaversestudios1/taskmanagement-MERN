@@ -17,6 +17,48 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+
+const uploadDocument = (buffer, originalname, mimetype) => {
+  return new Promise((resolve, reject) => {
+    if (!mimetype || typeof mimetype !== 'string') {
+
+      return reject(new Error("MIME type is required and must be a string"));
+    }
+    
+    let resourceType = "raw"; // Default to 'raw' for non-image/video files
+
+    if (mimetype.startsWith("image")) {
+      resourceType = "image";
+    } else if (mimetype.startsWith("video")) {
+      resourceType = "video";
+    }else if (mimetype === "application/pdf") {
+      resourceType = "raw"; // Explicitly set PDFs as raw
+    }
+    const fileExtension = path.extname(originalname);
+    const fileNameWithoutExtension = path.basename(originalname, fileExtension);
+    const publicId = `${fileNameWithoutExtension}${fileExtension}`; // Include extension in public_id
+
+    const options = {
+      resource_type: resourceType,
+      public_id: publicId, // Set the public_id with extension
+      use_filename: true,
+      unique_filename: false,
+      overwrite: true,
+    };
+
+    const uploadStream = cloudinary.uploader.upload(`data:${mimetype};base64,${buffer.toString('base64')}`, options, (error, result) => {
+      if (error) {
+        console.error("Cloudinary upload error:", error);
+        return reject(new Error("Cloudinary upload failed"));
+      }
+      console.log("Cloudinary upload result:", result);
+      resolve(result);
+    });
+
+    // uploadStream.end(buffer); // Upload the file from the buffer
+  });
+};
+
 const uploadImage = (buffer, originalname, mimetype) => {
   return new Promise((resolve, reject) => {
     if (!mimetype || typeof mimetype !== 'string') {
@@ -62,13 +104,11 @@ const deleteImage = async (publicId) => {
 
 
 const insertEmployee = async (req, res) => {
-  // console.log(req.body, req.file)
   try {
     const { password, ...employeeData } = req.body; // Extract password from req.body
     if (
       !password ||
       !employeeData.name ||
-      !employeeData.email ||
       !employeeData.role ||
       !employeeData.contact_number
     ) {
@@ -86,16 +126,56 @@ const insertEmployee = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
      let photo = null;
+     let document = null;
+    
      try{
+      if (req.files) {
+       
+        // Handle photo
+        if (req.files['photo'] && req.files['photo'][0] && req.files['photo'][0].buffer) {
+          
+          const photoFile = req.files['photo'][0];
+          const photoFileName = photoFile.originalname.toLowerCase();
+          if (photoFileName.includes('photo') || photoFile.mimetype.startsWith('image/')) {
+            const uploadResult = await uploadImage(photoFile.buffer, photoFile.originalname, photoFile.mimetype);
+            photo = {
+              publicId: uploadResult.public_id,
+              url: uploadResult.secure_url,
+              originalname: photoFile.originalname,
+              mimetype: photoFile.mimetype,
+            };
+          } else {
+            // Handle unsupported file type
+            return res.status(400).json({
+              success: false,
+              message: "Unsupported file type for photo",
+            });
+          }
+        }
 
-      if (req.file && req.file.buffer) {
-        const uploadResult = await uploadImage(req.file.buffer, req.file.originalname, req.file.mimetype);
-        photo = {
-          publicId: uploadResult.public_id,
-          url: uploadResult.secure_url,
-          originalname: req.file.originalname,
-          mimetype: req.file.mimetype,
-        };
+        // Handle document
+        if (req.files['document'] && req.files['document'][0] && req.files['document'][0].buffer) {
+          const documentFile = req.files['document'][0];
+          const documentFileName = documentFile.originalname.toLowerCase();
+          // Accept both application files and images as documents
+          if (documentFileName.includes('document') || documentFile.mimetype.startsWith('application/') || documentFile.mimetype.startsWith('image/')) {
+            const uploadResult = await uploadDocument(documentFile.buffer, documentFile.originalname, documentFile.mimetype);
+            document = {
+              publicId: uploadResult.public_id,
+              url: uploadResult.secure_url,
+              originalname: documentFile.originalname,
+              mimetype: documentFile.mimetype,
+            };
+          } else {
+            // Handle unsupported file type
+            return res.status(400).json({
+              success: false,
+              message: "Unsupported file type for document",
+            });
+          }
+        }
+      } else {
+        console.log('No files were uploaded');
       }
 
     } catch (uploadError) {
@@ -111,9 +191,10 @@ const insertEmployee = async (req, res) => {
       ...employeeData,
       password: hashedPassword,
       photo: photo || undefined, 
+      document: document || undefined, 
     });
 
-    await newEmployee.save();
+     await newEmployee.save();
     res.status(201).json({ success: true });
   } catch (error) {
     res.status(500).json({
@@ -172,56 +253,98 @@ const deleteEmployee = async (req, res) => {
       .json({ success: false, message: "Error updating data: " + err.message });
   }
 };
-
 const updateEmployee = async (req, res) => {
-  //const id = req.body.id; // Extract the ID from the request parameters
-  // console.log(req.body)
   const updateData = req.body; // Extract the update data from the request body
   const id = updateData.id;
+  
   try {
-    let photo;
+    let photo = null;
+    let document = null;
+    // console.log(req.files)
+    if (req.files) {
+      // Handle photo
+      if (req.files['photo'] && req.files['photo'][0] && req.files['photo'][0].buffer) {
+        // console.log(req.files['photo']);
+        const photoFile = req.files['photo'][0];
+        const photoFileName = photoFile.originalname.toLowerCase();
+        if (photoFileName.includes('photo') || photoFile.mimetype.startsWith('image/')) {
+          const uploadResult = await uploadImage(photoFile.buffer, photoFile.originalname, photoFile.mimetype);
+          photo = {
+            publicId: uploadResult.public_id,
+            url: uploadResult.secure_url,
+            originalname: photoFile.originalname,
+            mimetype: photoFile.mimetype,
+          };
+        } else {
+          return res.status(400).json({
+            success: false,
+            message: "Unsupported file type for photo",
+          });
+        }
+      }
 
-    // If a file is present, handle the file upload to Cloudinary
-    if (req.file && req.file.buffer) {
+      // Handle document
+      if (req.files['document'] && req.files['document'][0] && req.files['document'][0].buffer) {
+        const documentFile = req.files['document'][0];
+        const documentFileName = documentFile.originalname.toLowerCase();
+        if (documentFileName.includes('document') || documentFile.mimetype.startsWith('application/') || documentFile.mimetype.startsWith('image/')) {
+          const uploadResult = await uploadDocument(documentFile.buffer, documentFile.originalname, documentFile.mimetype);
+          document = {
+            publicId: uploadResult.public_id,
+            url: uploadResult.secure_url,
+            originalname: documentFile.originalname,
+            mimetype: documentFile.mimetype,
+          };
+        } else {
+          return res.status(400).json({
+            success: false,
+            message: "Unsupported file type for document",
+          });
+        }
+      }
+    } 
+
+    // Parse updateData.oldData safely
+    let updateFields = {};
+    if (updateData.oldData) {
       try {
-        const uploadResult = await uploadImage(req.file.buffer, req.file.originalname, req.file.mimetype);
-        photo = {
-          publicId: uploadResult.public_id,
-          url: uploadResult.secure_url,
-          originalname: req.file.originalname,
-          mimetype: req.file.mimetype,
-        };
-      } catch (uploadError) {
-        return res.status(500).json({
+        updateFields = JSON.parse(updateData.oldData);
+      } catch (e) {
+        return res.status(400).json({
           success: false,
-          message: "Error uploading image",
-          error: uploadError.message,
+          message: "Invalid JSON format for oldData",
         });
       }
     }
-    // Build the update object
-    const updateFields = { ...JSON.parse(updateData.oldData)};
-    
+
+    // Include new file data if available
     if (photo) {
       updateFields.photo = photo;
+    }
+    if (document) {
+      updateFields.document = document;
     }
 
     const result = await Employee.updateOne(
       { _id: id },
       { $set: updateFields }
     );
-    if (!result) {
+
+    if (result.nModified === 0) {
       return res
         .status(404)
-        .json({ success: false, message: "Employee not found" });
+        .json({ success: false, message: "Employee not found or no changes made" });
     }
-    res.status(201).json({ success: true });
+
+    res.status(200).json({ success: true });
   } catch (err) {
-    res
-      .status(500)
-      .json({ success: false, message: "Error updating data: " + err.message });
+    res.status(500).json({
+      success: false,
+      message: "Error updating data: " + err.message,
+    });
   }
 };
+
 
 const getSingleEmployee = async (req, res) => {
   try {
