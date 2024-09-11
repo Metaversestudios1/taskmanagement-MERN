@@ -34,7 +34,7 @@ const ShowProject = () => {
       setLoader(true);
       try {
         const response = await fetch(
-          `http://localhost:3000/api/getSingleproject`,
+          `${process.env.REACT_APP_BACKEND_URL}/api/getSingleproject`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

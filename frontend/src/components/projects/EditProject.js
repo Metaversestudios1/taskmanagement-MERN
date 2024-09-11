@@ -34,7 +34,7 @@ const EditProject = () => {
     const fetchOldData = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/getSingleproject`,
+          `${process.env.REACT_APP_BACKEND_URL}/api/getSingleproject`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -80,7 +80,7 @@ const EditProject = () => {
   }, [id]);
 
   const fetchEmployees = async() =>{
-    const res = await fetch(`http://localhost:3000/api/getemployee`);
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getemployee`);
     const response = await res.json()
     if(response.success){
       setEmployees(response.result);
@@ -166,7 +166,7 @@ const EditProject = () => {
     }
     setLoader(true);
     const updateData = { id, oldData };
-    const response = await fetch(`http://localhost:3000/api/updateproject`, {
+    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateproject`, {
       method: "PUT",
       headers: { "Content-Type": "application/json " },
       body: JSON.stringify(updateData),
