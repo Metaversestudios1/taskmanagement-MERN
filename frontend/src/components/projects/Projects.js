@@ -62,7 +62,10 @@ const Projects = () => {
       }
     );
     const employeeName = await nameRes.json();
-    return employeeName.success ? employeeName.data[0].name : "Unknown";
+    return employeeName.success && employeeName.data?.length > 0
+  ? employeeName.data[0].name
+  : "Unknown";
+
   };
 
 
