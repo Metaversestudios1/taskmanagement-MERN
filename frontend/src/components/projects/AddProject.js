@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect,useState } from "react";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import $ from "jquery";
 import 'jquery-validation';
+
 const AddProject = () => {
   const navigate = useNavigate()
 
@@ -29,12 +30,24 @@ const AddProject = () => {
   const [data, setData] = useState(initialState);
   const [error, setError] = useState("");
   const [loader, setLoader] = useState(false);
+  const [employees, setEmployees] = useState([]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setData({ ...data, [name]: value });
   };
 
+  useEffect(() => {
+    fetchEmployees();
+},[]);
+
+const fetchEmployees = async() =>{
+  const res = await fetch(`http://localhost:3000/api/getemployee`);
+  const response = await res.json()
+  if(response.success){
+    setEmployees(response.result);
+  }
+}
 
   const validateprojectForm = () => {
     $("#projectform").validate({
@@ -48,7 +61,9 @@ const AddProject = () => {
         no_of_sprints: {
           digits: true,
         },
-      
+        assigned_manager:{
+          required:true,
+        },
         project_duration: {
           digits: true,
         },
@@ -74,6 +89,10 @@ const AddProject = () => {
         },
         project_duration: {
           digits: "Please enter a valid number"
+        },
+        assigned_manager:{
+          required: "Please select manager"
+    
         }
       },
       errorElement: 'div',
@@ -101,7 +120,7 @@ const AddProject = () => {
     }
     setLoader(true)
 
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertproject`, {
+    const res = await fetch(`http://localhost:3000/api/insertproject`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -235,7 +254,7 @@ const AddProject = () => {
                 htmlFor="no_of_sprints"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
               >
-                No of Sprints<span className="text-red-900 text-lg ">&#x2a;</span>
+                No of Sprints
               </label>
               <input
                 name="no_of_sprints"
@@ -315,16 +334,27 @@ const AddProject = () => {
                 htmlFor="assigned_manager"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
               >
-                Assigned Manager
+                Assigned Manager<span className="text-red-900 text-lg ">&#x2a;</span>
               </label>
+              <select
+               name="assigned_manager"
+               value={data.assigned_manager}
+               onChange={handleChange}
+               type="text"
+               id="assigned_manager"
+               className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
+               placeholder="Leads">
+                <option value="">select Manager</option>
+                {employees.map((item) => (
+                  <option value={item._id}
+                  key={item._id}
+                  className=" bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5"
+                  >{item.name}</option>
+                ))}
+
+              </select>
               <input
-                name="assigned_manager"
-                value={data.assigned_manager}
-                onChange={handleChange}
-                type="text"
-                id="assigned_manager"
-                className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
-                placeholder="Leads"
+               
 
               />
             </div>

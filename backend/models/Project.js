@@ -19,7 +19,7 @@ const projectSchema = new mongoose.Schema({
         type: Number
     },
     assigned_manager: {
-        type: String
+        type: mongoose.Schema.Types.ObjectId, ref: 'Employee'
     },
     designer: {
         type: String
@@ -42,7 +42,12 @@ const projectSchema = new mongoose.Schema({
     status: {
         type: Number,
         enum: [0, 1, 2], // 0 = inactive, 1 = active, 2 = hold
-        default: 1 // Default to 'active'
+        default: 0 // Default to 'active'
+    },
+    publish: {
+        type: Number,
+        enum: [0, 1], // 0 = unpublished, 1 = published, 2 = hold
+        default: 0 // Default to 'active'
     },
     start_date: {
         type: Date,

@@ -187,7 +187,34 @@ const Sidebar = ({ sidebar }) => {
                         </div>
                         </li>
                 </ul>
+                
               )}
+              <li className="transition-all duration-200 hover:scale-105">
+                <NavLink
+                  to="/projects"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg"
+                      : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg hover:text-black hover:bg-white"
+                  }
+                >
+                  <GoTasklist className="text-lg" />
+                  Project
+                </NavLink>
+              </li>
+              <li className="transition-all duration-200 hover:scale-105">
+                <NavLink
+                  to="/projects/addproject"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg"
+                      : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg hover:text-black hover:bg-white"
+                  }
+                >
+                  <GoTasklist className="text-lg" />
+                  Add Project
+                </NavLink>
+              </li>
               {((userInfo?.permissions?.includes("Admin_permission")) && (userInfo?.role === "Admin" || userInfo?.role === "admin")) && (
                 <>
                   <li className="hs-accordion" id="users-accordion">
@@ -426,38 +453,7 @@ const Sidebar = ({ sidebar }) => {
                           </NavLink>
                         </div>
                       </li>
-                      <li className="transition-all duration-200 hover:scale-110">
-                        <NavLink
-                          to="/projects"
-                          className={({ isActive }) =>
-                            isActive
-                              ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg ml-10 "
-                              : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg ml-10  hover:text-black hover:bg-white"
-                          }
-                        >
-                          Projects
-                        </NavLink>
-                      </li>
-                      <li
-                        id="users-accordion"
-                        className="hs-accordion-content w-full my-2 overflow-hidden transition-all duration-200 hover:scale-110"
-                      >
-                        <div
-                          className="hs-accordion"
-                          id="users-accordion-sub-1"
-                        >
-                          <NavLink
-                            to="/projects/addproject"
-                            className={({ isActive }) =>
-                              isActive
-                                ? "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white bg-blue-600 rounded-lg ml-10 "
-                                : "flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg ml-10  hover:text-black hover:bg-white"
-                            }
-                          >
-                            Add Project
-                          </NavLink>
-                        </div>
-                      </li>
+                      
                     </ul>
                   )}
                 </>

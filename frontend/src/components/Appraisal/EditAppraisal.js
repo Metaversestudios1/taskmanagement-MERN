@@ -42,6 +42,7 @@ const Editappraisal = () => {
         },
         overall_rating: {
           required: true,
+          digit:true,
         },
        
       },
@@ -54,6 +55,7 @@ const Editappraisal = () => {
         },
         overall_rating: {
           required: "Please enter rating ",
+           digit:"please enter valid number"
         },
         
       },

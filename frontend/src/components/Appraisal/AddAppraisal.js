@@ -46,6 +46,7 @@ const Addappraisal = () => {
         },
         overall_rating: {
           required: true,
+          digit:true,
         },
        
       },
@@ -58,6 +59,7 @@ const Addappraisal = () => {
         },
         overall_rating: {
           required: "Please enter rating ",
+          digit:"please enter valid number"
         },
         
       },

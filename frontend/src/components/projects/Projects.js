@@ -26,7 +26,7 @@ const Projects = () => {
   const fetchProjects = async () => {
     setLoader(true)
     const res = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/getproject?page=${page}&limit=${pageSize}&search=${search}&filter=${filter}`
+      `http://localhost:3000/api/getproject?page=${page}&limit=${pageSize}&search=${search}&filter=${filter}`
     );
     const response = await res.json();
     if (response.success) {
@@ -49,7 +49,7 @@ const Projects = () => {
       if (count === 1) {
         projectOne = false;
       }
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/deleteproject`, {
+      const res = await fetch(`http://localhost:3000/api/deleteproject`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
@@ -100,7 +100,7 @@ const Projects = () => {
         projectOne = false;
       }
       try {
-        const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updatestatus/Project/${id}`, {
+        const res = await fetch(`http://localhost:3000/api/updatestatus/Project/${id}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -127,6 +127,41 @@ const Projects = () => {
     }
   };
 
+  const handleStatuspublish = async(id, newStatus) =>{
+    const permissionOfpublish = window.confirm(`Are you sure you want to publish the Project?`);
+    if(permissionOfpublish){
+      let projectOne = projects.length === 1;
+      if(count===1){
+        projectOne = false;
+      }
+      
+      const updateData = { id, newStatus };
+      try{    
+           const res = await fetch(`http://localhost:3000/api/publishproject`,{
+            method:'POST',
+            headers: { "Content-Type": "application/json " }, // Remove the extra space
+            body: JSON.stringify(updateData),
+           })
+           const response = await res.json(); // Add await here
+
+           console.log(response.success)
+           if(response.success){
+              toast.success('Project is Published Successfully',{
+                position: "top-right",
+                autoClose: 1000,
+              });
+              if(projectOne){
+                setPage(page-1);
+              }else{
+                fetchProjects();
+              }
+           }
+      } catch (error) {
+        console.error('Error updating status:', error);
+        alert('Error updating status');
+      }
+    }
+  }
 
   const startIndex = (page - 1) * pageSize;
 
@@ -266,6 +301,23 @@ const Projects = () => {
                         Inactive
                       </button>
                     )}
+                    &ensp;
+                    {item?.publish === 0 ? (
+                      <button
+                        className="bg-blue-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+                        onClick={() => handleStatuspublish(item._id, 0)}
+                      >
+                        publish
+                      </button>
+                    ) : (
+                      <button
+                        className="bg-grey-500 hover:bg-red-600 text-black font-bold py-2 px-4 rounded"
+                         >
+                        published
+                      </button>
+                    )}
+
+                    
                   </th>
 
                   <td className="py-5  pl-5 gap-1 border-2  border-gray-300">

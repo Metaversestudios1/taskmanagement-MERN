@@ -10,6 +10,7 @@ const EditProject = () => {
   const navigate = useNavigate();
   const [loader, setLoader] = useState(false);
   const params = useParams();
+  const [employees, setEmployees] = useState([]);
   const { id } = params;
   const initialState = {
     name: "",
@@ -33,7 +34,7 @@ const EditProject = () => {
     const fetchOldData = async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_BACKEND_URL}/api/getSingleproject`,
+          `http://localhost:3000/api/getSingleproject`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -74,9 +75,18 @@ const EditProject = () => {
         console.error("Failed to fetch old data:", error);
       }
     };
-
+    fetchEmployees();
     fetchOldData();
   }, [id]);
+
+  const fetchEmployees = async() =>{
+    const res = await fetch(`http://localhost:3000/api/getemployee`);
+    const response = await res.json()
+    if(response.success){
+      setEmployees(response.result);
+    }
+  }
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setOldData({
@@ -103,7 +113,10 @@ const EditProject = () => {
         description: {
           required: true,
           minlength: 100 // Minimum length validation
-        }
+        },
+        assigned_manager:{
+          required:true,
+        },
       },
       messages: {
         name: {
@@ -122,6 +135,10 @@ const EditProject = () => {
         },
         project_duration: {
           digits: "Please enter a valid number"
+        },
+        assigned_manager:{
+          required: "Please select manager"
+    
         }
       },
       errorElement: 'div',
@@ -149,7 +166,7 @@ const EditProject = () => {
     }
     setLoader(true);
     const updateData = { id, oldData };
-    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateproject`, {
+    const response = await fetch(`http://localhost:3000/api/updateproject`, {
       method: "PUT",
       headers: { "Content-Type": "application/json " },
       body: JSON.stringify(updateData),
@@ -362,16 +379,23 @@ const EditProject = () => {
               >
                 No of Assigned Manager
               </label>
-              <input
-                name="assigned_manager"
-                value={oldData.assigned_manager}
-                onChange={handleChange}
-                type="text"
-                id="assigned_manager"
-                className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
-                placeholder="Leads"
+              <select
+               name="assigned_manager"
+               value={oldData.assigned_manager}
+               onChange={handleChange}
+               type="text"
+               id="assigned_manager"
+               className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
+               placeholder="Leads">
+                <option value="">select Manager</option>
+                {employees.map((item) => (
+                  <option value={item._id}
+                  key={item._id}
+                  className=" bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5"
+                  >{item.name}</option>
+                ))}
 
-              />
+              </select>
             </div>
 
             <div>
