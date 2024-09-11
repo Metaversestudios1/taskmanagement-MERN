@@ -26,7 +26,7 @@ const Projects = () => {
   const fetchProjects = async () => {
     setLoader(true)
     const res = await fetch(
-      `http://localhost:3000/api/getproject?page=${page}&limit=${pageSize}&search=${search}&filter=${filter}`
+      `${process.env.REACT_APP_BACKEND_URL}/api/getproject?page=${page}&limit=${pageSize}&search=${search}&filter=${filter}`
     );
     const response = await res.json();
     if (response.success) {
@@ -34,12 +34,37 @@ const Projects = () => {
       if (response.result.length === 0) {
         setNoData(true)
       }
-
+     
+      const projectWithEmployeeNames = await Promise.all(
+        response.result.map(async (project) => {
+          const employee_name = await fetchEmployeeName(project.assigned_manager);
+          
+          return {
+            ...project,
+            employee_id: employee_name,
+          };
+        })
+      );
       setLoader(false)
-      setProjects(response.result);
+      setProjects(projectWithEmployeeNames);
       setCount(response.count);
     }
   };
+
+  const fetchEmployeeName = async (id) => {
+   
+    const nameRes = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/api/getesingleemployee`,
+      {
+        method: "POST",
+        headers: { "Content-type": "application/json" },
+        body: JSON.stringify({ id }),
+      }
+    );
+    const employeeName = await nameRes.json();
+    return employeeName.success ? employeeName.data[0].name : "Unknown";
+  };
+
 
   const handleDelete = async (e, id) => {
     e.preventDefault();
@@ -49,7 +74,7 @@ const Projects = () => {
       if (count === 1) {
         projectOne = false;
       }
-      const res = await fetch(`http://localhost:3000/api/deleteproject`, {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/deleteproject`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
@@ -100,7 +125,7 @@ const Projects = () => {
         projectOne = false;
       }
       try {
-        const res = await fetch(`http://localhost:3000/api/updatestatus/Project/${id}`, {
+        const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updatestatus/Project/${id}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -137,14 +162,12 @@ const Projects = () => {
       
       const updateData = { id, newStatus };
       try{    
-           const res = await fetch(`http://localhost:3000/api/publishproject`,{
+           const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/publishproject`,{
             method:'POST',
             headers: { "Content-Type": "application/json " }, // Remove the extra space
             body: JSON.stringify(updateData),
            })
            const response = await res.json(); // Add await here
-
-           console.log(response.success)
            if(response.success){
               toast.success('Project is Published Successfully',{
                 position: "top-right",
@@ -237,7 +260,7 @@ const Projects = () => {
                 Project Name
               </th>
               <th scope="col" className="px-6 py-3 border-2 border-gray-300">Start Date</th>
-              <th scope="col" className="px-6 py-3 border-2 border-gray-300">Assigned Manager</th>
+              <th scope="col" className="px-6 py-3 border-2 border-gray-300"> Assigned Manager</th>
               <th scope="col" className="px-6 py-3 border-2 border-gray-300" style={{ width: '200px' }}>Project Description</th>
               <th scope="col" className="px-6 py-3 border-2 border-gray-300">Status</th>
               <th scope="col" className="px-6 py-3 border-2 border-gray-300">
@@ -271,9 +294,9 @@ const Projects = () => {
                   </th>
                   <th
                     scope="row"
-                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap  border-2 border-gray-300"
+                    className="px-6 py-4 font-medium text-gray-900   border-2 border-gray-300"
                   >
-                    {item?.assigned_manager}
+                    {item?.employee_id}
                   </th>
                   <th
                     scope="row"
