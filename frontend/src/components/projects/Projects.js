@@ -296,7 +296,7 @@ const Projects = () => {
                     scope="row"
                     className="px-6 py-4 font-medium text-gray-900   border-2 border-gray-300"
                   >
-                    {item?.employee_id}
+                    {item?.employee_id || '-'}
                   </th>
                   <th
                     scope="row"
