@@ -127,8 +127,10 @@ const Login = () => {
         });
         Cookies.set("jwt", response.token);
         setAuth({ isAuthenticated: true, user: response.user });
+        const redirectPath = localStorage.getItem('redirectAfterLogin') || '/';
+      localStorage.removeItem('redirectAfterLogin');
         setTimeout(() => {
-          navigate("/");
+          navigate(redirectPath);
         }, 1500);
       } else {
         setLoading(false);

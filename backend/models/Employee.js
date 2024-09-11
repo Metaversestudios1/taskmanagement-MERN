@@ -43,6 +43,7 @@ const employeeSchema = new mongoose.Schema(
     },
     shift_timing: { type: String },
     permanent_address: { type: String },
+    current_address: { type: String },
     work_location: { type: String },
     joining_date: { type: Date },
     reporting_manager: { type: String },
@@ -60,6 +61,9 @@ const employeeSchema = new mongoose.Schema(
     hobbies: { type: String },
     education: { type: String },
     skills: { type: String },
+    relative_name:{type: String},
+    relative_contact:{type: String, required: true},
+    relative_relation:{type: String},
     bank_details: {
       acc_no: { type: String },
       ifsc_code: { type: String },
