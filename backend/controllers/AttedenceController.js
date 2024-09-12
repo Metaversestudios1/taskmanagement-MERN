@@ -99,10 +99,11 @@ const comparePhotos = async (url1, buffer2) => {
 };
 
 const insertattendence = async (req, res) => {
+  
   try {
     const { emp_id } = req.body;
     const employee = await Employee.findOne({ _id: emp_id });
-    if (req.file) {
+    if (req.body.photo) {
       if (!employee) {
         return res.status(404).json({
           success: false,
@@ -111,7 +112,8 @@ const insertattendence = async (req, res) => {
       }
       
       if (employee.photo.url) {
-        const isMatch = await comparePhotos(employee.photo.url, req.file.buffer);
+        //console.log(req.body.photo);
+        const isMatch = await comparePhotos(employee.photo.url, req.body.photo.buffer);
         if (!isMatch) {
           return res.status(400).json({
             success: false,
@@ -233,7 +235,7 @@ const updateattendence = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Employee not found" });
     }
-    if (req.file) {
+    if (req.body.photo) {
       const employee = await Employee.findOne({ _id: emp_id });
       if (!employee) {
         return res.status(404).json({
@@ -242,7 +244,7 @@ const updateattendence = async (req, res) => {
         });
       }
       if (employee.photo.url) {
-        const isMatch = await comparePhotos(employee.photo.url, req.file.buffer);
+        const isMatch = await comparePhotos(employee.photo.url,req.body.photo.buffer);
         if (!isMatch) {
           return res.status(400).json({
             success: false,
@@ -261,7 +263,7 @@ const updateattendence = async (req, res) => {
 
     const roundedDurationHours = calculateWorkingHours(check_in, check_out);
     let attendance_status = roundedDurationHours >= 8 ? "present" : "absent";
-    console.log(typeof(roundedDurationHours))
+
     await Attendence.updateOne(
       { emp_id, date: result.date },
       {
