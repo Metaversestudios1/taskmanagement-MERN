@@ -50,7 +50,7 @@ const ShowEmployee = () => {
 
   const fetchRoleName = async (id) => {
     try {
-      const res = await fetch("${process.env.REACT_APP_BACKEND_URL}/api/getSingleRole", {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getSingleRole`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
@@ -68,7 +68,7 @@ const ShowEmployee = () => {
   };
   const fetchDepartmentName = async (id) => {
     try {
-      const res = await fetch("${process.env.REACT_APP_BACKEND_URL}/api/getSingleDepartment", {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getSingleDepartment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
