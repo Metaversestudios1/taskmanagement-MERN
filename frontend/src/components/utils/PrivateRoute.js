@@ -3,6 +3,7 @@ import { Navigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 
 const PrivateRoute = ({ children }) => {
+  const currentPath = window.location.pathname;
   const { auth, loading } = useContext(AuthContext);
 
   if (loading) {
@@ -32,6 +33,7 @@ const PrivateRoute = ({ children }) => {
   }
 
   if (!auth.isAuthenticated) {
+    localStorage.setItem('redirectAfterLogin', currentPath);
     return <Navigate to="/login" />;
   }
 

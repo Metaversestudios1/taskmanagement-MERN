@@ -28,14 +28,14 @@ const AddEmployee = () => {
   ];
   const genders = [
     {
-      id:1,
-      gen:"male"
+      id: 1,
+      gen: "male",
     },
     {
-      id:2,
-      gen:"female"
+      id: 2,
+      gen: "female",
     },
-  ]
+  ];
   const initialState = {
     name: "",
     personal_email: "",
@@ -50,6 +50,7 @@ const AddEmployee = () => {
     employee_type: "",
     shift_timing: "",
     permanent_address: "",
+    current_address: "",
     work_location: "",
     joining_date: "",
     reporting_manager: "",
@@ -68,6 +69,9 @@ const AddEmployee = () => {
       bank_name: "",
       branch: "",
     },
+    relative_name: "",
+    relative_contact: "",
+    relative_relation: "",
   };
   const [data, setData] = useState(initialState);
   const [roles, setRoles] = useState([]);
@@ -106,6 +110,15 @@ const AddEmployee = () => {
       "Please enter a valid 10-digit phone number."
     );
 
+    // Add custom validation method for experience
+    $.validator.addMethod(
+      "validExperience",
+      function (value, element) {
+        return this.optional(element) || /^\d+(\.\d{1,2})?$/.test(value);
+      },
+      "Please enter a valid experience in years (e.g., 1, 2, 1.2, 1.11)."
+    );
+
     // Initialize jQuery validation
     $("#employeeform").validate({
       rules: {
@@ -126,12 +139,19 @@ const AddEmployee = () => {
         role: {
           required: true,
         },
+        relative_contact: {
+          required: true,
+          validPhone: true,
+        },
+        experience: {
+          validExperience: true, // Apply custom experience validation
+        },
       },
       messages: {
         name: {
           required: "Please enter name",
         },
-        email: {
+        personal_email: {
           required: "Please enter email",
           email: "Please enter a valid email address",
         },
@@ -142,8 +162,16 @@ const AddEmployee = () => {
           required: "Please enter contact details",
           validPhone: "Phone number must be exactly 10 digits", // Custom error message
         },
+        relative_contact: {
+          required: "Please enter contact details",
+          validPhone:"Phone number must be exactly 10 digits",
+        },
         role: {
           required: "Please select a role",
+        },
+        experience: {
+          validExperience:
+            "Please enter a valid experience in years (e.g., 1, 2, 1.2, 1.11).",
         },
       },
       errorElement: "div",
@@ -164,27 +192,26 @@ const AddEmployee = () => {
   };
 
   const handleChange = (e) => {
-  const { name, value } = e.target;
+    const { name, value } = e.target;
 
-  // Check if the name includes nested object properties
-  if (name.includes("bank_details.")) {
-    const [parent, child] = name.split(".");
+    // Check if the name includes nested object properties
+    if (name.includes("bank_details.")) {
+      const [parent, child] = name.split(".");
 
-    setData((prevState) => ({
-      ...prevState,
-      [parent]: {
-        ...prevState[parent],
-        [child]: value,
-      },
-    }));
-  } else {
-    setData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  }
-};
-
+      setData((prevState) => ({
+        ...prevState,
+        [parent]: {
+          ...prevState[parent],
+          [child]: value,
+        },
+      }));
+    } else {
+      setData((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -199,13 +226,11 @@ const AddEmployee = () => {
       Object.keys(data).forEach((key) => {
         formData.append(key, data[key]);
       });
-      console.log(formData)
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertemployee`, {
         method: "POST",
         body: formData,
       });
       const response = await res.json();
-      console.log(response)
       if (response.success) {
         setMobileValid("");
         toast.success("New employee is added Successfully!", {
@@ -236,7 +261,6 @@ const AddEmployee = () => {
   const handleGoBack = () => {
     navigate(-1);
   };
-  console.log(data)
   return (
     <>
       <div className="flex items-center ">
@@ -397,6 +421,42 @@ const AddEmployee = () => {
                 />
               </div>
             </div>
+            <div className="grid gap-6 mb-6 md:grid-cols-2 items-center">
+              <div className="">
+                <label
+                  htmlFor="date_of_birth"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
+                >
+                  Date of Birth
+                </label>
+                <input
+                  name="date_of_birth"
+                  value={data?.date_of_birth}
+                  onChange={handleChange}
+                  type="date"
+                  id="date_of_birth"
+                  placeholder=""
+                  className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="nationality"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
+                >
+                  Nationality
+                </label>
+                <input
+                  name="nationality"
+                  value={data?.nationality}
+                  onChange={handleChange}
+                  type="text"
+                  id="nationality"
+                  placeholder="nationality"
+                  className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
+                />
+              </div>
+            </div>
 
             <div className="grid gap-6 mb-6 md:grid-cols-2 items-center">
               <div>
@@ -412,6 +472,7 @@ const AddEmployee = () => {
                   onChange={handleChange}
                   type="text"
                   id="hobbies"
+                  placeholder="Hobbies"
                   className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
                 />
               </div>
@@ -458,30 +519,14 @@ const AddEmployee = () => {
                   onChange={handleChange}
                   type="date"
                   id="marriage_anniversary"
-                  className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="nationality"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
-                >
-                  Nationality
-                </label>
-                <input
-                  name="nationality"
-                  value={data?.nationality}
-                  onChange={handleChange}
-                  type="text"
-                  id="nationality"
+                  placeholder=""
                   className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
                 />
               </div>
             </div>
 
             <div className="grid gap-6 mb-6 md:grid-cols-2 items-center">
-              <div className="mb-6">
+              <div className="">
                 <label
                   htmlFor="permanent_address"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
@@ -493,29 +538,88 @@ const AddEmployee = () => {
                   value={data?.permanent_address}
                   onChange={handleChange}
                   type="text"
-                  rows={5}
+                  rows={3}
                   id="permanent_address"
                   className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
                 />
               </div>
-              <div className="mb-6">
+              <div className="">
                 <label
-                  htmlFor="date_of_birth"
+                  htmlFor="current_address"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
                 >
-                  Date of Birth
+                  Current Address
                 </label>
-                <input
-                  name="date_of_birth"
-                  value={data?.date_of_birth}
+                <textarea
+                  name="current_address"
+                  value={data?.current_address}
                   onChange={handleChange}
-                  type="date"
-                  id="date_of_birth"
+                  type="text"
+                  rows={3}
+                  id="current_address"
                   className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
                 />
               </div>
             </div>
-            <h4 className="font-bold my-3">Company Information: </h4>
+            <h4 className="font-bold my-3">Relative/Spouse Information: </h4>
+
+            <div className="grid gap-6 mb-6 md:grid-cols-2 items-center">
+              <div>
+                <label
+                  htmlFor="relative_name"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
+                >
+                  Relative name
+                </label>
+                <input
+                  name="relative_name"
+                  value={data?.relative_name}
+                  onChange={handleChange}
+                  type="text"
+                  id="relative_name"
+                  placeholder="relative name"
+                  className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="relative_relation"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
+                >
+                  Relative relation
+                </label>
+                <input
+                  name="relative_relation"
+                  value={data?.relative_relation}
+                  onChange={handleChange}
+                  type="text"
+                  id="relative_relation"
+                  placeholder="relative relation"
+                  className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
+                />
+              </div>
+            </div>
+            <div className="grid gap-6 mb-6 md:grid-cols-2 items-center">
+              <div>
+                <label
+                  htmlFor="relative_contact"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
+                >
+                  Relative contact<span className="text-red-900 text-lg ">&#x2a;</span>
+                </label>
+                <input
+                  name="relative_contact"
+                  value={data?.relative_contact}
+                  onChange={handleChange}
+                  type="text"
+                  id="relative_contact"
+                  placeholder="relative contact"
+                  required
+                  className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
+                />
+              </div>
+            </div>
+            <h4 className="font-bold my-3">Employment Details:  </h4>
             <div className="grid gap-6 mb-6 md:grid-cols-2 items-center">
               <div className="">
                 <label
@@ -588,6 +692,7 @@ const AddEmployee = () => {
                   onChange={handleChange}
                   type="text"
                   id="designation"
+                  placeholder="designation"
                   className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
                 />
               </div>
@@ -650,6 +755,7 @@ const AddEmployee = () => {
                   onChange={handleChange}
                   type="text"
                   id="reporting_manager"
+                  placeholder="reporting manager"
                   className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
                 />
               </div>
@@ -668,6 +774,7 @@ const AddEmployee = () => {
                   onChange={handleChange}
                   type="text"
                   id="work_location"
+                  placeholder="work location"
                   className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
                 />
               </div>
@@ -685,6 +792,7 @@ const AddEmployee = () => {
                   onChange={handleChange}
                   type="date"
                   id="joining_date"
+                  placeholder=""
                   className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
                 />
               </div>
@@ -704,6 +812,7 @@ const AddEmployee = () => {
                   onChange={handleChange}
                   type="text"
                   id="experience"
+                  placeholder="experience"
                   className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
                 />
               </div>
@@ -721,6 +830,7 @@ const AddEmployee = () => {
                   onChange={handleChange}
                   type="text"
                   id="education"
+                  placeholder="education"
                   className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
                 />
               </div>
@@ -739,6 +849,7 @@ const AddEmployee = () => {
                   onChange={handleChange}
                   type="text"
                   id="skills"
+                  placeholder="skills"
                   className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
                 />
               </div>
@@ -747,13 +858,13 @@ const AddEmployee = () => {
                   htmlFor="document"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
                 >
-                  Any document
+                  Documents
                 </label>
                 <input
                   name="document"
                   onChange={handleFileChange}
                   type="file"
-                  id="photo"
+                  id="document"
                   className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
                 />
               </div>
@@ -773,6 +884,7 @@ const AddEmployee = () => {
                   onChange={handleChange}
                   type="text"
                   id="acc_no"
+                  placeholder="account number"
                   className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
                 />
               </div>
@@ -790,6 +902,7 @@ const AddEmployee = () => {
                   onChange={handleChange}
                   type="text"
                   id="ifsc_code"
+                  placeholder="IFSC code"
                   className="bg-gray-200  border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
                 />
               </div>
@@ -808,6 +921,7 @@ const AddEmployee = () => {
                   onChange={handleChange}
                   type="text"
                   id="acc_holder_name"
+                  placeholder="Acc holder name"
                   className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
                 />
               </div>
@@ -825,6 +939,7 @@ const AddEmployee = () => {
                   onChange={handleChange}
                   type="text"
                   id="bank_name"
+                  placeholder="bank name"
                   className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
                 />
               </div>
@@ -843,6 +958,7 @@ const AddEmployee = () => {
                   onChange={handleChange}
                   type="text"
                   id="branch"
+                  placeholder="branch"
                   className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
                 />
               </div>
