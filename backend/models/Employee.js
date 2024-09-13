@@ -46,7 +46,8 @@ const employeeSchema = new mongoose.Schema(
     current_address: { type: String },
     work_location: { type: String },
     joining_date: { type: Date },
-    reporting_manager: { type: String },
+    team_lead: { type: String},
+    projects_assigned: { type: [String] },
     date_of_birth: { type: Date },
     marriage_anniversary: { type: Date },
     document: {

@@ -5,7 +5,12 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import $ from "jquery";
 import "jquery-validation"; // Import the validation plugin
+import { FaAngleDown } from "react-icons/fa6";
+
 const EditEmployee = () => {
+  const [employees, setEmployees] = useState([]);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [projects, setProjects] = useState([]);
   const [loader, setLoader] = useState(false);
   const [departments, setDepartments] = useState([]);
   const [error, setError] = useState("");
@@ -44,7 +49,8 @@ const EditEmployee = () => {
     current_address: "",
     work_location: "",
     joining_date: "",
-    reporting_manager: "",
+    team_lead: "",
+    projects_assigned: [],
     date_of_birth: "",
     marriage_anniversary: "",
     nationality: "",
@@ -68,78 +74,11 @@ const EditEmployee = () => {
   const [oldData, setOldData] = useState(initialState);
 
   useEffect(() => {
-    const fetchOldData = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_BACKEND_URL}/api/getesingleemployee`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id }),
-          }
-        );
-        const result = await response.json();
-        if (result.success) {
-          const formatDate = (dateString) => {
-            if (dateString) {
-              const date = new Date(dateString);
-              return date.toISOString().split('T')[0]; // Convert to yyyy-mm-dd format
-            }
-            return ''; // Return empty if dateString is null/undefined
-          };
-          setOldData({
-            name: result.data[0]?.name,
-            personal_email: result.data[0]?.personal_email,
-            company_email: result.data[0]?.company_email,
-            contact_number: result.data[0]?.contact_number,
-            relative_contact: result.data[0]?.relative_contact,
-            role: result.data[0]?.role,
-            photo: result.data[0]?.photo,
-            document: result.data[0]?.document,
-            department: result.data[0]?.department,
-            designation: result.data[0]?.designation,
-            employee_type: result.data[0]?.employee_type,
-            shift_timing: result.data[0]?.shift_timing,
-            permanent_address: result.data[0]?.permanent_address,
-            current_address: result.data[0]?.current_address,
-            work_location: result.data[0]?.work_location,
-            joining_date: formatDate(result.data[0]?.joining_date),
-            reporting_manager: result.data[0]?.reporting_manager,
-            date_of_birth: formatDate(result.data[0]?.date_of_birth),
-            marriage_anniversary: formatDate(result.data[0]?.marriage_anniversary),
-            nationality: result.data[0]?.nationality,
-            gender: result.data[0]?.gender,
-            experience: result.data[0]?.experience,
-            hobbies: result.data[0]?.hobbies,
-            education: result.data[0]?.education,
-            skills: result.data[0]?.skills,
-            bank_details: {
-              acc_no: result.data[0]?.bank_details?.acc_no,
-              ifsc_code: result.data[0]?.bank_details?.ifsc_code,
-              acc_holder_name: result.data[0]?.bank_details?.acc_holder_name,
-              bank_name: result.data[0]?.bank_details?.bank_name,
-              branch: result.data[0]?.bank_details?.branch,
-            },
-          });
-        } else {
-          console.error("No data found for the given parameter.");
-        }
-      } catch (error) {
-        console.error("Failed to fetch old data:", error);
-      }
-    };
-
-    const fetchRoles = async () => {
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getrole`);
-      const response = await res.json();
-      if (response.success) {
-        setRoles(response.result);
-      }
-    };
-
     fetchOldData();
     fetchRoles();
     fetchDepartments();
+    fetchEmployees();
+    fetchProjects();
     validateEmployeeForm(); // Initialize validation on mount
   }, [id]);
 
@@ -148,6 +87,94 @@ const EditEmployee = () => {
     validateEmployeeForm();
   }, [oldData]);
 
+  const fetchProjects = async () => {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getproject`);
+    const response = await res.json();
+    if (response.success) {
+      setProjects(response.result);
+    }
+  };
+  const fetchEmployees = async () => {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getemployee`);
+    const response = await res.json();
+    if (response.success) {
+      setEmployees(response.result);
+    }
+  };
+  const fetchRoles = async () => {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getrole`);
+    const response = await res.json();
+    if (response.success) {
+      setRoles(response.result);
+    }
+  };
+
+  const fetchOldData = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/getesingleemployee`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        }
+      );
+      const result = await response.json();
+      if (result.success) {
+        const formatDate = (dateString) => {
+          if (dateString) {
+            const date = new Date(dateString);
+            return date.toISOString().split("T")[0]; // Convert to yyyy-mm-dd format
+          }
+          return ""; // Return empty if dateString is null/undefined
+        };
+        setOldData({
+          ...oldData,
+          name: result.data[0]?.name,
+          personal_email: result.data[0]?.personal_email,
+          company_email: result.data[0]?.company_email,
+          contact_number: result.data[0]?.contact_number,
+          relative_contact: result.data[0]?.relative_contact,
+          relative_name: result.data[0]?.relative_name,
+          relative_relation: result.data[0]?.relative_relation,
+          role: result.data[0]?.role,
+          photo: result.data[0]?.photo,
+          document: result.data[0]?.document,
+          department: result.data[0]?.department,
+          designation: result.data[0]?.designation,
+          employee_type: result.data[0]?.employee_type,
+          shift_timing: result.data[0]?.shift_timing,
+          permanent_address: result.data[0]?.permanent_address,
+          current_address: result.data[0]?.current_address,
+          work_location: result.data[0]?.work_location,
+          joining_date: formatDate(result.data[0]?.joining_date),
+          team_lead: result.data[0]?.team_lead,
+          projects_assigned: result.data[0]?.projects_assigned,
+          date_of_birth: formatDate(result.data[0]?.date_of_birth),
+          marriage_anniversary: formatDate(
+            result.data[0]?.marriage_anniversary
+          ),
+          nationality: result.data[0]?.nationality,
+          gender: result.data[0]?.gender,
+          experience: result.data[0]?.experience,
+          hobbies: result.data[0]?.hobbies,
+          education: result.data[0]?.education,
+          skills: result.data[0]?.skills,
+          bank_details: {
+            acc_no: result.data[0]?.bank_details?.acc_no,
+            ifsc_code: result.data[0]?.bank_details?.ifsc_code,
+            acc_holder_name: result.data[0]?.bank_details?.acc_holder_name,
+            bank_name: result.data[0]?.bank_details?.bank_name,
+            branch: result.data[0]?.bank_details?.branch,
+          },
+        });
+      } else {
+        console.error("No data found for the given parameter.");
+      }
+    } catch (error) {
+      console.error("Failed to fetch old data:", error);
+    }
+  };
   const fetchDepartments = async () => {
     const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getalldepartment`);
     const response = await res.json();
@@ -219,7 +246,7 @@ const EditEmployee = () => {
         },
         relative_contact: {
           required: "Please enter contact details",
-          validPhone:"Phone number must be exactly 10 digits",
+          validPhone: "Phone number must be exactly 10 digits",
         },
         role: {
           required: "Please select a role",
@@ -312,7 +339,15 @@ const EditEmployee = () => {
       setError(response.message);
     }
   };
-
+  const handleCheckboxChange = (e) => {
+    const { value, checked } = e.target;
+    setOldData((prevState) => ({
+      ...prevState,
+      projects_assigned: checked
+        ? [...prevState.projects_assigned, value]
+        : prevState.projects_assigned.filter((id) => id !== value),
+    }));
+  };
   const handleGoBack = (e) => {
     e.preventDefault();
     navigate(-1);
@@ -442,7 +477,6 @@ const EditEmployee = () => {
               </div>
             </div>
             <div className="grid gap-6 mb-6 md:grid-cols-2 items-center">
-              
               <div className="">
                 <label
                   htmlFor="photo"
@@ -459,7 +493,7 @@ const EditEmployee = () => {
                   placeholder="Enter the task completion time"
                 />
               </div>
-                <div className="mb-6">
+              <div className="mb-6">
                 <label
                   htmlFor="date_of_birth"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
@@ -550,44 +584,43 @@ const EditEmployee = () => {
               </div>
             </div>
 
-      
             <div className="grid gap-6 mb-6 md:grid-cols-2 items-center">
-            <div className="">
-              <label
-                htmlFor="permanent_address"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
-              >
-                Permanent Address
-              </label>
-              <textarea
-                name="permanent_address"
-                value={oldData?.permanent_address}
-                onChange={handleChange}
-                type="text"
-                rows={3}
-                id="permanent_address"
-                className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
-              />
+              <div className="">
+                <label
+                  htmlFor="permanent_address"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
+                >
+                  Permanent Address
+                </label>
+                <textarea
+                  name="permanent_address"
+                  value={oldData?.permanent_address}
+                  onChange={handleChange}
+                  type="text"
+                  rows={3}
+                  id="permanent_address"
+                  className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
+                />
+              </div>
+              <div className="">
+                <label
+                  htmlFor="current_address"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
+                >
+                  Current Address
+                </label>
+                <textarea
+                  name="current_address"
+                  value={oldData?.current_address}
+                  onChange={handleChange}
+                  type="text"
+                  rows={3}
+                  id="current_address"
+                  className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
+                />
+              </div>
             </div>
-            <div className="">
-              <label
-                htmlFor="current_address"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
-              >
-                Current Address
-              </label>
-              <textarea
-                name="current_address"
-                value={oldData?.current_address}
-                onChange={handleChange}
-                type="text"
-                rows={3}
-                id="current_address"
-                className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
-              />
-              </div>
-              </div>
-              <h4 className="font-bold my-3">Relative/Spouse Information: </h4>
+            <h4 className="font-bold my-3">Relative/Spouse Information: </h4>
 
             <div className="grid gap-6 mb-6 md:grid-cols-2 items-center">
               <div>
@@ -631,7 +664,8 @@ const EditEmployee = () => {
                   htmlFor="relative_contact"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
                 >
-                  Relative contact<span className="text-red-900 text-lg ">&#x2a;</span>
+                  Relative contact
+                  <span className="text-red-900 text-lg ">&#x2a;</span>
                 </label>
                 <input
                   name="relative_contact"
@@ -757,37 +791,75 @@ const EditEmployee = () => {
             <div className="grid gap-6 mb-6 md:grid-cols-2 items-center">
               <div>
                 <label
-                  htmlFor="shift_timing"
+                  htmlFor="projects_assigned"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
                 >
-                  Shift Timing
+                  Projects Assigned
                 </label>
-                <input
-                  name="shift_timing"
-                  onChange={handleChange}
-                  type="text"
-                  id="shift_timing"
-                  value={oldData?.shift_timing}
-                  className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
-                  placeholder="Ex. 9-6, 10-7"
-                />
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDropdownOpen(!dropdownOpen);
+                    }}
+                    className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black w-full p-2.5 flex justify-between items-center"
+                  >
+                    Select Projects
+                    <FaAngleDown className="text-end" />
+                  </button>
+                  {dropdownOpen && (
+                    <div className="absolute top-full left-0 bg-white border border-gray-300 rounded-sm shadow-lg w-full">
+                      {projects.map((item) => (
+                        <div
+                          key={item._id}
+                          className="p-2  bg-gray-200 text-gray-900 text-sm  focus:ring-blue-500 focus:border-black block w-full"
+                        >
+                          <input
+                            type="checkbox"
+                            id={`project-${item._id}`}
+                            value={item._id}
+                            checked={oldData?.projects_assigned.includes(
+                              item._id
+                            )}
+                            onChange={handleCheckboxChange}
+                            className="mr-2"
+                          />
+                          <label
+                            htmlFor={`project-${item._id}`}
+                            className="text-gray-900 text-sm"
+                          >
+                            {item.name}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
               <div>
                 <label
-                  htmlFor="reporting_manager"
+                  htmlFor="team_lead"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
                 >
-                  Reporting Manager
+                  Team Lead
                 </label>
-                <input
-                  name="reporting_manager"
-                  value={oldData?.reporting_manager}
+                <select
+                  name="team_lead"
+                  value={oldData?.team_lead}
                   onChange={handleChange}
-                  type="text"
-                  id="reporting_manager"
-                  placeholder="reporting manager"
                   className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
-                />
+                >
+                  <option value="">Select a Lead.</option>
+                  {employees.map((item) => (
+                    <option
+                      key={item._id}
+                      value={item._id}
+                      className=" bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5"
+                    >
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
             <div className="grid gap-6 mb-6 md:grid-cols-2 items-center">
@@ -882,6 +954,25 @@ const EditEmployee = () => {
                   className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
                 />
               </div>
+              <div>
+                <label
+                  htmlFor="shift_timing"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
+                >
+                  Shift Timing
+                </label>
+                <input
+                  name="shift_timing"
+                  onChange={handleChange}
+                  type="text"
+                  id="shift_timing"
+                  value={oldData?.shift_timing}
+                  className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
+                  placeholder="Ex. 9-6, 10-7"
+                />
+              </div>
+              </div>
+              <div className="grid gap-6 mb-6 md:grid-cols-2 items-center">
               <div className="">
                 <label
                   htmlFor="document"

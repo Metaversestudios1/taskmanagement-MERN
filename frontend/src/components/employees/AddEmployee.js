@@ -5,8 +5,13 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import $ from "jquery";
 import "jquery-validation";
+import { FaAngleDown} from "react-icons/fa6";
+
 
 const AddEmployee = () => {
+  const [employees, setEmployees] = useState([]);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [projects, setProjects] = useState([]);
   const [loader, setLoader] = useState(false);
   const [departments, setDepartments] = useState([]);
   const [mobileValid, setMobileValid] = useState("");
@@ -53,7 +58,8 @@ const AddEmployee = () => {
     current_address: "",
     work_location: "",
     joining_date: "",
-    reporting_manager: "",
+    team_lead: "",
+    projects_assigned: [],
     date_of_birth: "",
     marriage_anniversary: "",
     nationality: "",
@@ -79,8 +85,25 @@ const AddEmployee = () => {
   useEffect(() => {
     fetchRoles();
     fetchDepartments();
+    fetchEmployees();
+    fetchProjects();
   }, []);
-
+  const fetchProjects = async () => {
+    const res = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/api/getproject`
+    );
+    const response = await res.json();
+    if (response.success) {
+      setProjects(response.result);
+    }
+  };
+  const fetchEmployees = async () => {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getemployee`);
+    const response = await res.json();
+    if (response.success) {
+      setEmployees(response.result);
+    }
+  };
   const fetchDepartments = async () => {
     const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getalldepartment`);
     const response = await res.json();
@@ -164,7 +187,7 @@ const AddEmployee = () => {
         },
         relative_contact: {
           required: "Please enter contact details",
-          validPhone:"Phone number must be exactly 10 digits",
+          validPhone: "Phone number must be exactly 10 digits",
         },
         role: {
           required: "Please select a role",
@@ -191,6 +214,15 @@ const AddEmployee = () => {
     return $("#employeeform").valid();
   };
 
+  const handleCheckboxChange = (e) => {
+    const { value, checked } = e.target;
+    setData((prevState) => ({
+      ...prevState,
+      projects_assigned: checked
+        ? [...prevState.projects_assigned, value]
+        : prevState.projects_assigned.filter((id) => id !== value),
+    }));
+  };
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -223,9 +255,31 @@ const AddEmployee = () => {
     try {
       setLoader(true);
       const formData = new FormData();
-      Object.keys(data).forEach((key) => {
-        formData.append(key, data[key]);
+
+// Append other fields to FormData
+Object.keys(data).forEach((key) => {
+  if (typeof data[key] === "object" && data[key] !== null) {
+    // If the field is an object (e.g., bank_details), handle it separately
+    if (key === "bank_details") {
+      Object.keys(data[key]).forEach((nestedKey) => {
+        formData.append(`bank_details[${nestedKey}]`, data[key][nestedKey]);
       });
+    } else if (key === "projects_assigned") {
+      // Append array data (e.g., projects_assigned) to FormData
+      data[key].forEach((value) => {
+        formData.append(`${key}[]`, value);
+      });
+    } else {
+      // Handle file uploads (photo, document)
+      formData.append(key, data[key]);
+    }
+  } else {
+    // For primitive data types, append directly
+    formData.append(key, data[key]);
+  }
+});
+console.log(formData)
+  
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/insertemployee`, {
         method: "POST",
         body: formData,
@@ -261,6 +315,7 @@ const AddEmployee = () => {
   const handleGoBack = () => {
     navigate(-1);
   };
+  console.log(data)
   return (
     <>
       <div className="flex items-center ">
@@ -605,7 +660,8 @@ const AddEmployee = () => {
                   htmlFor="relative_contact"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
                 >
-                  Relative contact<span className="text-red-900 text-lg ">&#x2a;</span>
+                  Relative contact
+                  <span className="text-red-900 text-lg ">&#x2a;</span>
                 </label>
                 <input
                   name="relative_contact"
@@ -619,7 +675,7 @@ const AddEmployee = () => {
                 />
               </div>
             </div>
-            <h4 className="font-bold my-3">Employment Details:  </h4>
+            <h4 className="font-bold my-3">Employment Details: </h4>
             <div className="grid gap-6 mb-6 md:grid-cols-2 items-center">
               <div className="">
                 <label
@@ -726,38 +782,66 @@ const AddEmployee = () => {
               </div>
             </div>
             <div className="grid gap-6 mb-6 md:grid-cols-2 items-center">
+            <div>
+          <label
+            htmlFor="projects_assigned"
+            className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
+          >
+            Projects Assigned
+          </label>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={()=>{setDropdownOpen(!dropdownOpen)}}
+              className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black w-full p-2.5 flex justify-between items-center"
+            >
+              Select Projects<FaAngleDown className="text-end" />
+            </button>
+            {dropdownOpen && (<div className="absolute top-full left-0 bg-white border border-gray-300 rounded-sm shadow-lg w-full">
+              {projects.map((item) => (
+                <div key={item._id} className="p-2  bg-gray-200 text-gray-900 text-sm  focus:ring-blue-500 focus:border-black block w-full">
+                  <input
+                    type="checkbox"
+                    id={`project-${item._id}`}
+                    value={item._id}
+                    checked={data.projects_assigned.includes(item._id)}
+                    onChange={handleCheckboxChange}
+                    className="mr-2"
+                  />
+                  <label htmlFor={`project-${item._id}`} className="text-gray-900 text-sm">
+                    {item.name}
+                  </label>
+                </div>
+              ))}
+            </div>)}
+          </div>
+        </div>
+
+       
               <div>
                 <label
-                  htmlFor="shift_timing"
+                  htmlFor="team_lead"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
                 >
-                  Shift Timing
+                  Team Lead
                 </label>
-                <input
-                  name="shift_timing"
+                <select
+                  name="team_lead"
+                  value={data?.team_lead}
                   onChange={handleChange}
-                  type="text"
-                  id="shift_timing"
                   className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
-                  placeholder="Ex. 9-6, 10-7"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="reporting_manager"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
                 >
-                  Reporting Manager
-                </label>
-                <input
-                  name="reporting_manager"
-                  value={data?.reporting_manager}
-                  onChange={handleChange}
-                  type="text"
-                  id="reporting_manager"
-                  placeholder="reporting manager"
-                  className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
-                />
+                  <option value="">Select a Lead.</option>
+                  {employees.map((item) => (
+                    <option
+                      key={item._id}
+                      value={item._id}
+                      className=" bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5"
+                    >
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
             <div className="grid gap-6 mb-6 md:grid-cols-2 items-center">
@@ -853,6 +937,24 @@ const AddEmployee = () => {
                   className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
                 />
               </div>
+              <div>
+                <label
+                  htmlFor="shift_timing"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
+                >
+                  Shift Timing
+                </label>
+                <input
+                  name="shift_timing"
+                  onChange={handleChange}
+                  type="text"
+                  id="shift_timing"
+                  className="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black block w-full p-2.5 "
+                  placeholder="Ex. 9-6, 10-7"
+                />
+              </div>
+            </div>
+            <div className="grid gap-6 mb-6 md:grid-cols-2 items-center">
               <div className="">
                 <label
                   htmlFor="document"

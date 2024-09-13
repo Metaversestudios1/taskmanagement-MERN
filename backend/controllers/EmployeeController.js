@@ -5,9 +5,9 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const session = require("express-session");
 const jwt = require("jsonwebtoken");
-const crypto = require('crypto');
-const nodemailer = require('nodemailer');
-const path = require('path'); // Include the path module to handle file extensions
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
+const path = require("path"); // Include the path module to handle file extensions
 const dotenv = require("dotenv");
 const cloudinary = require("cloudinary").v2;
 const Permission = require("../models/Permission");
@@ -20,18 +20,17 @@ cloudinary.config({
 
 const uploadDocument = (buffer, originalname, mimetype) => {
   return new Promise((resolve, reject) => {
-    if (!mimetype || typeof mimetype !== 'string') {
-
+    if (!mimetype || typeof mimetype !== "string") {
       return reject(new Error("MIME type is required and must be a string"));
     }
-    
+
     let resourceType = "raw"; // Default to 'raw' for non-image/video files
 
     if (mimetype.startsWith("image")) {
       resourceType = "image";
     } else if (mimetype.startsWith("video")) {
       resourceType = "video";
-    }else if (mimetype === "application/pdf") {
+    } else if (mimetype === "application/pdf") {
       resourceType = "raw"; // Explicitly set PDFs as raw
     }
     const fileExtension = path.extname(originalname);
@@ -46,14 +45,18 @@ const uploadDocument = (buffer, originalname, mimetype) => {
       overwrite: true,
     };
 
-    const uploadStream = cloudinary.uploader.upload(`data:${mimetype};base64,${buffer.toString('base64')}`, options, (error, result) => {
-      if (error) {
-        console.error("Cloudinary upload error:", error);
-        return reject(new Error("Cloudinary upload failed"));
+    const uploadStream = cloudinary.uploader.upload(
+      `data:${mimetype};base64,${buffer.toString("base64")}`,
+      options,
+      (error, result) => {
+        if (error) {
+          console.error("Cloudinary upload error:", error);
+          return reject(new Error("Cloudinary upload failed"));
+        }
+        console.log("Cloudinary upload result:", result);
+        resolve(result);
       }
-      console.log("Cloudinary upload result:", result);
-      resolve(result);
-    });
+    );
 
     // uploadStream.end(buffer); // Upload the file from the buffer
   });
@@ -61,7 +64,7 @@ const uploadDocument = (buffer, originalname, mimetype) => {
 
 const uploadImage = (buffer, originalname, mimetype) => {
   return new Promise((resolve, reject) => {
-    if (!mimetype || typeof mimetype !== 'string') {
+    if (!mimetype || typeof mimetype !== "string") {
       return reject(new Error("MIME type is required and must be a string"));
     }
 
@@ -72,21 +75,27 @@ const uploadImage = (buffer, originalname, mimetype) => {
     const fileNameWithoutExtension = path.basename(originalname);
     const publicId = `${fileNameWithoutExtension}`;
     const options = {
-      resource_type: "image",  // Only images are allowed
+      resource_type: "image", // Only images are allowed
       public_id: publicId,
       use_filename: true,
       unique_filename: false,
       overwrite: true,
     };
 
-    const dataURI = `data:${mimetype};base64,${buffer.toString('base64')}`;
-    
-    cloudinary.uploader.upload(dataURI, { resource_type: 'auto' }, (error, result) => {
-      if (error) {
-        return reject(new Error(`Cloudinary upload failed: ${error.message}`));
+    const dataURI = `data:${mimetype};base64,${buffer.toString("base64")}`;
+
+    cloudinary.uploader.upload(
+      dataURI,
+      { resource_type: "auto" },
+      (error, result) => {
+        if (error) {
+          return reject(
+            new Error(`Cloudinary upload failed: ${error.message}`)
+          );
+        }
+        resolve(result);
       }
-      resolve(result);
-    });
+    );
   });
 };
 
@@ -101,7 +110,6 @@ const deleteImage = async (publicId) => {
     });
   });
 };
-
 
 const insertEmployee = async (req, res) => {
   try {
@@ -125,19 +133,28 @@ const insertEmployee = async (req, res) => {
     // Hash the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-     let photo = null;
-     let document = null;
-    
-     try{
+    let photo = null;
+    let document = null;
+
+    try {
       if (req.files) {
-       
         // Handle photo
-        if (req.files['photo'] && req.files['photo'][0] && req.files['photo'][0].buffer) {
-          
-          const photoFile = req.files['photo'][0];
+        if (
+          req.files["photo"] &&
+          req.files["photo"][0] &&
+          req.files["photo"][0].buffer
+        ) {
+          const photoFile = req.files["photo"][0];
           const photoFileName = photoFile.originalname.toLowerCase();
-          if (photoFileName.includes('photo') || photoFile.mimetype.startsWith('image/')) {
-            const uploadResult = await uploadImage(photoFile.buffer, photoFile.originalname, photoFile.mimetype);
+          if (
+            photoFileName.includes("photo") ||
+            photoFile.mimetype.startsWith("image/")
+          ) {
+            const uploadResult = await uploadImage(
+              photoFile.buffer,
+              photoFile.originalname,
+              photoFile.mimetype
+            );
             photo = {
               publicId: uploadResult.public_id,
               url: uploadResult.secure_url,
@@ -154,12 +171,24 @@ const insertEmployee = async (req, res) => {
         }
 
         // Handle document
-        if (req.files['document'] && req.files['document'][0] && req.files['document'][0].buffer) {
-          const documentFile = req.files['document'][0];
+        if (
+          req.files["document"] &&
+          req.files["document"][0] &&
+          req.files["document"][0].buffer
+        ) {
+          const documentFile = req.files["document"][0];
           const documentFileName = documentFile.originalname.toLowerCase();
           // Accept both application files and images as documents
-          if (documentFileName.includes('document') || documentFile.mimetype.startsWith('application/') || documentFile.mimetype.startsWith('image/')) {
-            const uploadResult = await uploadDocument(documentFile.buffer, documentFile.originalname, documentFile.mimetype);
+          if (
+            documentFileName.includes("document") ||
+            documentFile.mimetype.startsWith("application/") ||
+            documentFile.mimetype.startsWith("image/")
+          ) {
+            const uploadResult = await uploadDocument(
+              documentFile.buffer,
+              documentFile.originalname,
+              documentFile.mimetype
+            );
             document = {
               publicId: uploadResult.public_id,
               url: uploadResult.secure_url,
@@ -175,9 +204,8 @@ const insertEmployee = async (req, res) => {
           }
         }
       } else {
-        console.log('No files were uploaded');
+        console.log("No files were uploaded");
       }
-
     } catch (uploadError) {
       return res.status(500).json({
         success: false,
@@ -190,11 +218,11 @@ const insertEmployee = async (req, res) => {
     const newEmployee = new Employee({
       ...employeeData,
       password: hashedPassword,
-      photo: photo || undefined, 
-      document: document || undefined, 
+      photo: photo || undefined,
+      document: document || undefined,
     });
 
-     await newEmployee.save();
+    await newEmployee.save();
     res.status(201).json({ success: true });
   } catch (error) {
     res.status(500).json({
@@ -256,19 +284,30 @@ const deleteEmployee = async (req, res) => {
 const updateEmployee = async (req, res) => {
   const updateData = req.body; // Extract the update data from the request body
   const id = updateData.id;
-  
+
   try {
     let photo = null;
     let document = null;
     // console.log(req.files)
     if (req.files) {
       // Handle photo
-      if (req.files['photo'] && req.files['photo'][0] && req.files['photo'][0].buffer) {
+      if (
+        req.files["photo"] &&
+        req.files["photo"][0] &&
+        req.files["photo"][0].buffer
+      ) {
         // console.log(req.files['photo']);
-        const photoFile = req.files['photo'][0];
+        const photoFile = req.files["photo"][0];
         const photoFileName = photoFile.originalname.toLowerCase();
-        if (photoFileName.includes('photo') || photoFile.mimetype.startsWith('image/')) {
-          const uploadResult = await uploadImage(photoFile.buffer, photoFile.originalname, photoFile.mimetype);
+        if (
+          photoFileName.includes("photo") ||
+          photoFile.mimetype.startsWith("image/")
+        ) {
+          const uploadResult = await uploadImage(
+            photoFile.buffer,
+            photoFile.originalname,
+            photoFile.mimetype
+          );
           photo = {
             publicId: uploadResult.public_id,
             url: uploadResult.secure_url,
@@ -284,11 +323,23 @@ const updateEmployee = async (req, res) => {
       }
 
       // Handle document
-      if (req.files['document'] && req.files['document'][0] && req.files['document'][0].buffer) {
-        const documentFile = req.files['document'][0];
+      if (
+        req.files["document"] &&
+        req.files["document"][0] &&
+        req.files["document"][0].buffer
+      ) {
+        const documentFile = req.files["document"][0];
         const documentFileName = documentFile.originalname.toLowerCase();
-        if (documentFileName.includes('document') || documentFile.mimetype.startsWith('application/') || documentFile.mimetype.startsWith('image/')) {
-          const uploadResult = await uploadDocument(documentFile.buffer, documentFile.originalname, documentFile.mimetype);
+        if (
+          documentFileName.includes("document") ||
+          documentFile.mimetype.startsWith("application/") ||
+          documentFile.mimetype.startsWith("image/")
+        ) {
+          const uploadResult = await uploadDocument(
+            documentFile.buffer,
+            documentFile.originalname,
+            documentFile.mimetype
+          );
           document = {
             publicId: uploadResult.public_id,
             url: uploadResult.secure_url,
@@ -302,7 +353,7 @@ const updateEmployee = async (req, res) => {
           });
         }
       }
-    } 
+    }
 
     // Parse updateData.oldData safely
     let updateFields = {};
@@ -333,7 +384,10 @@ const updateEmployee = async (req, res) => {
     if (result.nModified === 0) {
       return res
         .status(404)
-        .json({ success: false, message: "Employee not found or no changes made" });
+        .json({
+          success: false,
+          message: "Employee not found or no changes made",
+        });
     }
 
     res.status(200).json({ success: true });
@@ -344,7 +398,6 @@ const updateEmployee = async (req, res) => {
     });
   }
 };
-
 
 const getSingleEmployee = async (req, res) => {
   try {
@@ -369,7 +422,7 @@ const getSingleEmployee = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const { email, password , role} = req.body;
+  const { email, password, role } = req.body;
   try {
     // Find user by email
     if (!email || !password) {
@@ -401,14 +454,20 @@ const login = async (req, res) => {
     // Fetch permissions for the role
     const permissions = await Promise.all(
       roleObject.permission.map(async (permId) => {
-        const perm = await Permission.findById({_id:permId});
+        const perm = await Permission.findById({ _id: permId });
         return perm ? perm.permission : null;
       })
     );
 
     // Create token with role and permissions
     const token = jwt.sign(
-      { id: user._id, name: user.name, email: user.email, role: roleObject.role, permissions },
+      {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: roleObject.role,
+        permissions,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
@@ -421,7 +480,7 @@ const login = async (req, res) => {
     res.cookie("token", token, options).json({
       success: true,
       token,
-      user
+      user,
     });
   } catch (err) {
     res
@@ -431,7 +490,7 @@ const login = async (req, res) => {
 };
 
 const loginmobile = async (req, res) => {
-  const { email, password} = req.body;
+  const { email, password } = req.body;
   try {
     // Find user by email
     if (!email || !password) {
@@ -466,7 +525,7 @@ const loginmobile = async (req, res) => {
     res.cookie("token", token, options).json({
       success: true,
       token,
-      user
+      user,
     });
   } catch (err) {
     res
@@ -474,7 +533,6 @@ const loginmobile = async (req, res) => {
       .json({ success: false, message: "Server error: " + err.message });
   }
 };
-
 
 const logout = (req, res) => {
   req.session.destroy((err) => {
@@ -528,7 +586,7 @@ const changePassword = async (req, res) => {
 
 const sendotp = async (req, res) => {
   const { email } = req.body;
-  
+
   try {
     const employee = await Employee.findOne({ email });
     if (!employee) {
@@ -536,22 +594,22 @@ const sendotp = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Employee not found" });
     }
-      const otp = crypto.randomInt(100000, 999999).toString();
-      const otpExpires = Date.now() + 10 * 60 * 1000;       
-      const update = await Employee.updateOne(
-        { email: employee.email }, 
-        {
-          $set: {
-            resetOtp: otp,
-            otpExpires: otpExpires,
-          },
-        }
-      );
+    const otp = crypto.randomInt(100000, 999999).toString();
+    const otpExpires = Date.now() + 10 * 60 * 1000;
+    const update = await Employee.updateOne(
+      { email: employee.email },
+      {
+        $set: {
+          resetOtp: otp,
+          otpExpires: otpExpires,
+        },
+      }
+    );
     const transporter = nodemailer.createTransport({
-      host:"smtp.gmail.com",
-      port:587,
-      secure:false,
-      requireTLS:true,
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      requireTLS: true,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
@@ -569,11 +627,11 @@ const sendotp = async (req, res) => {
       message: "OTP sent to email",
     });
   } catch (err) {
-         res
-        .status(500)
-        .json({ success: false, message: "Server error: " + err.message })
+    res
+      .status(500)
+      .json({ success: false, message: "Server error: " + err.message });
   }
-}
+};
 
 const verifyOtp = async (req, res) => {
   const { email, otp } = req.body;
@@ -581,14 +639,10 @@ const verifyOtp = async (req, res) => {
     // Find employee by email and OTP
     const employee = await Employee.findOne({ email });
     if (!employee || employee.resetOtp !== otp) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid OTP" });
+      return res.status(400).json({ success: false, message: "Invalid OTP" });
     }
     if (employee.otpExpires < Date.now()) {
-      return res
-        .status(400)
-        .json({ success: false, message: "OTP expired" });
+      return res.status(400).json({ success: false, message: "OTP expired" });
     }
 
     res.status(200).json({
@@ -601,38 +655,46 @@ const verifyOtp = async (req, res) => {
       .json({ success: false, message: "Server error: " + err.message });
   }
 };
-const resetPassword = async(req, res)=>{
-  const {email, newPassword} = req.body
+const resetPassword = async (req, res) => {
+  const { email, newPassword } = req.body;
   const user = await Employee.findOne({ email });
 
   const salt = await bcrypt.genSalt(10);
   user.password = await bcrypt.hash(newPassword, salt);
 
   await user.save();
-  res.status(200).json({success: true})
-}
-const deleteEmployeePhoto = async(req, res) => {
-  const {id} = req.body;
-  try{
+  res.status(200).json({ success: true });
+};
+const deleteEmployeePhoto = async (req, res) => {
+  const { id } = req.body;
+  try {
     const employee = await Employee.findById(id);
-    
+
     if (!employee) {
-      return res.status(404).json({ success: false, message: "Employee not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Employee not found" });
     }
 
     // Check if there's an existing photo to delete from Cloudinary
-    if (employee.photo && employee.photo.publicId) {      
-        await deleteImage(employee.photo.publicId); // Delete the photo from Cloudinary
+    if (employee.photo && employee.photo.publicId) {
+      await deleteImage(employee.photo.publicId); // Delete the photo from Cloudinary
     }
     const result = await Employee.updateOne(
-      {_id:id},
+      { _id: id },
       { $unset: { photo: "" } } // Use $unset to remove the photo field
-    )
- res.status(200).json({success: true})
-  }catch(err){
-    res.status(500).json({success:false,message:"error updating leave",error:error.message})
+    );
+    res.status(200).json({ success: true });
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "error updating leave",
+        error: error.message,
+      });
   }
-}
+};
 module.exports = {
   insertEmployee,
   getAllEmployees,
@@ -646,5 +708,5 @@ module.exports = {
   verifyOtp,
   resetPassword,
   deleteEmployeePhoto,
-  loginmobile
+  loginmobile,
 };
