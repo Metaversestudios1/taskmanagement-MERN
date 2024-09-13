@@ -146,7 +146,7 @@ const ShowEmployee = () => {
           projects.map((id) =>
             fetchDataAndGetValue(
               id,
-              "${process.env.REACT_APP_BACKEND_URL}/api/getSingleproject",
+              `${process.env.REACT_APP_BACKEND_URL}/api/getSingleproject`,
               "name"
             )
           )
