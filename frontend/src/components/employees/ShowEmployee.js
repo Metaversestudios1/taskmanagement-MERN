@@ -79,9 +79,7 @@ const ShowEmployee = () => {
       }
     } catch (error) {
       console.error("Failed to fetch old data:", error);
-    } finally {
-      setLoader(false);
-    }
+    } 
   };
 
   const formatEmployeeData = (data) => ({
@@ -158,6 +156,8 @@ const ShowEmployee = () => {
       }
     } catch (err) {
       console.error("Error fetching related details:", err);
+    }finally {
+      setLoader(false);
     }
   };
 
