@@ -46,27 +46,34 @@ const ShowEmployee = () => {
   const params = useParams();
   const { id } = params;
 
-  
-
   useEffect(() => {
     fetchEmployeeDetails();
   }, []);
 
   const fetchEmployeeDetails = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getesingleemployee`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/getesingleemployee`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        }
+      );
       const result = await response.json();
 
       if (result.success && result.data[0]) {
         setEmployeeDetail(formatEmployeeData(result.data[0]));
 
         // Fetch related details
-        const { role, department, team_lead, projects_assigned } = result.data[0];
-        await fetchRelatedDetails(role, department, team_lead, projects_assigned);
+        const { role, department, team_lead, projects_assigned } =
+          result.data[0];
+        await fetchRelatedDetails(
+          role,
+          department,
+          team_lead,
+          projects_assigned
+        );
       } else {
         console.error("No data found for the given parameter.");
       }
@@ -111,13 +118,39 @@ const ShowEmployee = () => {
 
   const fetchRelatedDetails = async (role, department, teamLead, projects) => {
     try {
-      if (role) fetchDataAndUpdateState(role, "role", "${process.env.REACT_APP_BACKEND_URL}/api/getSingleRole", "role");
-      if (department) fetchDataAndUpdateState(department, "department", "${process.env.REACT_APP_BACKEND_URL}/api/getSingleDepartment", "department_name");
-      if (teamLead) fetchDataAndUpdateState(teamLead, "team_lead", "${process.env.REACT_APP_BACKEND_URL}/api/getesingleemployee", "name");
+      if (role)
+        fetchDataAndUpdateState(
+          role,
+          "role",
+          `${process.env.REACT_APP_BACKEND_URL}/api/getSingleRole `,
+          "role"
+        );
+      if (department)
+        fetchDataAndUpdateState(
+          department,
+          "department",
+          `${process.env.REACT_APP_BACKEND_URL}/api/getSingleDepartment`,
+          "department_name"
+        );
+      if (teamLead)
+        fetchDataAndUpdateState(
+          teamLead,
+          "team_lead",
+          `${process.env.REACT_APP_BACKEND_URL}/api/getesingleemployee`,
+          "name"
+        );
 
       // Fetch project names in parallel
       if (projects.length > 0) {
-        const projectNames = await Promise.all(projects.map((id) => fetchDataAndGetValue(id, "${process.env.REACT_APP_BACKEND_URL}/api/getSingleproject", "name")));
+        const projectNames = await Promise.all(
+          projects.map((id) =>
+            fetchDataAndGetValue(
+              id,
+              "${process.env.REACT_APP_BACKEND_URL}/api/getSingleproject",
+              "name"
+            )
+          )
+        );
         setEmployeeDetail((prevState) => ({
           ...prevState,
           projects_assigned: projectNames.filter((name) => name),
@@ -206,10 +239,13 @@ const ShowEmployee = () => {
                   <p className="text-gray-700">
                     {employeeDetail?.designation || "NA"}
                   </p>
-                  <IoMdDownload className="mt-4 text-2xl cursor-pointer" onClick={handleDocumentView}/>
+                  <IoMdDownload
+                    className="mt-4 text-2xl cursor-pointer"
+                    onClick={handleDocumentView}
+                  />
                 </div>
                 <hr className="my-6 border-t border-gray-300" />
-               <div className="flex flex-col">
+                <div className="flex flex-col">
                   <span className="text-gray-700 uppercase font-bold tracking-wider mb-2">
                     Projects assigned
                   </span>
@@ -300,17 +336,19 @@ const ShowEmployee = () => {
                         <div>{employeeDetail?.hobbies || "NA"}</div>
                       </div>
                     </div>
-                    </div>
-                    <div className=" mx-10 ">
+                  </div>
+                  <div className=" mx-10 ">
                     <div className=" text-lg flex flex-wrap">
-                    <div className="font-bold">Current Address: </div> {employeeDetail?.current_address || "NA"} 
+                      <div className="font-bold">Current Address: </div>{" "}
+                      {employeeDetail?.current_address || "NA"}
                     </div>
-                    </div>
-                    <div className=" mx-10 my-2">
+                  </div>
+                  <div className=" mx-10 my-2">
                     <div className=" text-lg flex flex-wrap">
-                    <div className="font-bold">Permanent Address: </div> {employeeDetail?.permanent_address || "NA"} 
+                      <div className="font-bold">Permanent Address: </div>{" "}
+                      {employeeDetail?.permanent_address || "NA"}
                     </div>
-                    </div>
+                  </div>
                 </div>
                 <div>
                   <h3 className="font-semibold text-center mt-3 text-xl">
@@ -378,23 +416,34 @@ const ShowEmployee = () => {
                     <div>
                       <div className="flex gap-1 flex-wrap my-3 text-lg">
                         <div className="font-bold">Account holder Name: </div>
-                        <div>{employeeDetail?.bank_details?.acc_holder_name || "NA"}</div>
+                        <div>
+                          {employeeDetail?.bank_details?.acc_holder_name ||
+                            "NA"}
+                        </div>
                       </div>
                       <div className="flex gap-1 flex-wrap my-3 text-lg">
                         <div className="font-bold">Account Number: </div>
-                        <div>{employeeDetail?.bank_details?.acc_no || "NA"}</div>
+                        <div>
+                          {employeeDetail?.bank_details?.acc_no || "NA"}
+                        </div>
                       </div>
                       <div className="flex gap-1 flex-wrap my-3 text-lg">
                         <div className="font-bold">IFSC code: </div>
-                        <div>{employeeDetail?.bank_details?.ifsc_code || "NA"}</div>
+                        <div>
+                          {employeeDetail?.bank_details?.ifsc_code || "NA"}
+                        </div>
                       </div>
                       <div className="flex gap-1 flex-wrap my-3 text-lg">
                         <div className="font-bold">Bank name: </div>
-                        <div>{employeeDetail?.bank_details?.bank_name || "NA "}</div>
+                        <div>
+                          {employeeDetail?.bank_details?.bank_name || "NA "}
+                        </div>
                       </div>
                       <div className="flex gap-1 flex-wrap my-3 text-lg">
                         <div className="font-bold">Bank Branch: </div>
-                        <div>{employeeDetail?.bank_details?.branch || "NA "}</div>
+                        <div>
+                          {employeeDetail?.bank_details?.branch || "NA "}
+                        </div>
                       </div>
                     </div>
                   </div>
