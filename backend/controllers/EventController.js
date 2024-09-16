@@ -84,11 +84,38 @@ const deleteevent = async(req, res) => {
         res.status(500).json({ success: false, message: "error fetching holiday" });
     }
 }
+
+const geteventnotification = async (req, res) => { 
+    try {
+        // Set 'today' to the start of the day
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Set time to 00:00:00.000
+        
+        // Fetch all events
+        const allEvents = await Event.find({ deleted_at: null })
+            .sort({ createdAt: -1 });
+        
+        // Filter events to include those starting from today
+        const filteredEvents = allEvents.filter(event => new Date(event.date) >= today);
+        
+        const count = filteredEvents.length;    
+        res.status(200).json({ success: true, result: filteredEvents, count });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Error fetching events",
+            error: error.message,
+        });
+    }
+};
+
+
 module.exports={
     getAllevent,
     insertevent,
     getSingleevent,
     deleteevent,
-    updateevent
+    updateevent,
+    geteventnotification
 
 }

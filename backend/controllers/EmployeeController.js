@@ -695,6 +695,103 @@ const deleteEmployeePhoto = async (req, res) => {
       });
   }
 };
+
+const getemployeenotification = async (req, res) => {
+  try {
+    const today = new Date();
+    const threeDaysLater = new Date();
+    threeDaysLater.setDate(today.getDate() + 3); // 3 days from today
+
+    // Fetch all employees
+    const allEmployees = await Employee.find({ deleted_at: null }).sort({ createdAt: -1 });
+
+    // Array to hold upcoming events
+    const upcomingEvents = [];
+
+    allEmployees.forEach((employee) => {
+      // Get birthdate, marriage anniversary, and joining date
+      const { date_of_birth, marriage_anniversary, joining_date } = employee;
+     // Birthdays
+     const currentYear = today.getFullYear();
+     const currentMonth = today.getMonth(); // 0-based month
+     const currentDay = today.getDate();
+     if (date_of_birth) {
+      // Get the birthdate of the employee but set it to the current year
+      const employeeBirthDate = new Date(date_of_birth);
+      const birthdateThisYear = new Date(currentYear, employeeBirthDate.getMonth(), employeeBirthDate.getDate());
+    
+    
+      const adjustedBirthdateThisYear = new Date(birthdateThisYear);
+      adjustedBirthdateThisYear.setDate(adjustedBirthdateThisYear.getDate() + 1);
+
+      if (adjustedBirthdateThisYear > today && adjustedBirthdateThisYear <= threeDaysLater) {
+        // Add this event to upcoming events if the birthday is coming up
+        upcomingEvents.push({
+          type: "Birthday",
+          employee_name: employee.name,
+          eventDate: birthdateThisYear.toLocaleDateString('en-GB'), // Format in dd-mm-yyyy
+        });
+        // Optional: For debugging, log the employee name
+      
+      }
+    }
+       
+
+      //Marriage Anniversaries
+      if (marriage_anniversary) {
+        const employeeMAnniversryDate = new Date(marriage_anniversary);
+        const anniversaryThisYear = new Date(currentYear, employeeMAnniversryDate.getMonth(), employeeMAnniversryDate.getDate());
+       
+        const adjustedMhisYear = new Date(anniversaryThisYear);
+        adjustedMhisYear.setDate(adjustedMhisYear.getDate() + 1);
+
+         if (adjustedMhisYear > today && adjustedMhisYear <= threeDaysLater) {
+          upcomingEvents.push({
+            type: "Marriage Anniversary",
+            employee_name: employee.name,
+            eventDate: anniversaryThisYear.toLocaleDateString('en-GB'),
+          });
+        }
+      }
+      // console.log(upcomingEvents);
+      // Work Anniversary
+      if (joining_date) {
+        const employeeWAnniversryDate = new Date(joining_date);
+        const workAnniversary = new Date(currentYear, employeeWAnniversryDate.getMonth(), employeeWAnniversryDate.getDate());
+        const adjustedwhisYear = new Date(workAnniversary);
+        adjustedwhisYear.setDate(adjustedwhisYear.getDate() + 1);
+       // const workAnniversary = new Date(today.getFullYear(), new Date(joining_date).getMonth(), new Date(joining_date).getDate());
+        if (adjustedwhisYear > today && adjustedwhisYear <= threeDaysLater) {
+          upcomingEvents.push({
+            type: "Work Anniversary",
+            employee_name: employee.name,
+            eventDate: workAnniversary.toLocaleDateString('en-GB'),
+          });
+        }
+      }
+      // //   // Probation Period (3 months from joining date)
+        // const probationPeriodEnd = new Date(joining_date);
+        // probationPeriodEnd.setMonth(probationPeriodEnd.getMonth() + 3); // Add 3 months to joining date
+        // if (probationPeriodEnd >= today && probationPeriodEnd <= threeDaysLater) {
+        //   upcomingEvents.push({
+        //     type: "Probation Period Ending",
+        //     employee_name: employee.name,
+        //     eventDate: probationPeriodEnd.toLocaleDateString('en-GB'),
+        //   });
+        // }
+      
+    });
+
+    const count = upcomingEvents.length;
+    res.status(200).json({ success: true, result: upcomingEvents, count });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching events",
+      error: error.message,
+    });
+  }
+};
 module.exports = {
   insertEmployee,
   getAllEmployees,
@@ -709,4 +806,5 @@ module.exports = {
   resetPassword,
   deleteEmployeePhoto,
   loginmobile,
+  getemployeenotification
 };

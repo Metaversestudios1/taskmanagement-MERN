@@ -24,12 +24,78 @@ const Navbar = ({ toggleSideBar }) => {
 
   const [emp_id, setEmpId] = useState(userInfo?.id);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications] = useState([
-    "New Activity Added",
-    "Your meeting confirmed",
-    "Meeting at 3 PM",
-  ]);
+  const [notifications,setnotification] = useState('');
+  const [notificationCount, setNotificationCount] = useState(0);
+  const fetchnotification = async () => {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getleavenotification`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+    const response = await res.json();
+    
+    let newNotifications = [];
+    if (response.success && Array.isArray(response.result) && response.result.length > 0) {
+      newNotifications = response.result.map((notification) => ({
+        message: `Leave Request: ${notification.employeeName || '-'}`,
+        link: `/leaverequests` // Example link
+      }));
+    }
+    
+    const activityRes = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/geteventnotification`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+    const activityResponse = await activityRes.json();  
+    let activityNotifications = [];
+  
+    if (activityResponse.success && Array.isArray(activityResponse.result) && activityResponse.result.length > 0) {
+      activityNotifications = activityResponse.result.map((activity) => ({
+        message: `Activity: ${activity.title || '-'}`,
+        link: `/activity` // Example link
+      }));
+    }
+    
+    const holidayres = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getholidaynotification`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+    
+    const holidayresponse = await holidayres.json();
+    let holidaynotifications = [];
+    if (holidayresponse.success && Array.isArray(holidayresponse.result) && holidayresponse.result.length > 0) {
+      holidaynotifications = holidayresponse.result.map((holiday) => ({
+        message: `Holiday: ${holiday.reason || '-'}`,
+        link: `/holiday` // Example link
+      }));
+    }
+    
 
+    const employeedayres = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getemployeenotification`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+    
+    const employeedayresponse = await employeedayres.json();
+    let employeenotifications = [];
+    if (employeedayresponse.success && Array.isArray(employeedayresponse.result) && employeedayresponse.result.length > 0) {
+      employeenotifications = employeedayresponse.result.map((employee) => ({
+        message: `${employee.type || '-'} :  ${employee.employee_name || '-'}- ${employee.eventDate || '-'}`,
+        link: `/employees` // Example link
+      }));
+    }
+    
+    // Update the state with the new notifications
+    const allNotifications = [
+      ...newNotifications,
+      ...activityNotifications,
+      ...holidaynotifications,
+      ...employeenotifications,
+    ];
+
+    setnotification(allNotifications);
+    setNotificationCount(allNotifications.length);
+  };
+  
   const handleButtonClick = () => {
     //alert('ok')
     setShowNotifications(!showNotifications);
@@ -54,6 +120,7 @@ const Navbar = ({ toggleSideBar }) => {
   }
   useEffect(() => {
     fetchCheckInRecord();
+    fetchnotification();
   }, []);
   const currentDate = () => {
     const currentDate = new Date();
@@ -330,9 +397,13 @@ const Navbar = ({ toggleSideBar }) => {
                 </svg>
               </button>
 
-              <span className={`absolute top-[10px] right-1 inline-flex  items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-red transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full`}>
-                3
-              </span>
+              {notificationCount > 0 && (
+          <span
+            className="absolute top-[10px] right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-red transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full"
+          >
+            {notificationCount}
+          </span>
+        )}
             </div>
             {!token ? (
               <NavLink
@@ -371,25 +442,30 @@ const Navbar = ({ toggleSideBar }) => {
           </div>
         </div>
         {showNotifications && (
-          <div
-            className="absolute top-[50px] right-40 w-64 p-4 bg-white border border-gray-300 rounded-lg shadow-lg"
-            // style={{ background: "red", zIndex: 1111 }}
+  <div
+    className="absolute top-[50px] right-40 w-64 p-4 bg-white border border-gray-300 rounded-lg shadow-lg"
+  >
+    <button
+      onClick={handleClose}
+      className="absolute top-0 right-0 mt-2 mr-2 text-black p-1 hover:bg-gray-800"
+    >
+      &times;
+    </button>
+    <ul>
+      {notifications.map((notification, index) => (
+        <li key={index} className="mb-2">
+          <a
+            href={notification.link}
+            className="text-blue-500 hover:underline"
           >
-            <button
-              onClick={handleClose}
-              className="absolute top-0 right-0 mt-2 mr-2 text-black p-1 hover:bg-gray-800"
-            >
-              &times;
-            </button>
-            <ul>
-              {notifications.map((notification, index) => (
-                <li key={index} className="mb-2">
-                  {notification}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+            {notification.message}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
+
       </nav>
     </header>
   );

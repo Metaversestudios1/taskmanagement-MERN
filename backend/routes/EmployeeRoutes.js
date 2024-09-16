@@ -38,5 +38,6 @@ router.post('/verifyOtp', verifyOtp);
 router.post('/deleteEmployeePhoto',deleteEmployeePhoto);
 router.post('/sendotp', sendotp);
 router.post('/loginmobile', loginmobile);
+router.post('/getemployeenotification', getemployeenotification);
 
 module.exports = router;

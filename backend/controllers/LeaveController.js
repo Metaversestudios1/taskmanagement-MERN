@@ -1,8 +1,35 @@
 const Leave = require("../models/Leave");
+const Employee = require("../models/Employee");
 const GlobalLeave = require("../models/GlobalLeave");
+const { sendEmail } = require('../utils/mailer');
 
 const insertleave = async (req, res) => {
   try {
+   
+   const  {Emp_id} = req.body
+
+   const employee = Employee.findOne({_id:Emp_id});
+   if (!employee) {
+    res.status(404).json({ success: false, message: "employee not found" });
+  }
+   const lead_id = employee.team_lead;
+   const lead = Employee.findOne({_id:lead_id});
+   if (!lead) {
+    res.status(404).json({ success: false, message: "lead not found" });
+  }
+  // console.log(employee.name);
+   const lead_email = lead.company_email;
+   const leaveFrom = new Date(req.body.leave_from).toLocaleDateString('en-GB'); // Converts to dd-mm-yyyy
+   const leaveTo = new Date(req.body.leave_to).toLocaleDateString('en-GB');     // Converts to dd-mm-yyyy
+  
+   await sendEmail(
+    lead_email, // Recipient email address
+    'Leave Request', // Email subject
+    `<p>Dear Manager</p><p>A new leave request has been submitted by <strong>${employee.name}</strong>..</p><p><strong>From Date:</strong> ${leaveFrom}</p><p><strong>To Date:</strong> ${leaveTo}</p><p><strong>Reason:</strong> ${req.body.reason}</p><p>Please review and respond to the request accordingly.</p><p>Thank you<br/></p>`
+  );
+ 
+
+    // console.log(employee)
     const newleave = new Leave(req.body);
     await newleave.save();
     res.status(201).json({ success: true });
@@ -163,6 +190,82 @@ const getGlobalLeaveData = async (req, res) => {
   }
   res.status(200).json({ success: true, result });
 };
+
+// const getleavenotification = async(req,res)=>{
+//   try {
+//     const query = {
+//       deleted_at: null,
+//       status:'pending'
+//     };
+
+//     const leaves = await Leave.find(query)
+//       .sort({ createdAt: -1 })
+
+//     const  empID = result.map(leave =>leave.Emp_id);
+//     const employee = await Employee.find({_id:{ $in:empID}})
+//     const employeemap = employee.reduce((map,employee)=>{
+//       map[employee.emp_id] =employee.name
+//       return map;
+//     },{})
+//       // Add employee names to leave documents
+//       const result = leaves.map(leave => ({
+//         ...leave.toObject(),
+//         employeeName: employeeMap[leave.emp_id] || 'Unknown'
+//       }));
+  
+//       const count = leaves.length;
+//     const count = await Leave.find(query).countDocuments();
+
+//     res
+//       .status(200)
+//       .json({ success: true, result,  count});
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       message: "error fetching leave",
+//       error: error.message,
+//     });
+//   }
+// }
+const getleavenotification = async (req, res) => {
+  try {
+    const query = {
+      deleted_at: null,
+      status: 'pending'
+    };
+
+    // Fetch leave documents
+    const leaves = await Leave.find(query).sort({ createdAt: -1 });
+
+    // Extract emp_ids from leave documents
+    const empIds = leaves.map(leave => leave.emp_id);
+    
+    // Fetch employee details for the extracted emp_ids
+    const employees = await Employee.find({ _id: { $in: empIds } });
+  
+    // Create a map for employee data by emp_id
+    const employeeMap = employees.reduce((map, employee) => {
+      map[employee._id] = employee.name;
+      return map;
+    }, {});
+
+    // Add employee names to leave documents
+    const result = leaves.map(leave => ({
+      ...leave.toObject(),
+      employeeName: employeeMap[leave.emp_id] || 'Unknown'
+    }));
+    const count = leaves.length;
+
+    res.status(200).json({ success: true, result, count });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching leave",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   insertleave,
   updateleave,
@@ -172,4 +275,5 @@ module.exports = {
   updateLeaveStatus,
   updateGlobalLeaveSetting,
   getGlobalLeaveData,
+  getleavenotification,
 };
